@@ -117,7 +117,65 @@ audit_log           alle beheerhandelingen
 - Elke maand (of elke twee weken) worden alle voltooide boekingen opgeteld tegen de afgesproken inkoopprijs.
 - De salon ziet in het portaal een overzicht en de factuur. Beheer (finance) keurt goed en betaalt uit.
 
-## 6. Bouwvolgorde
+## 6. Functies per omgeving (inclusief extra ideeën)
+
+✦ = extra idee bovenop het oorspronkelijke concept
+
+### Leden-app
+| Functie | Waarom |
+|---|---|
+| Membership afsluiten, pauzeren (bijv. vakantie) en opzeggen | Pauzeren ✦ voorkomt opzeggingen: wie een maand weg is, pauzeert in plaats van op te zeggen |
+| Credits-overzicht met "wat kan ik nog boeken?" | Laat de waarde van het membership elke maand zien |
+| Zoeken op behandeling, wijk, datum en beoordeling + kaart | Kernfunctie |
+| Favoriete salons en stylisten ✦ | Vaste stylist = tevreden lid = minder opzeggingen |
+| Slim opnieuw boeken ✦ | "Je BIAB is 3 weken oud. Zelfde salon, zelfde tijd?" Eén tik, en voorspelbare vraag voor salons. |
+| Last-minute plekken ✦ | Vrije plekken van vandaag goedkoper in credits: vult lege uren voor salons |
+| Digitale ledenpas in Apple/Google Wallet ✦ | Met QR-code voor het inchecken in de salon. Voelt premium en is te gebruiken tegen misbruik. |
+| Credits bijkopen of een ander niveau kiezen ✦ | Extra omzet zonder korting |
+| Beoordelen na elke afspraak (kort, met sterren) | Kwaliteitscontrole van salons |
+| Verwijzen: "Nodig een vriendin uit" ✦ | Beide krijgen bonuscredits. De goedkoopste groei. |
+| Membership cadeau geven ✦ | Verjaardagen, Moederdag, december: sterke verkoopmomenten |
+| Founding member-status en ledenevents ✦ | Exclusiviteit en community, goed voor TikTok-content |
+
+### Salonportaal
+| Functie | Waarom |
+|---|---|
+| Dashboard: boekingen, gevulde uren en verdiensten deze maand | Laat de salon direct de waarde van BeautyPass zien |
+| Beschikbaarheid instellen, met aparte "BeautyPass-uren" ✦ | Salons geven vooral rustige uren vrij, en daardoor ook betere inkoopprijzen |
+| Inchecken door de QR-code van het lid te scannen ✦ | Bewijs dat de afspraak plaatsvond: basis voor uitbetaling, en tegen no-shows en misbruik |
+| No-show melden | Lid verliest de credits, salon krijgt (deels) betaald |
+| Medewerkers met eigen login en rechten | Eigenaar beheert, medewerker ziet alleen de agenda |
+| Automatische uitbetalingsoverzichten en facturen (self-billing) ✦ | BeautyPass maakt de factuur namens de salon. Geen administratie voor de salon. |
+| Inzicht in beoordelingen en feedback | Kwaliteit verbeteren |
+| Later: koppeling met Salonized / Treatwell-agenda | Geen dubbele agenda's |
+| Later: extra zichtbaarheid kopen ✦ | Extra inkomstenbron voor het platform |
+
+### Beheer
+| Functie | Waarom |
+|---|---|
+| Wachtlijst: aantallen per kanaal (TikTok, Instagram, creators), export | Marketing sturen |
+| Lanceringsrondes ("drops"): plekken, startmoment, voorrang, automatisch sluiten | Het lanceringsmechanisme uit het concept |
+| Salon-pipeline (CRM) ✦: lead → gesprek → proefbezoek → contract → actief | Salons werven is het moeilijkste deel, dus houd het bij als een verkoopproces |
+| Vraag- en aanbodkaart ✦: wachtlijst en boekingen per wijk en behandeling, afgezet tegen capaciteit | Laat zien waar je salons moet werven en wanneer er plek is voor een nieuwe ronde |
+| **Economie-dashboard ✦**: kosten per lid, gebruik per lid, marge per niveau, opzeggingen | **Het belangrijkste scherm**: laat elke week zien of het model klopt |
+| Kwaliteitscontrole ✦: salons met dalende scores, klachten, mystery visits | Eén slechte salon schaadt het hele merk |
+| Misbruiksignalen ✦: veel no-shows, pas gedeeld met anderen | Beschermt de marge |
+| Credits en tarieven per behandeling en salon instellen | Prijzen bijsturen zonder nieuwe code |
+| Support: lid of salon opzoeken, boeking aanpassen, credits corrigeren (met reden) | Klantenservice |
+| Uitbetalingen goedkeuren, audit-log | Financiële controle |
+
+## 7. Risico's die het platform moet opvangen
+
+| Risico | Hoe we het opvangen |
+|---|---|
+| **Marge**: leden gebruiken alles, inkoop is te duur | Credits per behandeling, vaste inkoopprijzen, BeautyPass-uren, economie-dashboard vanaf dag 1 |
+| **Omzeilen**: salon en lid spreken buiten het platform af | Salon krijgt geen contactgegevens. Het lid heeft voordeel van variatie en van het vaste bedrag. Afspraak in het salon-contract. |
+| **Pas delen** met vriendinnen | QR-check-in, naam en profielfoto in de app, misbruiksignalen |
+| **Kwaliteit** wisselt per salon | Selectie vooraf, beoordelingen, kwaliteitsscores, salons pauzeren |
+| **Capaciteit** op piekmomenten (vrijdag, zaterdag) | Credits laten variëren per tijdstip, last-minute plekken, nieuwe rondes pas openen bij genoeg capaciteit |
+| **Juridisch**: abonnementsrecht, btw, AVG | Online opzeggen, duidelijke voorwaarden, btw-advies over de constructie, privacyverklaring, verwerkersovereenkomsten |
+
+## 8. Bouwvolgorde
 
 | Fase | Wat | Doel |
 |---|---|---|
@@ -130,7 +188,7 @@ audit_log           alle beheerhandelingen
 
 > Tip: tijdens fase 2 kan het boeken eerst nog handmatig door het team via beheer gebeuren. Zo kun je eerder lanceren en leer je wat salons en leden echt nodig hebben voordat het salonportaal af is.
 
-## 7. Open beslissingen
+## 9. Open beslissingen
 
 1. Credits per behandeling en de membership-niveaus (prijs per maand)
 2. Regels voor annuleren en no-shows (bijvoorbeeld kosteloos tot 24 uur vooraf)
@@ -138,3 +196,4 @@ audit_log           alle beheerhandelingen
 4. Uitbetaling aan salons per twee weken of per maand?
 5. Boeken in realtime via de eigen agenda van de salon (koppeling met Salonized of Treatwell), of via beschikbaarheid in ons portaal? Advies: eerst ons eigen portaal, koppelingen later.
 6. Domeinnaam: is `beautypass.nl` beschikbaar?
+7. Merknaam: controleer "BeautyPass" in de merkenregisters van BOIP (Benelux) en EUIPO (EU) en leg de naam vast voordat je groot gaat adverteren.
