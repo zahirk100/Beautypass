@@ -287,9 +287,10 @@
   </footer>
 
 <script>
-  // Set this to a form endpoint (e.g. Brevo, Supabase or your own API) to collect sign-ups.
-  // Left empty, submissions are kept in this browser only (demo mode).
-  const WAITLIST_ENDPOINT = "";
+  // Sign-ups go to the Supabase "waitlist" table (insert-only for visitors, see supabase/migrations).
+  // The anon/publishable key is meant to be public; access is enforced by row level security.
+  const SUPABASE_URL = "https://vvgfdhwzfsevtxshhlqt.supabase.co";
+  const SUPABASE_ANON_KEY = "";
 
   // Card follows the pointer (desktop only)
   const card = document.getElementById("card");
@@ -326,23 +327,31 @@
 
     const params = new URLSearchParams(location.search);
     const payload = {
-      name, email,
-      phone: (data.get("phone") || "").trim(),
-      source: params.get("utm_source") || document.referrer || "direct",
-      campaign: params.get("utm_campaign") || "",
-      created_at: new Date().toISOString()
+      name: name.slice(0, 100),
+      email: email.toLowerCase(),
+      phone: (data.get("phone") || "").trim().slice(0, 30) || null,
+      consent: true,
+      source: (params.get("utm_source") || document.referrer || "direct").slice(0, 500),
+      campaign: (params.get("utm_campaign") || "").slice(0, 200) || null
     };
 
     submitBtn.disabled = true;
     submitLabel.textContent = "Even geduld…";
     try {
-      if (WAITLIST_ENDPOINT) {
-        const res = await fetch(WAITLIST_ENDPOINT, {
+      if (SUPABASE_ANON_KEY) {
+        const res = await fetch(`${SUPABASE_URL}/rest/v1/waitlist`, {
           method: "POST",
-          headers: { "Content-Type": "application/json", "Accept": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            "apikey": SUPABASE_ANON_KEY,
+            // Legacy anon keys are JWTs and also go in Authorization; new sb_publishable_ keys only need apikey
+            ...(SUPABASE_ANON_KEY.startsWith("eyJ") ? { "Authorization": `Bearer ${SUPABASE_ANON_KEY}` } : {}),
+            "Prefer": "return=minimal"
+          },
           body: JSON.stringify(payload)
         });
-        if (!res.ok) throw new Error("bad status");
+        // 409 = e-mail already on the list: treat as success
+        if (!res.ok && res.status !== 409) throw new Error("bad status " + res.status);
       } else {
         try {
           const list = JSON.parse(localStorage.getItem("beautypass_waitlist") || "[]");
