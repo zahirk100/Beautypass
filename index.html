@@ -1,0 +1,475 @@
+<!doctype html>
+<html lang="nl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>BeautyPass Amsterdam</title>
+  <meta name="description" content="Eén membership voor je complete maandelijkse beautyroutine bij de beste salons van Amsterdam. Meld je aan voor early access.">
+  <meta property="og:title" content="BeautyPass Amsterdam: early access">
+  <meta property="og:description" content="Nagels, pedicure, blowout en brows of lashes. Eén membership, de beste salons van Amsterdam.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,700;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --pink-50: #fff5f8;
+      --pink-100: #ffe6ee;
+      --pink-200: #ffcadb;
+      --pink-400: #f58bb0;
+      --pink-500: #e8628f;
+      --pink-700: #b63a66;
+      --ink: #2b1a22;
+      --muted: #7a6470;
+      --white: #ffffff;
+      --radius: 22px;
+      --shadow: 0 18px 50px -20px rgba(182, 58, 102, .35);
+    }
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: "Inter", system-ui, sans-serif;
+      color: var(--ink);
+      background: var(--white);
+      line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+    }
+    h1, h2, h3 { font-family: "Playfair Display", Georgia, serif; line-height: 1.15; margin: 0 0 .5em; }
+    h1 { font-size: clamp(2.4rem, 6vw, 4.2rem); }
+    h2 { font-size: clamp(1.8rem, 4vw, 2.6rem); }
+    h3 { font-size: 1.3rem; }
+    p { margin: 0 0 1em; }
+    a { color: var(--pink-700); }
+    .wrap { max-width: 1120px; margin: 0 auto; padding: 0 20px; }
+    .eyebrow {
+      display: inline-block; font-size: .78rem; font-weight: 600; letter-spacing: .14em;
+      text-transform: uppercase; color: var(--pink-700); background: var(--pink-100);
+      padding: 6px 14px; border-radius: 999px; margin-bottom: 18px;
+    }
+    .btn {
+      display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+      background: var(--pink-500); color: var(--white); border: 0; cursor: pointer;
+      font: 600 1rem "Inter", sans-serif; padding: 16px 30px; border-radius: 999px;
+      text-decoration: none; box-shadow: var(--shadow); transition: transform .15s, background .15s;
+    }
+    .btn:hover { background: var(--pink-700); transform: translateY(-1px); }
+    .btn:disabled { opacity: .6; cursor: wait; transform: none; }
+    .btn-ghost { background: var(--white); color: var(--pink-700); box-shadow: none; border: 1.5px solid var(--pink-200); }
+    .btn-ghost:hover { background: var(--pink-50); }
+
+    /* Nav */
+    nav { position: sticky; top: 0; z-index: 10; background: rgba(255,255,255,.88); backdrop-filter: blur(10px); border-bottom: 1px solid var(--pink-100); }
+    nav .wrap { display: flex; align-items: center; justify-content: space-between; height: 68px; }
+    .logo { font-family: "Playfair Display", serif; font-weight: 700; font-size: 1.5rem; color: var(--ink); text-decoration: none; }
+    .logo span { color: var(--pink-500); font-style: italic; }
+    nav .btn { padding: 10px 20px; font-size: .9rem; }
+
+    /* Hero */
+    .hero { background: radial-gradient(circle at 85% 10%, var(--pink-200), transparent 45%), linear-gradient(180deg, var(--pink-50), var(--white)); padding: 80px 0 90px; overflow: hidden; }
+    .hero .wrap { display: grid; grid-template-columns: 1.1fr .9fr; gap: 48px; align-items: center; }
+    .hero h1 em { color: var(--pink-500); }
+    .lead { font-size: 1.15rem; color: var(--muted); max-width: 520px; }
+    .hero-cta { display: flex; flex-wrap: wrap; gap: 12px; margin: 28px 0 18px; }
+    .spots { font-size: .92rem; color: var(--muted); }
+    .spots strong { color: var(--pink-700); }
+    .pass {
+      position: relative; aspect-ratio: 1.58; border-radius: 28px; padding: 30px;
+      background: linear-gradient(135deg, var(--pink-400), var(--pink-500) 55%, var(--pink-700));
+      color: var(--white); box-shadow: 0 40px 80px -30px rgba(182,58,102,.6);
+      transform: rotate(-4deg); display: flex; flex-direction: column; justify-content: space-between;
+    }
+    .pass::after { content: ""; position: absolute; inset: 0; border-radius: inherit; background: linear-gradient(120deg, rgba(255,255,255,.35), transparent 40%); pointer-events: none; }
+    .pass .pass-top { display: flex; justify-content: space-between; font-size: .8rem; letter-spacing: .16em; text-transform: uppercase; opacity: .9; }
+    .pass .pass-name { font-family: "Playfair Display", serif; font-size: 2.2rem; font-weight: 700; }
+    .pass .pass-name i { font-weight: 500; }
+    .pass .pass-icons { display: flex; gap: 10px; flex-wrap: wrap; }
+    .pass .pass-icons span { background: rgba(255,255,255,.22); padding: 6px 12px; border-radius: 999px; font-size: .82rem; }
+
+    section { padding: 90px 0; }
+    .center { text-align: center; max-width: 680px; margin: 0 auto 48px; }
+    .center p { color: var(--muted); }
+
+    /* Treatments */
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+    .card { background: var(--white); border: 1px solid var(--pink-100); border-radius: var(--radius); padding: 28px; transition: transform .2s, box-shadow .2s; }
+    .card:hover { transform: translateY(-4px); box-shadow: var(--shadow); }
+    .icon { width: 52px; height: 52px; border-radius: 16px; background: var(--pink-100); display: grid; place-items: center; font-size: 1.5rem; margin-bottom: 18px; }
+    .card p { color: var(--muted); font-size: .95rem; margin: 0; }
+
+    /* Steps */
+    .soft { background: var(--pink-50); }
+    .steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; counter-reset: step; }
+    .step { position: relative; padding-top: 56px; }
+    .step::before {
+      counter-increment: step; content: counter(step);
+      position: absolute; top: 0; left: 0; width: 42px; height: 42px; border-radius: 50%;
+      background: var(--pink-500); color: var(--white); display: grid; place-items: center;
+      font-family: "Playfair Display", serif; font-weight: 700; font-size: 1.2rem;
+    }
+    .step p { color: var(--muted); }
+
+    /* Tiers */
+    .tiers { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; align-items: stretch; }
+    .tier { border: 1px solid var(--pink-100); border-radius: var(--radius); padding: 32px 28px; display: flex; flex-direction: column; background: var(--white); }
+    .tier.featured { background: linear-gradient(180deg, var(--pink-50), var(--white)); border: 2px solid var(--pink-400); position: relative; }
+    .tier.featured .badge { position: absolute; top: -13px; left: 28px; background: var(--pink-500); color: var(--white); font-size: .75rem; font-weight: 600; padding: 4px 12px; border-radius: 999px; letter-spacing: .05em; }
+    .tier ul { list-style: none; padding: 0; margin: 14px 0 24px; flex: 1; }
+    .tier li { padding: 7px 0 7px 28px; position: relative; color: var(--muted); }
+    .tier li::before { content: "✓"; position: absolute; left: 0; color: var(--pink-500); font-weight: 700; }
+    .price { font-size: .95rem; color: var(--pink-700); font-weight: 600; }
+    .note { text-align: center; color: var(--muted); font-size: .9rem; margin-top: 26px; }
+
+    /* Waitlist */
+    .waitlist { background: linear-gradient(135deg, var(--pink-500), var(--pink-700)); color: var(--white); border-radius: 36px; padding: 64px 56px; display: grid; grid-template-columns: .9fr 1.1fr; gap: 48px; }
+    .waitlist h2 { color: var(--white); }
+    .waitlist .perks { list-style: none; padding: 0; margin: 24px 0 0; }
+    .waitlist .perks li { padding: 8px 0 8px 32px; position: relative; }
+    .waitlist .perks li::before { content: "♡"; position: absolute; left: 0; font-size: 1.1rem; }
+    form { background: var(--white); color: var(--ink); border-radius: var(--radius); padding: 30px; }
+    .field { margin-bottom: 16px; }
+    label { display: block; font-size: .88rem; font-weight: 600; margin-bottom: 6px; }
+    label .opt { color: var(--muted); font-weight: 400; }
+    input[type=text], input[type=email], input[type=tel], select {
+      width: 100%; font: 400 1rem "Inter", sans-serif; padding: 13px 16px; border-radius: 14px;
+      border: 1.5px solid var(--pink-100); background: var(--pink-50); color: var(--ink); outline: none; transition: border-color .15s;
+    }
+    input:focus, select:focus { border-color: var(--pink-400); background: var(--white); }
+    .row { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+    .chip input { position: absolute; opacity: 0; pointer-events: none; }
+    .chip span { display: inline-block; padding: 8px 14px; border-radius: 999px; border: 1.5px solid var(--pink-100); font-size: .88rem; cursor: pointer; user-select: none; transition: all .15s; }
+    .chip input:checked + span { background: var(--pink-500); border-color: var(--pink-500); color: var(--white); }
+    .chip input:focus-visible + span { outline: 2px solid var(--pink-700); outline-offset: 2px; }
+    .check { display: flex; gap: 10px; align-items: flex-start; font-size: .85rem; color: var(--muted); font-weight: 400; margin-bottom: 10px; }
+    .check input { margin-top: 4px; accent-color: var(--pink-500); }
+    form .btn { width: 100%; margin-top: 8px; }
+    .error { color: #c0264f; font-size: .88rem; margin-top: 10px; min-height: 1.2em; }
+    .success { display: none; text-align: center; padding: 30px 10px; }
+    .success .big { font-size: 3rem; }
+    .hp { position: absolute; left: -9999px; }
+
+    /* Salons */
+    .salon { display: grid; grid-template-columns: 1fr 1fr; gap: 48px; align-items: center; }
+    .salon-box { background: var(--pink-50); border-radius: var(--radius); padding: 36px; }
+    .salon-box ul { padding-left: 20px; color: var(--muted); }
+
+    /* FAQ */
+    .faq { max-width: 760px; margin: 0 auto; }
+    details { border-bottom: 1px solid var(--pink-100); padding: 20px 0; }
+    summary { cursor: pointer; font-weight: 600; font-size: 1.05rem; list-style: none; display: flex; justify-content: space-between; gap: 16px; }
+    summary::-webkit-details-marker { display: none; }
+    summary::after { content: "+"; color: var(--pink-500); font-size: 1.4rem; line-height: 1; }
+    details[open] summary::after { content: "−"; }
+    details p { color: var(--muted); margin: 12px 0 0; }
+
+    footer { padding: 40px 0; border-top: 1px solid var(--pink-100); color: var(--muted); font-size: .9rem; }
+    footer .wrap { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 16px; }
+    footer a { color: var(--muted); text-decoration: none; margin-left: 18px; }
+    footer a:first-child { margin-left: 0; }
+
+    @media (max-width: 900px) {
+      .hero .wrap, .waitlist, .salon { grid-template-columns: 1fr; }
+      .pass { max-width: 420px; margin: 10px auto 0; }
+      .grid-4 { grid-template-columns: repeat(2, 1fr); }
+      .steps, .tiers { grid-template-columns: 1fr; }
+      .waitlist { padding: 44px 24px; border-radius: 28px; }
+    }
+    @media (max-width: 560px) {
+      .wrap { padding: 0 16px; }
+      section { padding: 64px 0; }
+      .hero { padding: 48px 0 64px; }
+      .grid-4, .row { grid-template-columns: 1fr; }
+      form { padding: 22px; }
+      .waitlist { padding: 36px 18px; }
+      nav .btn { padding: 9px 14px; font-size: .82rem; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <a href="#" class="logo">Beauty<span>Pass</span></a>
+    <a href="#aanmelden" class="btn">Early access</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <div class="wrap">
+    <div>
+      <span class="eyebrow">Binnenkort in Amsterdam</span>
+      <h1>Je hele beauty&shy;routine. <em>Eén membership.</em></h1>
+      <p class="lead">Nagels, pedicure, blowout en brows of lashes bij de beste salons van Amsterdam. Eén vast bedrag per maand, boeken in een paar tikken.</p>
+      <div class="hero-cta">
+        <a href="#aanmelden" class="btn">Claim early access</a>
+        <a href="#hoe-het-werkt" class="btn btn-ghost">Hoe werkt het?</a>
+      </div>
+      <p class="spots">De eerste lancering heeft maar <strong>100 founding memberships</strong>. Wie op de lijst staat, krijgt als eerste toegang.</p>
+    </div>
+    <div class="pass" aria-hidden="true">
+      <div class="pass-top"><span>Founding member</span><span>AMS</span></div>
+      <div class="pass-name">Beauty<i>Pass</i></div>
+      <div class="pass-icons"><span>💅 Nails</span><span>🦶 Pedi</span><span>💇‍♀️ Blowout</span><span>✨ Brows</span></div>
+    </div>
+  </div>
+</header>
+
+<section id="behandelingen">
+  <div class="wrap">
+    <div class="center">
+      <span class="eyebrow">Wat zit erin</span>
+      <h2>Alles wat je maandelijks toch al doet</h2>
+      <p>Bij geselecteerde salons door heel Amsterdam. Jij kiest waar en wanneer.</p>
+    </div>
+    <div class="grid-4">
+      <div class="card"><div class="icon">💅</div><h3>Manicure</h3><p>BIAB of gellak, altijd netjes en up to date.</p></div>
+      <div class="card"><div class="icon">🦶</div><h3>Pedicure</h3><p>Een verzorgende pedicure door een vakkundige stylist.</p></div>
+      <div class="card"><div class="icon">💇‍♀️</div><h3>Blowout</h3><p>Wassen en professioneel föhnen. Klaar voor het weekend.</p></div>
+      <div class="card"><div class="icon">✨</div><h3>Naar keuze</h3><p>Brow lamination, lash lift of een andere geselecteerde behandeling.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="hoe-het-werkt" class="soft">
+  <div class="wrap">
+    <div class="center">
+      <span class="eyebrow">Hoe het werkt</span>
+      <h2>Zo simpel als het klinkt</h2>
+    </div>
+    <div class="steps">
+      <div class="step"><h3>Kies je membership</h3><p>Eén vast bedrag per maand. Geen losse rekeningen en geen gedoe bij de kassa.</p></div>
+      <div class="step"><h3>Boek bij jouw salon</h3><p>Kies uit aangesloten salons in Amsterdam en boek je behandeling op een moment dat jou uitkomt.</p></div>
+      <div class="step"><h3>Glow, elke maand</h3><p>Je routine is geregeld. Elke maand staan je behandelingen weer voor je klaar.</p></div>
+    </div>
+  </div>
+</section>
+
+<section id="memberships">
+  <div class="wrap">
+    <div class="center">
+      <span class="eyebrow">Memberships</span>
+      <h2>Kies wat bij jou past</h2>
+      <p>We stellen de memberships samen op basis van wat jij wilt. Geef je voorkeur door bij je aanmelding.</p>
+    </div>
+    <div class="tiers">
+      <div class="tier">
+        <h3>Nails</h3>
+        <p class="price">Prijs volgt bij lancering</p>
+        <ul><li>Manicure (BIAB of gellak)</li><li>Pedicure</li><li>Boeken bij alle nagelsalons</li></ul>
+        <a href="#aanmelden" class="btn btn-ghost" data-tier="nails">Interesse</a>
+      </div>
+      <div class="tier featured">
+        <span class="badge">MEEST GEKOZEN</span>
+        <h3>Glow</h3>
+        <p class="price">Prijs volgt bij lancering</p>
+        <ul><li>Manicure</li><li>Pedicure</li><li>Blowout</li><li>Brows, lashes of andere behandeling</li></ul>
+        <a href="#aanmelden" class="btn" data-tier="glow">Interesse</a>
+      </div>
+      <div class="tier">
+        <h3>All-in</h3>
+        <p class="price">Prijs volgt bij lancering</p>
+        <ul><li>Alles uit Glow</li><li>Extra behandelingen per maand</li><li>Toegang tot premiumbehandelingen</li></ul>
+        <a href="#aanmelden" class="btn btn-ghost" data-tier="all-in">Interesse</a>
+      </div>
+    </div>
+    <p class="note">Early-access leden horen de prijzen als eerste, en de founding members krijgen een speciaal tarief.</p>
+  </div>
+</section>
+
+<section id="aanmelden">
+  <div class="wrap">
+    <div class="waitlist">
+      <div>
+        <span class="eyebrow" style="background:rgba(255,255,255,.2);color:#fff">Early access</span>
+        <h2>Zet jezelf op de lijst</h2>
+        <p>Gratis en vrijblijvend. Je krijgt een persoonlijke link zodra de verkoop opent, en je bent eerder binnen dan de rest.</p>
+        <ul class="perks">
+          <li>Eerder toegang tot de 100 founding memberships</li>
+          <li>Speciaal founding-tarief</li>
+          <li>Als eerste weten welke salons meedoen</li>
+          <li>Geen plek bemachtigd? Dan blijf je automatisch op de wachtlijst</li>
+        </ul>
+      </div>
+
+      <div>
+        <form id="waitlist-form" novalidate>
+          <div class="row">
+            <div class="field">
+              <label for="name">Voornaam</label>
+              <input type="text" id="name" name="name" autocomplete="given-name" required>
+            </div>
+            <div class="field">
+              <label for="email">E-mail</label>
+              <input type="email" id="email" name="email" autocomplete="email" required>
+            </div>
+          </div>
+          <div class="field">
+            <label for="phone">Mobiel <span class="opt">(optioneel, voor een sms zodra de verkoop opent)</span></label>
+            <input type="tel" id="phone" name="phone" autocomplete="tel" placeholder="06 12345678">
+          </div>
+          <div class="row">
+            <div class="field">
+              <label for="tier">Welk membership spreekt je aan?</label>
+              <select id="tier" name="tier">
+                <option value="">Kies…</option>
+                <option value="nails">Nails</option>
+                <option value="glow">Glow</option>
+                <option value="all-in">All-in</option>
+                <option value="weet-niet">Weet ik nog niet</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="budget">Wat zou je per maand willen betalen?</label>
+              <select id="budget" name="budget">
+                <option value="">Kies…</option>
+                <option value="<75">Minder dan €75</option>
+                <option value="75-125">€75 – €125</option>
+                <option value="125-175">€125 – €175</option>
+                <option value="175-225">€175 – €225</option>
+                <option value=">225">Meer dan €225</option>
+              </select>
+            </div>
+          </div>
+          <div class="field">
+            <label>Wat laat je nu al regelmatig doen?</label>
+            <div class="chips">
+              <label class="chip"><input type="checkbox" name="treatments" value="manicure"><span>Manicure</span></label>
+              <label class="chip"><input type="checkbox" name="treatments" value="pedicure"><span>Pedicure</span></label>
+              <label class="chip"><input type="checkbox" name="treatments" value="blowout"><span>Blowout</span></label>
+              <label class="chip"><input type="checkbox" name="treatments" value="brows"><span>Brows</span></label>
+              <label class="chip"><input type="checkbox" name="treatments" value="lashes"><span>Lashes</span></label>
+              <label class="chip"><input type="checkbox" name="treatments" value="facial"><span>Facial</span></label>
+            </div>
+          </div>
+          <div class="field">
+            <label for="area">In welk deel van Amsterdam? <span class="opt">(optioneel)</span></label>
+            <select id="area" name="area">
+              <option value="">Kies…</option>
+              <option>Centrum</option><option>West</option><option>Oud-West</option><option>Zuid</option>
+              <option>Oost</option><option>Noord</option><option>Nieuw-West</option><option>Zuidoost</option>
+              <option>Buiten Amsterdam</option>
+            </select>
+          </div>
+          <input type="text" name="website" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+          <label class="check"><input type="checkbox" id="consent" name="consent" required>Ik wil updates en mijn early-access link ontvangen per e-mail (en sms als ik mijn nummer heb ingevuld). Afmelden kan altijd.</label>
+          <button type="submit" class="btn" id="submit-btn">Zet mij op de lijst</button>
+          <p class="error" id="form-error" role="alert"></p>
+        </form>
+        <div class="success" id="success" style="background:#fff;color:var(--ink);border-radius:var(--radius)">
+          <div class="big">💖</div>
+          <h3>Je staat op de lijst!</h3>
+          <p style="color:var(--muted)">Check je inbox. Zodra de verkoop opent, krijg je als eerste je persoonlijke link. Volg ons intussen op TikTok en Instagram voor de countdown.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="salons" class="soft">
+  <div class="wrap salon">
+    <div>
+      <span class="eyebrow">Voor salons</span>
+      <h2>Heb je een salon in Amsterdam?</h2>
+      <p style="color:var(--muted)">We zoeken 10 tot 15 founding partner-salons. Je krijgt terugkerende, betalende klanten en je lege uren raken gevuld, zonder dat je zelf in marketing hoeft te investeren.</p>
+      <a class="btn" href="mailto:salons@beautypass.nl?subject=Founding%20partner%20BeautyPass">Word founding partner</a>
+    </div>
+    <div class="salon-box">
+      <h3>Wat je krijgt</h3>
+      <ul>
+        <li>Nieuwe vaste klanten die elke maand terugkomen</li>
+        <li>Lege uren gevuld</li>
+        <li>Zichtbaarheid via onze TikTok, Instagram en creators</li>
+        <li>Als founding partner: de beste voorwaarden</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="faq">
+  <div class="wrap">
+    <div class="center"><span class="eyebrow">FAQ</span><h2>Veelgestelde vragen</h2></div>
+    <div class="faq">
+      <details><summary>Wanneer gaat BeautyPass live?</summary><p>We openen binnenkort met 100 founding memberships in Amsterdam. Wie op de lijst staat, hoort de datum als eerste en krijgt eerder toegang.</p></details>
+      <details><summary>Wat kost een membership?</summary><p>De prijzen maken we bekend bij de lancering. Je voorkeuren uit het aanmeldformulier helpen ons de memberships zo goed mogelijk samen te stellen.</p></details>
+      <details><summary>Zit ik ergens aan vast als ik me aanmeld?</summary><p>Nee. Aanmelden voor early access is gratis en vrijblijvend.</p></details>
+      <details><summary>Bij welke salons kan ik terecht?</summary><p>We selecteren zorgvuldig 10 tot 15 salons verspreid over Amsterdam. Welke dat zijn, maken we vóór de lancering bekend.</p></details>
+      <details><summary>Wat als de 100 plekken op zijn?</summary><p>Dan blijf je automatisch op de wachtlijst. Zodra er nieuwe plekken bijkomen, krijgen wachtenden voorrang.</p></details>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <span>© BeautyPass Amsterdam</span>
+    <span><a href="#">Instagram</a><a href="#">TikTok</a><a href="#">Privacy</a></span>
+  </div>
+</footer>
+
+<script>
+  // Set this to a form endpoint (e.g. Formspree, Brevo, Mailchimp or your own API)
+  // to collect sign-ups. Left empty, submissions are kept in this browser only (demo mode).
+  const WAITLIST_ENDPOINT = "";
+
+  const form = document.getElementById("waitlist-form");
+  const errorEl = document.getElementById("form-error");
+  const submitBtn = document.getElementById("submit-btn");
+
+  // Tier buttons preselect the tier in the form
+  document.querySelectorAll("[data-tier]").forEach(btn => {
+    btn.addEventListener("click", () => { document.getElementById("tier").value = btn.dataset.tier; });
+  });
+
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    errorEl.textContent = "";
+    const data = new FormData(form);
+    if (data.get("website")) return; // honeypot
+
+    const name = (data.get("name") || "").trim();
+    const email = (data.get("email") || "").trim();
+    if (!name) return showError("Vul je voornaam in.");
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showError("Vul een geldig e-mailadres in.");
+    if (!data.get("consent")) return showError("Geef toestemming zodat we je je early-access link kunnen sturen.");
+
+    const payload = {
+      name, email,
+      phone: (data.get("phone") || "").trim(),
+      tier: data.get("tier"),
+      budget: data.get("budget"),
+      treatments: data.getAll("treatments"),
+      area: data.get("area"),
+      source: new URLSearchParams(location.search).get("utm_source") || document.referrer || "direct",
+      created_at: new Date().toISOString()
+    };
+
+    submitBtn.disabled = true;
+    submitBtn.textContent = "Even geduld…";
+    try {
+      if (WAITLIST_ENDPOINT) {
+        const res = await fetch(WAITLIST_ENDPOINT, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "Accept": "application/json" },
+          body: JSON.stringify(payload)
+        });
+        if (!res.ok) throw new Error("bad status");
+      } else {
+        try {
+          const list = JSON.parse(localStorage.getItem("beautypass_waitlist") || "[]");
+          list.push(payload);
+          localStorage.setItem("beautypass_waitlist", JSON.stringify(list));
+        } catch (_) { /* storage unavailable: demo mode only */ }
+      }
+      form.style.display = "none";
+      document.getElementById("success").style.display = "block";
+    } catch (_) {
+      showError("Er ging iets mis. Probeer het later nog eens.");
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.textContent = "Zet mij op de lijst";
+    }
+  });
+
+  function showError(msg) { errorEl.textContent = msg; }
+</script>
+</body>
+</html>
