@@ -14,7 +14,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
 
   return (
     <div className="auth">
-      <aside className="auth-side" style={{ backgroundImage: `linear-gradient(160deg, rgba(58,24,40,.92) 20%, rgba(58,24,40,.55)), url(${PHOTOS.handsManicure.small})` }}>
+      <aside className="auth-side" style={{ backgroundImage: `linear-gradient(160deg, rgba(58,24,40,.92) 20%, rgba(58,24,40,.55)), url(${PHOTOS.reception.small})` }}>
         <Logo light />
         <h1>Je beauty&shy;routine, <em>geregeld.</em></h1>
         <p className="muted" style={{ position: "relative", zIndex: 1, color: "rgba(251,247,242,.7)" }}>
