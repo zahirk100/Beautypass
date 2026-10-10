@@ -21,6 +21,9 @@ export default async function Members({ searchParams }: { searchParams: Promise<
   const pending = (data ?? []).filter((m: any) => m.status === "pending").length;
   const isOps = can(role, ADMIN_WRITE.ops);
   const isSupport = can(role, ADMIN_WRITE.support);
+  // Return to the same filter/search after an action
+  const keep = new URLSearchParams(Object.entries({ f: sp.f ?? "", q: sp.q ?? "" }).filter(([, v]) => v)).toString();
+  const backTo = `/admin/leden${keep ? `?${keep}` : ""}`;
 
   return (
     <>
@@ -47,24 +50,24 @@ export default async function Members({ searchParams }: { searchParams: Promise<
                   <div className="inline-form">
                     {isOps && (m.status === "pending" || m.status === "paused") && (
                       <form action={activateMembership} className="inline-form">
-                        <input type="hidden" name="membership" value={m.membership_id} />
+                        <input type="hidden" name="membership" value={m.membership_id} /><input type="hidden" name="back" value={backTo} />
                         {m.status === "pending" && <label className="small" style={{ display: "flex", gap: 4, alignItems: "center" }}><input type="checkbox" name="founding" defaultChecked style={{ width: "auto" }} />Founding</label>}
                         <Submit className="btn small" confirm={m.status === "pending" ? "Membership activeren en de eerste credits toekennen? Doe dit pas na de eerste betaling." : "Membership weer activeren?"}>Activeer</Submit>
                       </form>
                     )}
                     {isSupport && m.status === "active" && (
-                      <form action={setMembershipStatus}><input type="hidden" name="membership" value={m.membership_id} /><input type="hidden" name="status" value="paused" /><Submit className="btn secondary small">Pauzeer</Submit></form>
+                      <form action={setMembershipStatus}><input type="hidden" name="membership" value={m.membership_id} /><input type="hidden" name="back" value={backTo} /><input type="hidden" name="status" value="paused" /><Submit className="btn secondary small">Pauzeer</Submit></form>
                     )}
                     {isSupport && m.membership_id && m.status !== "cancelled" && (
-                      <form action={setMembershipStatus}><input type="hidden" name="membership" value={m.membership_id} /><input type="hidden" name="status" value="cancelled" /><Submit className="btn danger small" confirm="Membership opzeggen?">Opzeggen</Submit></form>
+                      <form action={setMembershipStatus}><input type="hidden" name="membership" value={m.membership_id} /><input type="hidden" name="back" value={backTo} /><input type="hidden" name="status" value="cancelled" /><Submit className="btn danger small" confirm="Membership opzeggen?">Opzeggen</Submit></form>
                     )}
                     {isSupport && (
                       <details className="more">
                         <summary>Credits</summary>
                         <form action={adjustCredits} className="inline-form">
-                          <input type="hidden" name="user" value={m.user_id} />
+                          <input type="hidden" name="user" value={m.user_id} /><input type="hidden" name="back" value={backTo} />
                           <input type="number" name="delta" placeholder="+/-" required />
-                          <input name="note" placeholder="Reden" required style={{ minWidth: 160 }} />
+                          <input name="note" placeholder="Reden" required style={{ minWidth: 0, flex: "1 1 140px" }} />
                           <Submit className="btn small">Opslaan</Submit>
                         </form>
                       </details>

@@ -53,7 +53,7 @@ export default async function MemberDetail({ params, searchParams }: { params: P
               <form action={activateMembership} className="inline-form">
                 <input type="hidden" name="membership" value={m.membership_id} /><input type="hidden" name="back" value={back} />
                 {m.status === "pending" && <label className="small" style={{ display: "flex", gap: 4, alignItems: "center" }}><input type="checkbox" name="founding" defaultChecked />Founding</label>}
-                <Submit className="btn small">Activeer</Submit>
+                <Submit className="btn small" confirm={m.status === "pending" ? "Membership activeren en de eerste credits toekennen? Doe dit pas na de eerste betaling." : "Membership weer activeren?"}>Activeer</Submit>
               </form>
             )}
             {support && m.status === "active" && (

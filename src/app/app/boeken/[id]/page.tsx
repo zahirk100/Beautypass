@@ -122,8 +122,17 @@ export default async function SalonBooking({ params, searchParams }: { params: P
           </div>
 
           <div className="inline-form book-bar">
-            <Submit className="btn">Bevestig boeking</Submit>
-            <span className="small muted">Gratis annuleren tot 24 uur vooraf.</span>
+            {canBook ? (
+              <>
+                <Submit className="btn">Bevestig boeking</Submit>
+                <span className="small muted">Gratis annuleren tot 24 uur vooraf.</span>
+              </>
+            ) : (
+              <>
+                <Link href="/app/membership" className="btn">Activeer eerst je membership</Link>
+                <span className="small muted">Daarna kun je hier direct boeken.</span>
+              </>
+            )}
           </div>
         </form>
 

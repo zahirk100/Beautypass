@@ -46,8 +46,9 @@ export async function addSlots(fd: FormData) {
 
 export async function deleteSlot(fd: FormData) {
   const supabase = await createClient();
-  const { error } = await supabase.from("slots").delete().eq("id", str(fd, "slot")).neq("status", "booked");
+  const { data, error } = await supabase.from("slots").delete().eq("id", str(fd, "slot")).neq("status", "booked").select("id");
   if (error) back("/salon/agenda", "error", errorMessage(error));
+  if (!data?.length) back("/salon/agenda", "error", "Deze tijd is inmiddels geboekt en kan niet meer worden verwijderd.");
   revalidatePath("/salon/agenda");
   back("/salon/agenda", "ok", "Tijd verwijderd.");
 }
@@ -72,8 +73,9 @@ export async function addStaff(fd: FormData) {
 
 export async function removeStaff(fd: FormData) {
   const { supabase, salonId } = await getSalonContext();
-  const { error } = await supabase.from("salon_members").delete().eq("salon_id", salonId).eq("user_id", str(fd, "user")).eq("role", "staff");
+  const { data, error } = await supabase.from("salon_members").delete().eq("salon_id", salonId).eq("user_id", str(fd, "user")).eq("role", "staff").select("user_id");
   if (error) back("/salon/instellingen", "error", errorMessage(error));
+  if (!data?.length) back("/salon/instellingen", "error", "Alleen de eigenaar kan medewerkers verwijderen.");
   revalidatePath("/salon/instellingen");
   back("/salon/instellingen", "ok", "Medewerker verwijderd.");
 }

@@ -45,14 +45,26 @@ p { margin: 0; }
 /* Buttons & forms */
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px; border: 0; cursor: pointer; text-decoration: none;
-  background: var(--plum); color: var(--ivory); font: 600 .9rem var(--sans); padding: 11px 20px; border-radius: 999px; transition: background .2s, opacity .2s;
+  background: var(--plum); color: var(--ivory); font: 600 .9rem var(--sans); padding: 11px 20px; border-radius: 999px; transition: background .2s, opacity .2s, transform .15s; -webkit-tap-highlight-color: transparent;
 }
-.btn:hover { background: var(--rose); }
-.btn:disabled { opacity: .6; cursor: wait; }
+/* Hover only on devices with a mouse: on phones a tap leaves :hover stuck, which made buttons turn rose */
+@media (hover: hover) {
+  .btn:hover { background: var(--plum-2); }
+  .btn.secondary:hover { background: var(--blush-soft); }
+  .btn.danger:hover { background: var(--bad-bg); }
+}
+.btn:active { transform: scale(.98); }
+.btn:disabled { cursor: progress; }
+.btn:disabled:not(.armed) { box-shadow: inset 0 0 0 999px rgba(251,247,242,.12); }
 .btn.secondary { background: var(--paper); color: var(--ink); border: 1px solid var(--line); }
-.btn.secondary:hover { background: var(--blush-soft); }
-.btn.danger { background: var(--paper); color: var(--bad); border: 1px solid #efc4d1; }
-.btn.danger:hover { background: var(--bad-bg); }
+.btn.danger { background: var(--paper); color: var(--bad); border: 1px solid var(--bad-line, #efc4d1); }
+.btn.armed { background: var(--plum); color: var(--ivory); box-shadow: 0 0 0 3px var(--champagne); }
+.btn.danger.armed { background: var(--bad); color: #fff; border-color: var(--bad); box-shadow: none; }
+.confirm-hint { position: fixed; z-index: 80; left: 50%; transform: translateX(-50%); bottom: 24px; width: min(420px, calc(100vw - 32px));
+  background: var(--plum); color: var(--ivory); padding: 13px 18px; border-radius: 16px; font-size: .88rem; line-height: 1.45; text-align: center;
+  box-shadow: 0 20px 40px -16px rgba(34,20,27,.55); animation: hint-in .2s ease-out; }
+@keyframes hint-in { from { opacity: 0; transform: translate(-50%, 8px); } }
+@media (max-width: 900px) { .confirm-hint { bottom: calc(86px + env(safe-area-inset-bottom)); } }
 .btn.small { padding: 7px 14px; font-size: .8rem; }
 .btn.block { width: 100%; }
 .btn:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible { outline: 2px solid var(--rose-light); outline-offset: 2px; }
@@ -457,3 +469,17 @@ input[type=radio], input[type=checkbox] { width: auto; accent-color: var(--plum)
 .legal-eyebrow { font-size: .78rem; letter-spacing: .16em; text-transform: uppercase; color: var(--muted) !important; }
 .legal-lead { font-size: 1.08rem; }
 .legal-back { margin-top: 36px; padding-top: 20px; border-top: 1px solid var(--line); }
+
+/* Map tiles: OpenStreetMap, softened towards the ivory/plum palette */
+.bp-tiles { filter: grayscale(1) sepia(.18) brightness(1.06) contrast(.88); }
+
+/* Mobile polish (audit): comfortable tap targets, no iOS zoom on selects, long values wrap */
+@media (max-width: 900px) {
+  .chip { min-height: 36px; padding-top: 8px; padding-bottom: 8px; display: inline-flex; align-items: center; }
+  .btn.small { min-height: 40px; }
+  .m-header select { font-size: 16px !important; }
+  .rtable td { overflow-wrap: anywhere; }
+  .rtable td > * { min-width: 0; }
+}
+button.chip { font-family: inherit; }
+.chips-label { align-self: center; font-size: .68rem; letter-spacing: .14em; text-transform: uppercase; font-weight: 600; color: var(--muted); margin-right: 4px; min-width: 64px; }

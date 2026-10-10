@@ -6,6 +6,7 @@ import { Flash } from "@/components/Flash";
 import { StatusBadge } from "@/components/Badge";
 import { getAdminContext } from "../context";
 import { setWaitlistStatus } from "../actions";
+import { Submit } from "@/components/Submit";
 
 export const metadata = { title: "Wachtlijst" };
 const STATUSES = ["waiting", "invited", "member", "unsubscribed"];
@@ -64,8 +65,9 @@ export default async function Waitlist({ searchParams }: { searchParams: Promise
                   {canEdit ? (
                     <form action={setWaitlistStatus} className="inline-form">
                       <input type="hidden" name="id" value={w.id} />
+                      <input type="hidden" name="back" value={`/admin/wachtlijst${sp.status || sp.sort ? `?${new URLSearchParams(Object.entries({ status: sp.status ?? "", sort: sp.sort ?? "" }).filter(([, v]) => v))}` : ""}`} />
                       <select name="status" defaultValue={w.status}>{STATUSES.map((s) => <option key={s} value={s}>{s}</option>)}</select>
-                      <button className="btn secondary small">Opslaan</button>
+                      <Submit className="btn secondary small">Opslaan</Submit>
                     </form>
                   ) : <StatusBadge status={w.status} />}
                 </td>

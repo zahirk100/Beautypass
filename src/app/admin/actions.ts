@@ -37,10 +37,12 @@ export async function adjustCredits(fd: FormData) {
 
 export async function setWaitlistStatus(fd: FormData) {
   const supabase = await createClient();
-  const { error } = await supabase.from("waitlist").update({ status: str(fd, "status") }).eq("id", str(fd, "id"));
-  if (error) back("/admin/wachtlijst", "error", errorMessage(error));
+  const to = str(fd, "back").startsWith("/admin/wachtlijst") ? str(fd, "back") : "/admin/wachtlijst";
+  const { data, error } = await supabase.from("waitlist").update({ status: str(fd, "status") }).eq("id", str(fd, "id")).select("id");
+  if (error) back(to, "error", errorMessage(error));
+  if (!data?.length) back(to, "error", "Dit kon niet worden opgeslagen: je hebt hier geen rechten voor of het bestaat niet meer.");
   revalidatePath("/admin/wachtlijst");
-  back("/admin/wachtlijst", "ok", "Status bijgewerkt.");
+  back(to, "ok", "Status bijgewerkt.");
 }
 
 export async function createSalon(fd: FormData) {
@@ -115,11 +117,12 @@ export async function removeSalonMember(fd: FormData) {
 
 export async function updateTreatment(fd: FormData) {
   const supabase = await createClient();
-  const { error } = await supabase.from("treatments").update({
+  const { data, error } = await supabase.from("treatments").update({
     name: str(fd, "name"), credits: int(fd, "credits"), retail_price_cents: cents(fd, "retail"),
     default_payout_cents: cents(fd, "payout"), duration_min: int(fd, "duration"), active: fd.get("active") === "on",
-  }).eq("id", str(fd, "id"));
+  }).eq("id", str(fd, "id")).select("id");
   if (error) back("/admin/behandelingen", "error", errorMessage(error));
+  if (!data?.length) back("/admin/behandelingen", "error", "Dit kon niet worden opgeslagen: je hebt hier geen rechten voor of het bestaat niet meer.");
   revalidatePath("/admin/behandelingen");
   back("/admin/behandelingen", "ok", "Behandeling opgeslagen.");
 }
@@ -139,11 +142,12 @@ export async function createTreatment(fd: FormData) {
 
 export async function updatePlan(fd: FormData) {
   const supabase = await createClient();
-  const { error } = await supabase.from("plans").update({
+  const { data, error } = await supabase.from("plans").update({
     name: str(fd, "name"), tagline: str(fd, "tagline"), monthly_price_cents: cents(fd, "price"),
     monthly_credits: int(fd, "credits"), rollover_max: int(fd, "rollover"), active: fd.get("active") === "on",
-  }).eq("id", str(fd, "id"));
+  }).eq("id", str(fd, "id")).select("id");
   if (error) back("/admin/plannen", "error", errorMessage(error));
+  if (!data?.length) back("/admin/plannen", "error", "Dit kon niet worden opgeslagen: je hebt hier geen rechten voor of het bestaat niet meer.");
   revalidatePath("/admin/plannen");
   back("/admin/plannen", "ok", "Membership opgeslagen.");
 }

@@ -16,9 +16,11 @@ export default function SalonMap({ salons, me, height = 420 }: { salons: MapSalo
       const L = (await import("leaflet")).default;
       if (cancelled || !el.current) return;
       map = L.map(el.current, { scrollWheelZoom: false, zoomControl: true, attributionControl: true });
-      L.tileLayer("https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png", {
-        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/">CARTO</a>',
-        subdomains: "abcd",
+      // CARTO now requires an API key. OpenStreetMap tiles need none (fine for our traffic; switch to a keyed
+      // provider such as MapTiler via NEXT_PUBLIC_MAP_TILES when usage grows). A CSS filter gives the soft brand look.
+      L.tileLayer(process.env.NEXT_PUBLIC_MAP_TILES || "https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+        className: "bp-tiles",
         maxZoom: 19,
       }).addTo(map);
       const points: [number, number][] = [];

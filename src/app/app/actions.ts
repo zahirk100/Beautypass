@@ -82,7 +82,8 @@ export async function saveLocation(fd: FormData) {
   const to = safeBack(str(fd, "back"));
   const geo = await geocodePostcode(str(fd, "postcode"));
   if (!geo) back(to, "error", "Deze postcode herkennen we niet. Gebruik bijvoorbeeld 1072 LN.");
-  await supabase.from("profiles").update({ postcode: geo.postcode, latitude: geo.lat, longitude: geo.lng }).eq("id", user!.id);
+  const { error } = await supabase.from("profiles").update({ postcode: geo.postcode, latitude: geo.lat, longitude: geo.lng }).eq("id", user!.id);
+  if (error) back(to, "error", "Je postcode kon niet worden opgeslagen. Probeer het opnieuw.");
   // Drop a temporary browser location so the saved postcode is used
   const url = new URL(to, "http://x");
   url.searchParams.delete("lat"); url.searchParams.delete("lng"); url.searchParams.delete("ok"); url.searchParams.delete("error");
@@ -95,8 +96,11 @@ export async function toggleFavorite(fd: FormData) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
   const salon = str(fd, "salon");
-  if (fd.get("on") === "1") await supabase.from("favorites").delete().eq("user_id", user!.id).eq("salon_id", salon);
-  else await supabase.from("favorites").insert({ user_id: user!.id, salon_id: salon });
+  const { error } = fd.get("on") === "1"
+    ? await supabase.from("favorites").delete().eq("user_id", user!.id).eq("salon_id", salon)
+    : await supabase.from("favorites").insert({ user_id: user!.id, salon_id: salon });
+  // A double tap inserts twice; the second is a harmless duplicate
+  if (error && !error.message.includes("duplicate")) back(safeBack(str(fd, "back")), "error", "Favoriet opslaan lukte niet.");
   revalidatePath("/app", "layout");
   redirect(safeBack(str(fd, "back")));
 }

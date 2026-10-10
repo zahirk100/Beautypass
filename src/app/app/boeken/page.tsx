@@ -76,12 +76,14 @@ export default async function BrowseSalons({ searchParams }: { searchParams: Pro
           {(treatments ?? []).map((t: any) => <Link key={t.id} href={href({ t: t.slug })} className={`chip${filterT?.id === t.id ? " on" : ""}`}>{t.name}</Link>)}
         </div>
         <div className="chips">
+          <span className="chips-label">Wanneer</span>
           {WHEN.map(([v, l]) => <Link key={v} href={href({ when: v || undefined })} className={`chip${(sp.when ?? "") === v ? " on" : ""}`}>{l}</Link>)}
-          <span className="muted small" style={{ alignSelf: "center", margin: "0 6px" }}>·</span>
+        </div>
+        <div className="chips">
+          <span className="chips-label">Sorteer</span>
           {SORT.map(([v, l]) => (
             <Link key={v} href={href({ sort: v })} className={`chip${sort === v ? " on" : ""}`} aria-disabled={v === "distance" && !me}>{l}</Link>
           ))}
-          <span className="muted small" style={{ alignSelf: "center", margin: "0 6px" }}>·</span>
           <Link href={href({ fav: sp.fav === "1" ? undefined : "1" })} className={`chip${sp.fav === "1" ? " on" : ""}`}>♥ Favorieten</Link>
         </div>
         {sort === "distance" && !me && <p className="small muted">Vul je postcode in of gebruik je locatie om op afstand te sorteren.</p>}
