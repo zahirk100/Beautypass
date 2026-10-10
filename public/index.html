@@ -60,22 +60,25 @@
     .hero h1 em { color: var(--champagne); }
     .lead { font-size: 1.12rem; color: rgba(251,247,242,.78); max-width: 500px; margin-bottom: 30px; }
 
-    .hero-media { grid-column: 2; grid-row: 1; position: relative; margin: 0; min-height: 100%; }
+    .hero-media { grid-column: 2; grid-row: 1; position: relative; margin: 0; min-height: 100%; overflow: hidden; }
     .hero-media img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: 55% 20%; display: block; animation: zoom 18s ease-in-out infinite alternate; }
     .hero-media::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, var(--plum) 0%, rgba(58,24,40,.35) 22%, rgba(58,24,40,0) 45%), linear-gradient(0deg, rgba(34,20,27,.45), rgba(34,20,27,0) 35%); }
     @keyframes zoom { to { transform: scale(1.06); } }
 
     /* Form: name, email and button in one capsule */
     form { max-width: 560px; }
-    .capsule { display: grid; grid-template-columns: .8fr 1.2fr auto; align-items: center; gap: 4px; padding: 6px; border-radius: 999px; background: rgba(251,247,242,.97); box-shadow: 0 30px 60px -30px rgba(0,0,0,.6); }
-    .capsule label + label input { border-left: 1px solid var(--line); border-radius: 0; }
-    input[type=text], input[type=email], input[type=tel] { width: 100%; font: 400 16px var(--sans); color: var(--ink); background: transparent; border: 0; padding: 14px 18px; outline: none; }
-    .capsule input:focus { background: transparent; }
-    .capsule:focus-within { box-shadow: 0 0 0 3px rgba(227,199,159,.55), 0 30px 60px -30px rgba(0,0,0,.6); }
+    .capsule { display: grid; grid-template-columns: .8fr 1.2fr auto; align-items: center; padding: 6px; border-radius: 999px; background: rgba(251,247,242,.08); border: 1px solid rgba(251,247,242,.22); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); transition: border-color .2s, background .2s; }
+    .capsule:focus-within { border-color: rgba(227,199,159,.75); background: rgba(251,247,242,.11); }
+    .capsule label + label input { border-left: 1px solid rgba(251,247,242,.18); }
+    input[type=text], input[type=email], input[type=tel] { width: 100%; font: 400 16px var(--sans); color: var(--ivory); caret-color: var(--champagne); background: transparent; border: 0; border-radius: 0; padding: 14px 20px; outline: none; }
+    input::placeholder { color: rgba(251,247,242,.55); }
+    input:-webkit-autofill { -webkit-text-fill-color: var(--ivory); -webkit-box-shadow: 0 0 0 40px #4a2536 inset; caret-color: var(--champagne); }
+    .capsule input[aria-invalid=true]::placeholder { color: #ffc2d4; }
     .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
     .phone-wrap { margin-top: 10px; display: none; }
     .phone-wrap.open { display: block; }
-    .phone-wrap input { background: rgba(251,247,242,.97); border-radius: 999px; padding: 15px 22px; }
+    .phone-wrap input { background: rgba(251,247,242,.08); border: 1px solid rgba(251,247,242,.22); border-radius: 999px; padding: 15px 22px; }
+    .phone-wrap input:focus { border-color: rgba(227,199,159,.75); }
     .form-meta { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px 20px; flex-wrap: wrap; margin-top: 16px; }
     .consent { font-size: .8rem; color: rgba(251,247,242,.7); line-height: 1.5; flex: 1 1 260px; margin: 0; }
     .consent a { color: rgba(251,247,242,.9); }
@@ -84,13 +87,21 @@
     .btn {
       width: 100%; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; gap: 10px; white-space: nowrap;
       background: var(--plum); color: var(--ivory); border: 0; border-radius: 999px; padding: 16px 26px; font: 600 1rem var(--sans); cursor: pointer; min-height: 54px;
+      -webkit-tap-highlight-color: transparent; transition: transform .15s;
     }
-    .btn::before { content: ""; position: absolute; inset: 0; background: linear-gradient(110deg, var(--rose), #cf6b8f); transform: translateX(-101%); transition: transform .5s cubic-bezier(.2,.7,.1,1); }
-    .btn:hover::before { transform: none; }
+    .btn::before { content: ""; position: absolute; inset: 0; background: linear-gradient(110deg, #6a3049, var(--plum)); transform: translateX(-101%); transition: transform .5s cubic-bezier(.2,.7,.1,1); }
+    @media (hover: hover) { .btn:hover::before { transform: none; } }
+    .btn:active { transform: scale(.98); }
+    .hero .btn { background: var(--champagne); color: var(--plum); box-shadow: 0 16px 32px -16px rgba(227,199,159,.6); }
+    .hero .btn::before { background: linear-gradient(110deg, #f0dcbd, #ead1ab); }
+    .hero .success .btn { background: var(--plum); color: var(--ivory); box-shadow: none; }
+    .hero .success .btn::before { background: linear-gradient(110deg, #6a3049, var(--plum)); }
     .btn > * { position: relative; }
     .btn:disabled { opacity: .65; cursor: wait; }
     .fine { font-size: .76rem; color: rgba(251,247,242,.55); margin-top: 14px; }
-    .error { color: #ffc2d4; font-size: .88rem; margin-top: 12px; }
+    .error { display: flex; align-items: center; gap: 8px; color: #ffd3df; font-size: .88rem; margin-top: 10px; padding-left: 20px; animation: shake .35s; }
+    .error::before { content: "!"; flex: none; width: 18px; height: 18px; border-radius: 50%; background: #e0819f; color: var(--plum); font: 700 .72rem/18px var(--sans); text-align: center; }
+    @keyframes shake { 25% { transform: translateX(-4px); } 75% { transform: translateX(4px); } }
     .error:empty { display: none; }
     .hp { position: absolute; left: -9999px; }
     .scroll-cue { position: absolute; z-index: 3; left: 50%; bottom: max(18px, env(safe-area-inset-bottom)); transform: translateX(-50%); font-size: .72rem; letter-spacing: .18em; text-transform: uppercase; color: rgba(251,247,242,.65); text-decoration: none; display: flex; gap: 8px; align-items: center; }
@@ -127,9 +138,8 @@
     .chip-float small { color: var(--muted); font-size: .76rem; }
 
     @media (max-width: 1100px) {
-      .capsule { grid-template-columns: 1fr 1fr; border-radius: 24px; padding: 6px; }
-      .capsule .btn { grid-column: 1 / -1; }
-      .capsule label:nth-child(2) input { border-left: 1px solid var(--line); }
+      .capsule { grid-template-columns: 1fr 1fr; border-radius: 26px; padding: 6px; }
+      .capsule .btn { grid-column: 1 / -1; margin-top: 4px; }
       .pass { width: 250px; }
     }
     @media (max-width: 900px) {
@@ -145,9 +155,13 @@
       .scroll-cue { display: none; }
     }
     @media (max-width: 520px) {
-      .capsule { grid-template-columns: 1fr; border-radius: 22px; gap: 0; padding: 6px; }
-      .capsule label + label input, .capsule label:nth-child(2) input { border-left: 0; border-top: 1px solid var(--line); }
-      .capsule .btn { margin-top: 6px; }
+      .capsule { grid-template-columns: 1fr; gap: 10px; padding: 0; border: 0; background: none; backdrop-filter: none; -webkit-backdrop-filter: none; border-radius: 0; }
+      .capsule:focus-within { background: none; border: 0; }
+      .capsule input { background: rgba(251,247,242,.08); border: 1px solid rgba(251,247,242,.22) !important; border-radius: 16px !important; padding: 16px 18px; backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); transition: border-color .2s; }
+      .capsule input:focus { border-color: rgba(227,199,159,.75) !important; background: rgba(251,247,242,.11); }
+      .capsule input[aria-invalid=true] { border-color: #e0819f !important; }
+      .capsule .btn { margin-top: 2px; }
+      .error { padding-left: 4px; }
       .form-meta { margin-top: 14px; }
     }
 
@@ -230,6 +244,7 @@
           <label><span class="sr">E-mailadres</span><input type="email" id="email" name="email" autocomplete="email" placeholder="E-mailadres" required></label>
           <button type="submit" class="btn" id="submit-btn"><span class="label">Claim early access</span><span aria-hidden="true">→</span></button>
         </div>
+        <p class="error" id="form-error" role="alert"></p>
         <div class="phone-wrap" id="phone-wrap">
           <label><span class="sr">Mobiel nummer</span><input type="tel" id="phone" name="phone" autocomplete="tel" placeholder="Mobiel nummer, bijv. 06 12345678"></label>
         </div>
@@ -238,7 +253,6 @@
           <p class="consent">Je ontvangt je early-access link en updates per e-mail. Afmelden kan altijd. <a href="/privacy">Privacy</a></p>
           <button type="button" class="phone-toggle" id="phone-toggle" aria-expanded="false" aria-controls="phone-wrap">+ Ook een sms als de verkoop opent</button>
         </div>
-        <p class="error" id="form-error" role="alert"></p>
         <p class="fine">Gratis en vrijblijvend · geen betaalgegevens nodig</p>
       </form>
 
@@ -318,8 +332,9 @@
 
     const name = (data.get("name") || "").trim();
     const email = (data.get("email") || "").trim();
-    if (!name) return showError("Vul je voornaam in.");
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showError("Vul een geldig e-mailadres in.");
+    form.querySelectorAll("[aria-invalid]").forEach((el) => el.removeAttribute("aria-invalid"));
+    if (!name) return showError("Vul je voornaam in.", "name");
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showError("Vul een geldig e-mailadres in.", "email");
 
     const params = new URLSearchParams(location.search);
     const payload = {
@@ -395,7 +410,12 @@
     } catch (_) { /* share cancelled or clipboard unavailable */ }
   });
 
-  function showError(msg) { errorEl.textContent = msg; }
+  function showError(msg, field) {
+    errorEl.textContent = "";
+    requestAnimationFrame(() => { errorEl.textContent = msg; }); // re-trigger the shake
+    if (field) { const el = document.getElementById(field); el.setAttribute("aria-invalid", "true"); el.focus(); }
+  }
+  form.addEventListener("input", (e) => { if (e.target.getAttribute("aria-invalid")) { e.target.removeAttribute("aria-invalid"); errorEl.textContent = ""; } });
 </script>
 </body>
 </html>
