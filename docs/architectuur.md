@@ -1,6 +1,6 @@
 # BeautyPass: platformstructuur en rechten
 
-Voorstel, versie 0.1. Nog niet gebouwd. Dit document legt vast hoe het platform is opgebouwd voordat we de code schrijven.
+Versie 0.2. Fase 0–3 zijn gebouwd (zie [opzet.md](opzet.md)); betalingen via Mollie en de groeifuncties volgen.
 
 ## 1. Drie omgevingen
 
@@ -10,7 +10,7 @@ Voorstel, versie 0.1. Nog niet gebouwd. Dit document legt vast hoe het platform 
 | **Salonportaal** | `salon.beautypass.nl` | Salons en hun medewerkers | Beschikbaarheid beheren, boekingen zien en afhandelen, uitbetalingen inzien |
 | **Beheer** | `admin.beautypass.nl` | Het BeautyPass-team | Salons toelaten, leden en wachtlijst beheren, lanceringen, prijzen en credits, financiën, support |
 
-**Eén codebase, drie ingangen.** We bouwen het als één applicatie met drie afgeschermde delen, en het subdomein bepaalt welk deel je ziet. Voordelen:
+**Eén codebase, drie ingangen.** We bouwen het als één applicatie met drie afgeschermde delen. Voorlopig via paden (`/app`, `/salon`, `/admin`), later via subdomeinen. Voordelen:
 - één database en één login-systeem;
 - gedeelde onderdelen zoals het ontwerp, de behandelingenlijst en de boekingslogica;
 - één Vercel-project en dus één plek om te beheren.

@@ -1,7 +1,10 @@
 # BeautyPass
 
-Early-access landingspagina voor BeautyPass Amsterdam: een beauty-membership bij aangesloten salons.
+Beauty-membership platform voor Amsterdam: landingspagina + drie omgevingen (leden, salons, beheer).
 
-- `index.html`: statische pagina met aanmeldformulier, zonder build-stap.
-- Aanmeldingen: zet `WAITLIST_ENDPOINT` in `index.html` op een formulier- of e-mailtool (bijv. Brevo). Leeg = demomodus (alleen in de browser).
-- Hosting: Vercel (framework preset "Other", geen build command).
+- `public/index.html`: landingspagina met wachtlijst (op `/`)
+- `src/app/app`: leden-app · `src/app/salon`: salonportaal · `src/app/admin`: beheer
+- `supabase/migrations`: database, rollen en rechten (row level security)
+- `docs/`: [architectuur](docs/architectuur.md) · [prijsplan](docs/prijsplan.md) · [opzet](docs/opzet.md)
+
+Techniek: Next.js 15 (Vercel) + Supabase (Postgres, Auth). Lokaal: `npm install && npm run dev`.
