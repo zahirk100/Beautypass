@@ -9,6 +9,7 @@
    - [`004_salon_profiles_notes.sql`](../supabase/migrations/004_salon_profiles_notes.sql) (foto's, socials, opmerkingen)
    - [`005_media_keep_existing.sql`](../supabase/migrations/005_media_keep_existing.sql)
    - [`006_waitlist_referrals.sql`](../supabase/migrations/006_waitlist_referrals.sql) (wachtlijstpositie + uitnodigingslinks; de landingspagina gebruikt dit)
+   - [`007_waitlist_is_new.sql`](../supabase/migrations/007_waitlist_is_new.sql) ("je staat al op de lijst" bij dubbele aanmelding)
    - Of in één keer 003 + 004 + 005 + demodata: [`supabase/seed/demo_alles_in_een.sql`](../supabase/seed/demo_alles_in_een.sql)
 3. Wil je testen met voorbeelddata en testaccounts per rol? Zie [demo.md](demo.md).
 

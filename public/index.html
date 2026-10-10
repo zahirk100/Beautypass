@@ -40,7 +40,7 @@
     p { margin: 0; }
 
     /* Hero: one full-height section. Photo right on desktop, on top on mobile; content and form on plum. */
-    .hero { position: relative; isolation: isolate; overflow: hidden; background: var(--plum); color: var(--ivory); min-height: 100vh; min-height: 100svh; display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr); }
+    .hero { position: relative; isolation: isolate; overflow: hidden; overflow: clip; background: var(--plum); color: var(--ivory); min-height: 100vh; min-height: 100svh; display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, .95fr); }
     .hero::before { content: ""; position: absolute; z-index: -1; width: 70vmax; height: 70vmax; left: -28vmax; bottom: -42vmax; border-radius: 50%; background: radial-gradient(circle, rgba(184,70,110,.35), rgba(184,70,110,0) 65%); }
     header { position: absolute; z-index: 5; top: 0; left: 0; right: 0; display: flex; justify-content: space-between; align-items: center; padding: max(22px, env(safe-area-inset-top)) clamp(20px, 4.5vw, 64px) 0; }
     .logo { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ivory); }
@@ -94,8 +94,6 @@
     .btn:active { transform: scale(.98); }
     .hero .btn { background: var(--champagne); color: var(--plum); box-shadow: 0 16px 32px -16px rgba(227,199,159,.6); }
     .hero .btn::before { background: linear-gradient(110deg, #f0dcbd, #ead1ab); }
-    .hero .success .btn { background: var(--plum); color: var(--ivory); box-shadow: none; }
-    .hero .success .btn::before { background: linear-gradient(110deg, #6a3049, var(--plum)); }
     .btn > * { position: relative; }
     .btn:disabled { opacity: .65; cursor: wait; }
     .fine { font-size: .76rem; color: rgba(251,247,242,.55); margin-top: 14px; }
@@ -108,16 +106,26 @@
     .scroll-cue span { animation: nudge 2s ease-in-out infinite; }
     @keyframes nudge { 50% { transform: translateY(4px); } }
 
-    /* Success card (white on plum) */
-    .success { display: none; max-width: 520px; text-align: center; padding: 30px 24px; background: var(--paper); color: var(--ink); border-radius: 26px; box-shadow: 0 40px 80px -40px rgba(0,0,0,.6); }
-    .success svg { width: 64px; height: 64px; margin: 0 auto 14px; display: block; animation: pop .6s cubic-bezier(.2,1.4,.4,1) both; }
+    /* Success: part of the hero, same glass language as the form */
+    .success { display: none; max-width: 560px; padding: 26px; border-radius: 26px; background: rgba(251,247,242,.07); border: 1px solid rgba(251,247,242,.2); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); animation: rise .5s cubic-bezier(.2,.7,.1,1) both; }
+    @keyframes rise { from { opacity: 0; transform: translateY(12px); } }
+    .s-head { display: flex; align-items: center; gap: 14px; }
+    .s-head svg { width: 44px; height: 44px; flex: none; animation: pop .6s cubic-bezier(.2,1.4,.4,1) both; }
     @keyframes pop { from { transform: scale(.3) rotate(-30deg); opacity: 0; } }
-    .success h2 { font-family: var(--serif); font-weight: 500; font-size: 2.2rem; margin: 0 0 8px; }
-    .success h2 em { color: var(--rose); }
-    .success p { color: var(--muted); font-size: .95rem; }
-    .success .btn { margin-top: 18px; }
-    .success .fine { color: var(--muted); }
-    .ref-link input { background: var(--ivory); border-radius: 12px; }
+    .success h2 { font-family: var(--serif); font-weight: 500; font-size: 2rem; line-height: 1.05; margin: 0; color: var(--ivory); }
+    .success h2 em { color: var(--champagne); }
+    .spot { display: flex; align-items: center; gap: 16px; margin: 20px 0 18px; padding: 16px 0; border-top: 1px solid rgba(251,247,242,.14); border-bottom: 1px solid rgba(251,247,242,.14); }
+    .spot b { font-family: var(--serif); font-weight: 500; font-size: 3.6rem; line-height: .9; color: var(--champagne); }
+    .spot span { display: block; font-size: .7rem; letter-spacing: .18em; text-transform: uppercase; color: var(--champagne); font-weight: 600; }
+    .spot small { display: block; font-size: .9rem; color: rgba(251,247,242,.75); margin-top: 2px; }
+    .success p { color: rgba(251,247,242,.78); font-size: .95rem; }
+    .success p b { color: var(--ivory); font-weight: 500; }
+    .ref-link { display: flex; gap: 8px; margin: 16px 0 12px; }
+    .ref-link input { flex: 1; min-width: 0; font: 400 14px var(--sans) !important; padding: 13px 16px; background: rgba(251,247,242,.08); border: 1px solid rgba(251,247,242,.22); border-radius: 14px; color: var(--ivory); }
+    .ref-link button { flex: none; border: 1px solid rgba(227,199,159,.55); background: transparent; border-radius: 14px; padding: 0 16px; font: 600 .85rem var(--sans); cursor: pointer; color: var(--champagne); }
+    .success .fine { margin-top: 12px; }
+    .fine:empty { display: none; }
+    @media (max-width: 520px) { .success { padding: 22px 18px; } .success h2 { font-size: 1.75rem; } .spot b { font-size: 3.1rem; } }
 
     /* Pass + booking chip floating on the photo */
     .pass { position: absolute; z-index: 2; width: 300px; aspect-ratio: 1.586; border-radius: 22px; padding: 22px 24px; left: 4%; bottom: 13%; transform: rotate(-8deg); color: var(--ivory); display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; background: radial-gradient(120% 120% at 20% 0%, #6a3049 0%, var(--plum) 55%, #24101a 100%); box-shadow: 0 40px 70px -24px rgba(0,0,0,.6); animation: float 7s ease-in-out infinite; }
@@ -164,15 +172,6 @@
       .error { padding-left: 4px; }
       .form-meta { margin-top: 14px; }
     }
-
-    /* Success: position + referral */
-    .spot { display: inline-grid; justify-items: center; background: var(--blush-soft); border-radius: 18px; padding: 12px 22px; margin: 6px 0 14px; }
-    .spot span { font-size: .7rem; letter-spacing: .18em; text-transform: uppercase; color: var(--rose); font-weight: 600; }
-    .spot b { font-family: var(--serif); font-size: 2.6rem; line-height: 1.1; font-weight: 600; }
-    .spot small { font-size: .78rem; color: var(--muted); }
-    .ref-link { display: flex; gap: 8px; margin: 14px 0 4px; }
-    .ref-link input { flex: 1; min-width: 0; font: 400 14px var(--sans) !important; padding: 12px 14px; }
-    .ref-link button { border: 1.5px solid var(--line); background: #fff; border-radius: 12px; padding: 0 14px; font: 600 .85rem var(--sans); cursor: pointer; color: var(--plum); }
 
     /* Below the fold */
     .more { padding: clamp(40px, 8vw, 90px) clamp(18px, 4vw, 48px); }
@@ -257,9 +256,14 @@
       </form>
 
       <div class="success" id="success" role="status">
-        <svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="31" fill="#3a1828"/><path d="M20 33l8 8 16-17" fill="none" stroke="#e3c79f" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>
-        <h2>Welkom op <em>de lijst</em></h2>
-        <div class="spot"><span>Jouw plek</span><b id="pos">#—</b><small id="pos-total"></small></div>
+        <div class="s-head">
+          <svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="31" fill="#e3c79f"/><path d="M20 33l8 8 16-17" fill="none" stroke="#3a1828" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          <h2 id="s-title">Welkom op <em>de lijst</em></h2>
+        </div>
+        <div class="spot">
+          <b id="pos">#—</b>
+          <div><span>Jouw plek</span><small id="pos-total"></small></div>
+        </div>
         <p id="ref-pitch">Wil je eerder aan de beurt? <b>Elke vriendin die zich via jouw link aanmeldt, schuift je 10 plekken omhoog.</b></p>
         <div class="ref-link"><input id="ref-url" readonly aria-label="Jouw persoonlijke link"><button type="button" id="copy-btn">Kopieer</button></div>
         <button type="button" class="btn" id="share-btn"><span class="label">Deel met vriendinnen</span><span aria-hidden="true">→</span></button>
@@ -363,11 +367,11 @@
           body: JSON.stringify({ name: payload.p_name, email: payload.p_email, phone: payload.p_phone, consent: true, source: payload.p_source, campaign: payload.p_campaign })
         });
         if (!plain.ok && plain.status !== 409) throw new Error("bad status " + plain.status);
-        return showSuccess(null);
+        return showSuccess(null, name);
       }
       if (!res.ok) throw new Error("bad status " + res.status);
       const rows = await res.json();
-      showSuccess(rows && rows[0]);
+      showSuccess(rows && rows[0], name);
     } catch (_) {
       showError("Er ging iets mis. Probeer het zo nog eens.");
     } finally {
@@ -377,9 +381,13 @@
   });
 
   let shareUrl = location.origin + "/?utm_source=share";
-  function showSuccess(r) {
+  function showSuccess(r, name) {
     form.style.display = "none";
     document.getElementById("success").style.display = "block";
+    const first = escapeHtml((name || "").split(" ")[0]);
+    document.getElementById("s-title").innerHTML = r && r.is_new === false
+      ? `Je staat al <em>op de lijst</em>`
+      : `Welkom op de lijst${first ? `, <em>${first}</em>` : ""}`;
     if (r && r.referral_code) {
       shareUrl = `${location.origin}/?ref=${encodeURIComponent(r.referral_code)}`;
       document.getElementById("pos").textContent = "#" + r.waitlist_position;
@@ -390,7 +398,9 @@
       document.getElementById("ref-pitch").textContent = "Ken je iemand die dit ook wil? Deel BeautyPass met je vriendinnen.";
     }
     document.getElementById("ref-url").value = shareUrl;
-    document.getElementById("success").scrollIntoView({ behavior: "smooth", block: "center" });
+    // Scroll the window only: scrollIntoView would also scroll the clipped hero box itself
+    const box = document.getElementById("success").getBoundingClientRect();
+    window.scrollTo({ top: Math.max(0, scrollY + box.top - Math.max(16, (innerHeight - box.height) / 2)), behavior: "smooth" });
   }
 
   document.getElementById("copy-btn").addEventListener("click", async (e) => {
@@ -409,6 +419,8 @@
       }
     } catch (_) { /* share cancelled or clipboard unavailable */ }
   });
+
+  function escapeHtml(t) { return t.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]); }
 
   function showError(msg, field) {
     errorEl.textContent = "";
