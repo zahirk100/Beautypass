@@ -3,6 +3,17 @@
 -- (fresh availability for the next 2 weeks). Remove everything with demo_cleanup.sql before launch.
 -- All demo accounts use the password: Demo2026!
 
+-- 0. Check that the migrations have been run first
+do $$
+begin
+  if to_regclass('public.salons') is null then
+    raise exception 'Voer eerst supabase/migrations/002_platform.sql uit, daarna 003_locations_favorites.sql, en dan pas dit demoscript.';
+  end if;
+  if not exists (select 1 from information_schema.columns where table_schema = 'public' and table_name = 'salons' and column_name = 'is_demo') then
+    raise exception 'Voer eerst supabase/migrations/003_locations_favorites.sql uit, en dan pas dit demoscript.';
+  end if;
+end $$;
+
 -- 1. Reset previous demo data
 delete from public.bookings
  where salon_id in (select id from public.salons where is_demo)
