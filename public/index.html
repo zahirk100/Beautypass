@@ -10,29 +10,29 @@
   <meta name="theme-color" content="#fbf7f2">
   <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
   <link rel="manifest" href="/manifest.webmanifest">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='9' fill='%233a1828'/%3E%3Cpath d='M16 5C16.7 12.3 19.7 15.3 27 16C19.7 16.7 16.7 19.7 16 27C15.3 19.7 12.3 16.7 5 16C12.3 15.3 15.3 12.3 16 5Z' fill='%23e3c79f'/%3E%3C/svg%3E">
+  <link rel="icon" type="image/png" href="/icons/favicon.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,opsz,wght@0,6..96,400;0,6..96,500;1,6..96,400;1,6..96,500&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500;1,600&family=Jost:wght@400;500;600&display=swap" rel="stylesheet">
   <style>
     :root {
       --ivory: #fbf7f2; --paper: #fff; --blush: #f5dde4; --blush-soft: #fbeef1;
       --rose: #b8466e; --rose-light: #d98aa5; --plum: #3a1828; --ink: #22141b; --muted: #75626b;
       --champagne: #e3c79f; --champagne-deep: #b8925f; --line: rgba(34, 20, 27, .12);
-      --serif: "Bodoni Moda", "Didot", Georgia, serif; --sans: "Manrope", system-ui, sans-serif;
+      --serif: "Cormorant Garamond", "Cormorant", Georgia, serif; --sans: "Jost", system-ui, sans-serif;
     }
     * { box-sizing: border-box; }
     html { background: var(--ivory); }
-    body { margin: 0; min-height: 100vh; min-height: 100dvh; font-family: var(--sans); color: var(--ink); background: var(--ivory); line-height: 1.55; -webkit-font-smoothing: antialiased; display: flex; flex-direction: column; overflow-x: hidden; }
+    body { font-variant-numeric: lining-nums; margin: 0; min-height: 100vh; min-height: 100dvh; font-family: var(--sans); color: var(--ink); background: var(--ivory); line-height: 1.55; -webkit-font-smoothing: antialiased; display: flex; flex-direction: column; overflow-x: hidden; }
     body::before { content: ""; position: fixed; z-index: -1; width: 80vmax; height: 80vmax; right: -30vmax; top: -40vmax; border-radius: 50%; background: radial-gradient(circle, var(--blush) 0%, rgba(245, 221, 228, 0) 65%); }
-    h1 { font-family: var(--serif); font-weight: 400; letter-spacing: -.015em; margin: 0; }
+    h1 { font-family: var(--serif); font-weight: 500; letter-spacing: -.005em; margin: 0; }
     h1 em { font-style: italic; color: var(--rose); }
     p { margin: 0; }
 
     header { display: flex; justify-content: space-between; align-items: center; padding: max(20px, env(safe-area-inset-top)) clamp(18px, 4vw, 48px) 0; }
     .logo { display: inline-flex; align-items: center; gap: 10px; text-decoration: none; color: var(--ink); }
-    .logo svg { width: 32px; height: 32px; }
-    .logo span { font-family: var(--serif); font-size: 1.35rem; }
+    .logo svg { width: 36px; height: 36px; }
+    .logo span { font-family: var(--serif); font-weight: 500; font-size: 1.6rem; line-height: 1; }
     .logo i { color: var(--rose); }
     .login { font-size: .85rem; color: var(--muted); text-decoration: none; }
     .login:hover { color: var(--ink); }
@@ -41,7 +41,7 @@
     .kicker { display: inline-flex; align-items: center; gap: 8px; font-size: .72rem; font-weight: 600; letter-spacing: .2em; text-transform: uppercase; color: var(--rose); background: var(--blush-soft); padding: 6px 12px; border-radius: 999px; }
     .kicker .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--rose); animation: pulse 2s infinite; }
     @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(184,70,110,.45); } 70% { box-shadow: 0 0 0 8px rgba(184,70,110,0); } 100% { box-shadow: 0 0 0 0 rgba(184,70,110,0); } }
-    h1 { font-size: clamp(2.5rem, 5.4vw, 4.3rem); line-height: 1.03; margin: 18px 0 14px; }
+    h1 { font-size: clamp(2.75rem, 5.9vw, 4.8rem); line-height: 1; margin: 18px 0 14px; }
     .lead { font-size: 1.08rem; color: var(--muted); max-width: 470px; }
     .points { list-style: none; padding: 0; margin: 20px 0 26px; display: flex; flex-wrap: wrap; gap: 8px 18px; font-size: .88rem; }
     .points li { display: inline-flex; align-items: center; gap: 7px; }
@@ -79,7 +79,7 @@
     .success { display: none; text-align: center; padding: 30px 22px; }
     .success svg { width: 64px; height: 64px; margin: 0 auto 14px; display: block; animation: pop .6s cubic-bezier(.2,1.4,.4,1) both; }
     @keyframes pop { from { transform: scale(.3) rotate(-30deg); opacity: 0; } }
-    .success h2 { font-family: var(--serif); font-weight: 400; font-size: 1.9rem; margin: 0 0 8px; }
+    .success h2 { font-family: var(--serif); font-weight: 500; font-size: 2.2rem; margin: 0 0 8px; }
     .success h2 em { color: var(--rose); }
     .success p { color: var(--muted); font-size: .95rem; }
     .success .btn { margin-top: 18px; }
@@ -136,7 +136,7 @@
       .intro::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(180deg, rgba(34,20,27,0) 22%, rgba(34,20,27,.55) 55%, rgba(58,24,40,.94) 100%); }
       .intro .kicker { background: rgba(255,255,255,.16); color: var(--ivory); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
       .intro .kicker .dot { background: var(--champagne); }
-      .intro h1 { color: var(--ivory); margin: 12px 0 0; font-size: clamp(2.2rem, 9.5vw, 2.8rem); }
+      .intro h1 { color: var(--ivory); margin: 12px 0 0; font-size: clamp(2.45rem, 10.5vw, 3.1rem); }
       .intro h1 em { color: var(--champagne); }
       .mini-pass {
         display: grid; gap: 2px; position: absolute; top: 18px; right: 16px; width: 132px; padding: 12px 14px; border-radius: 14px; transform: rotate(6deg);
@@ -158,7 +158,7 @@
     @media (max-width: 900px) {
       main { grid-template-columns: 1fr; padding-top: 18px; }
       .visual { display: none; }
-      h1 { font-size: clamp(2.3rem, 10vw, 3rem); }
+      h1 { font-size: clamp(2.5rem, 10.5vw, 3.2rem); }
       .points { margin: 16px 0 20px; }
     }
     @media (max-width: 420px) {
@@ -175,7 +175,7 @@
 
   <header>
     <a href="/" class="logo" aria-label="BeautyPass">
-      <svg viewBox="0 0 34 34" aria-hidden="true"><rect width="34" height="34" rx="10" fill="#3a1828"/><path d="M17 6C17.7 13.4 20.6 16.3 28 17C20.6 17.7 17.7 20.6 17 28C16.3 20.6 13.4 17.7 6 17C13.4 16.3 16.3 13.4 17 6Z" fill="#e3c79f"/></svg>
+      <svg viewBox="0 0 64 64" aria-hidden="true"><defs><mask id="bp-notch"><rect width="64" height="64" fill="#fff"/><circle cx="0" cy="32" r="6.5" fill="#000"/><circle cx="64" cy="32" r="6.5" fill="#000"/></mask></defs><rect width="64" height="64" rx="16" fill="#3a1828" mask="url(#bp-notch)"/><text x="32.5" y="45" text-anchor="middle" font-family="'Cormorant Garamond', Georgia, serif" font-style="italic" font-weight="600" font-size="40" fill="#e3c79f">B</text></svg>
       <span>Beauty<i>Pass</i></span>
     </a>
     <a href="/login" class="login">Inloggen</a>
@@ -213,7 +213,7 @@
       </form>
 
       <div class="success" id="success" role="status">
-        <svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="31" fill="#3a1828"/><path d="M32 14C33 26 38 31 50 32C38 33 33 38 32 50C31 38 26 33 14 32C26 31 31 26 32 14Z" fill="#e3c79f"/></svg>
+        <svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="31" fill="#3a1828"/><path d="M20 33l8 8 16-17" fill="none" stroke="#e3c79f" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></svg>
         <h2>Welkom op <em>de lijst</em></h2>
         <p>Je hoort als een van de eersten wanneer de verkoop opent. Ken je iemand die dit ook wil? De plekken zijn beperkt.</p>
         <button type="button" class="btn" id="share-btn"><span class="label">Deel met een vriendin</span><span aria-hidden="true">→</span></button>
@@ -224,9 +224,9 @@
       <figure class="photo"><img src="https://d8j0ntlcm91z4.cloudfront.net/user_3K0vP0LWwSjJ1THUL9zRSUshpTj/hf_20261010_155255_bd41a471-05c8-4604-9ced-f258ec6f3f3d_min.webp" alt="" fetchpriority="high"></figure>
       <div class="chip-float"><span class="ok">✓</span><div><b>Geboekt: BIAB manicure</b><small>Morgen 14:30 · De Pijp</small></div></div>
       <div class="pass">
-        <div class="top"><span>Founding member</span><span>✦</span></div>
+        <div class="top"><span>Founding member</span><span>Amsterdam</span></div>
         <div class="name">Beauty<i>Pass</i></div>
-        <div class="bottom"><span>Amsterdam<b>Lid sinds 2026</b></span><span style="text-align:right">Nº<b>001 / 100</b></span></div>
+        <div class="bottom"><span>Lid sinds<b>2026</b></span><span style="text-align:right">Nº<b>001 / 100</b></span></div>
       </div>
     </div>
   </main>

@@ -10,7 +10,7 @@ import { switchSalon } from "./actions";
 export const metadata = { title: "Salonportaal" };
 
 const links = [
-  { href: "/salon", label: "Vandaag", icon: "✦\uFE0E", exact: true },
+  { href: "/salon", label: "Vandaag", icon: "⌂\uFE0E", exact: true },
   { href: "/salon/agenda", label: "Agenda", icon: "◷\uFE0E" },
   { href: "/salon/profiel", label: "Profiel", icon: "✿\uFE0E" },
   { href: "/salon/uitbetalingen", label: "Geld", icon: "€\uFE0E" },

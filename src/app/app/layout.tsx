@@ -8,7 +8,7 @@ import { signOut } from "../actions";
 export const metadata = { title: "Mijn BeautyPass" };
 
 const links = [
-  { href: "/app", label: "Overzicht", icon: "✦\uFE0E", exact: true },
+  { href: "/app", label: "Overzicht", icon: "⌂\uFE0E", exact: true },
   { href: "/app/boeken", label: "Boeken", icon: "⌕\uFE0E" },
   { href: "/app/afspraken", label: "Afspraken", icon: "◷\uFE0E" },
   { href: "/app/membership", label: "Membership", icon: "◈\uFE0E" },

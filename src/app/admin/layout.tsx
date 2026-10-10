@@ -9,7 +9,7 @@ import { getAdminContext } from "./context";
 export const metadata = { title: "Beheer" };
 
 const links = [
-  { href: "/admin", label: "Dashboard", icon: "✦\uFE0E", exact: true },
+  { href: "/admin", label: "Dashboard", icon: "⌂\uFE0E", exact: true },
   { href: "/admin/leden", label: "Leden", icon: "☺\uFE0E" },
   { href: "/admin/salons", label: "Salons", icon: "✿\uFE0E" },
   { href: "/admin/boekingen", label: "Boekingen", icon: "◷\uFE0E" },

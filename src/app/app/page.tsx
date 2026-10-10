@@ -49,12 +49,12 @@ export default async function MemberHome({ searchParams }: { searchParams: Promi
     <>
       <Flash params={sp} />
       <p className="muted small" style={{ marginBottom: 4 }}>{greeting()},</p>
-      <h1 style={{ marginBottom: 20 }}>{profile?.first_name || "daar"} <em>✦</em></h1>
+      <h1 style={{ marginBottom: 20 }}>{profile?.first_name || "daar"}</h1>
 
       <div className="home-grid">
         {/* The pass */}
         <Link href="/app/membership" className="pass-card" aria-label="Bekijk je membership">
-          <div className="pc-top"><span>{active ? membership.plans?.name : "BeautyPass"}</span><span>{membership?.founding_number ? `Nº ${String(membership.founding_number).padStart(3, "0")}` : "✦"}</span></div>
+          <div className="pc-top"><span>{active ? membership.plans?.name : "BeautyPass"}</span><span>{membership?.founding_number ? `Nº ${String(membership.founding_number).padStart(3, "0")}` : "Amsterdam"}</span></div>
           {active ? (
             <>
               <div><div className="pc-big">{balance}</div><div className="pc-sub">credits beschikbaar</div></div>
