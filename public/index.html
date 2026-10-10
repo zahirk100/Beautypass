@@ -124,6 +124,8 @@
     .ref-link input { flex: 1; min-width: 0; font: 400 14px var(--sans) !important; padding: 13px 16px; background: rgba(251,247,242,.08); border: 1px solid rgba(251,247,242,.22); border-radius: 14px; color: var(--ivory); }
     .ref-link button { flex: none; border: 1px solid rgba(227,199,159,.55); background: transparent; border-radius: 14px; padding: 0 16px; font: 600 .85rem var(--sans); cursor: pointer; color: var(--champagne); }
     .success .fine { margin-top: 12px; }
+    .ref-example { margin-top: 8px; font-size: .88rem !important; color: rgba(251,247,242,.62) !important; }
+    .ref-example:empty { display: none; }
     .fine:empty { display: none; }
     @media (max-width: 520px) { .success { padding: 22px 18px; } .success h2 { font-size: 1.75rem; } .spot b { font-size: 3.1rem; } }
 
@@ -262,9 +264,10 @@
         </div>
         <div class="spot">
           <b id="pos">#—</b>
-          <div><span>Jouw plek</span><small id="pos-total"></small></div>
+          <div><span>Jouw plek op de lijst</span><small id="pos-total"></small></div>
         </div>
-        <p id="ref-pitch">Wil je eerder aan de beurt? <b>Elke vriendin die zich via jouw link aanmeldt, schuift je 10 plekken omhoog.</b></p>
+        <p id="ref-pitch">We sturen de uitnodigingen in volgorde van de lijst. <b>Voor elke vriendin die zich via jouw link aanmeldt, ga je 10 plekken vooruit.</b></p>
+        <p id="ref-example" class="ref-example"></p>
         <div class="ref-link"><input id="ref-url" readonly aria-label="Jouw persoonlijke link"><button type="button" id="copy-btn">Kopieer</button></div>
         <button type="button" class="btn" id="share-btn"><span class="label">Deel met vriendinnen</span><span aria-hidden="true">→</span></button>
         <p class="fine" id="ref-count"></p>
@@ -391,7 +394,12 @@
     if (r && r.referral_code) {
       shareUrl = `${location.origin}/?ref=${encodeURIComponent(r.referral_code)}`;
       document.getElementById("pos").textContent = "#" + r.waitlist_position;
-      document.getElementById("pos-total").textContent = `van ${r.total} op de lijst`;
+      const pos = Number(r.waitlist_position);
+      document.getElementById("pos-total").textContent =
+        `van ${r.total} aanmeldingen · ${pos <= 100 ? "binnen de eerste 100" : `nog ${pos - 100} tot de eerste 100`}`;
+      document.getElementById("ref-example").textContent = pos > 1
+        ? `Meldt één vriendin zich via jouw link aan, dan ga je van #${pos} naar #${Math.max(1, pos - 10)}.`
+        : "Je staat bovenaan. Deel je link gerust: hoe sneller de lijst groeit, hoe sneller we openen.";
       if (r.referrals > 0) document.getElementById("ref-count").textContent = `Al ${r.referrals} ${r.referrals === 1 ? "vriendin" : "vriendinnen"} via jouw link aangemeld ✓`;
     } else {
       document.querySelector(".spot").style.display = "none";

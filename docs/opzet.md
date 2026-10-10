@@ -11,6 +11,7 @@
    - [`006_waitlist_referrals.sql`](../supabase/migrations/006_waitlist_referrals.sql) (wachtlijstpositie + uitnodigingslinks; de landingspagina gebruikt dit)
    - [`007_waitlist_is_new.sql`](../supabase/migrations/007_waitlist_is_new.sql) ("je staat al op de lijst" bij dubbele aanmelding)
    - [`008_waitlist_emails.sql`](../supabase/migrations/008_waitlist_emails.sql) (welkomstmail + mail bij uitnodiging, via Brevo; zie hieronder)
+   - [`009_platform_emails.sql`](../supabase/migrations/009_platform_emails.sql) (mails bij membership en boekingen, herinneringen; zie [emails.md](emails.md))
    - Of in één keer 003 + 004 + 005 + demodata: [`supabase/seed/demo_alles_in_een.sql`](../supabase/seed/demo_alles_in_een.sql)
 3. Wil je testen met voorbeelddata en testaccounts per rol? Zie [demo.md](demo.md).
 
