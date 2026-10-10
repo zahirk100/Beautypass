@@ -10,6 +10,7 @@
    - [`005_media_keep_existing.sql`](../supabase/migrations/005_media_keep_existing.sql)
    - [`006_waitlist_referrals.sql`](../supabase/migrations/006_waitlist_referrals.sql) (wachtlijstpositie + uitnodigingslinks; de landingspagina gebruikt dit)
    - [`007_waitlist_is_new.sql`](../supabase/migrations/007_waitlist_is_new.sql) ("je staat al op de lijst" bij dubbele aanmelding)
+   - [`008_waitlist_emails.sql`](../supabase/migrations/008_waitlist_emails.sql) (welkomstmail + mail bij uitnodiging, via Brevo; zie hieronder)
    - Of in één keer 003 + 004 + 005 + demodata: [`supabase/seed/demo_alles_in_een.sql`](../supabase/seed/demo_alles_in_een.sql)
 3. Wil je testen met voorbeelddata en testaccounts per rol? Zie [demo.md](demo.md).
 
@@ -59,3 +60,16 @@ Later kunnen dit eigen subdomeinen worden (`app.`, `salon.`, `admin.beautypass.n
 - **iPhone (Safari):** open de site → deelknop → **Zet op beginscherm**.
 - **Android (Chrome):** menu ⋮ → **App installeren** / **Toevoegen aan startscherm**.
 De app opent dan zonder browserbalk, met het BeautyPass-icoon.
+
+## E-mail via Brevo (wachtlijst)
+
+Na elke aanmelding roept de database `https://www.beautypass.nl/api/hooks/waitlist` aan; die stuurt de mail via Brevo
+en zet het contact in je Brevo-lijst voor latere lanceringsmails.
+
+1. Brevo: domein `beautypass.nl` authenticeren (DNS-records in Strato) en afzender `hallo@beautypass.nl` toevoegen.
+2. Brevo: Contacts → Lists → lijst "Wachtlijst" aanmaken (noteer het ID). Maak onder Contacts → Settings het attribuut `REFERRAL_LINK` (tekst) aan.
+3. Brevo: SMTP & API → API keys → nieuwe key.
+4. Vercel → Settings → Environment Variables: `BREVO_API_KEY`, `BREVO_LIST_ID`, `WAITLIST_HOOK_SECRET` (zelfbedachte lange code), optioneel `EMAIL_FROM`. Daarna redeploy.
+5. Supabase SQL Editor: `008_waitlist_emails.sql` uitvoeren, dan:
+   `insert into private.settings values ('waitlist_hook_url','https://www.beautypass.nl/api/hooks/waitlist'), ('waitlist_hook_secret','<dezelfde code>') on conflict (key) do update set value = excluded.value;`
+6. Controle: Supabase → `select * from net._http_response order by created desc limit 5;` toont de antwoorden van de website (200 = verstuurd).
