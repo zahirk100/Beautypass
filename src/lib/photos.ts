@@ -1,6 +1,6 @@
 // Editorial stock photos generated for BeautyPass (Higgsfield). Each has a full-size and a light webp version.
 const BASE = "https://d8j0ntlcm91z4.cloudfront.net/user_3K0vP0LWwSjJ1THUL9zRSUshpTj/";
-const photo = (file: string) => ({ full: `${BASE}${file}.png`, small: `${BASE}${file}.png` });
+const photo = (file: string) => ({ full: `${BASE}${file}.png`, small: `${BASE}${file}_min.webp` });
 
 export const PHOTOS = {
   handsManicure: photo("hf_20261010_155207_2aafdb3e-9e05-486a-a77d-0fed9d128437"),
