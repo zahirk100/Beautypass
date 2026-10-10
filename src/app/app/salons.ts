@@ -1,6 +1,7 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { dayKey } from "@/lib/format";
 import { distanceKm, type Point } from "@/lib/geo";
+import { TREATMENT_PHOTO } from "@/lib/photos";
 
 export type BrowseSalon = {
   id: string; name: string; district: string; address: string; description: string; tagline: string; cover: string;
@@ -26,11 +27,13 @@ export async function loadSalons(supabase: SupabaseClient, userId: string, me: P
   const favSet = new Set((favs ?? []).map((f: any) => f.salon_id));
 
   return (salons ?? []).map((s: any) => {
+    const firstSlug = (offers ?? []).filter((o: any) => o.salon_id === s.id && o.treatments?.active)
+      .sort((a: any, b: any) => a.treatments.sort - b.treatments.sort)[0]?.treatments as any;
     const own = (slots ?? []).filter((x: any) => x.salon_id === s.id);
     const r = (ratings ?? []).find((x: any) => x.salon_id === s.id);
     const point = s.latitude != null && s.longitude != null ? { lat: s.latitude, lng: s.longitude } : null;
     return {
-      id: s.id, name: s.name, district: s.district, address: s.address, description: s.description, tagline: s.tagline ?? "", cover: s.cover_url ?? "",
+      id: s.id, name: s.name, district: s.district, address: s.address, description: s.description, tagline: s.tagline ?? "", cover: s.cover_url || TREATMENT_PHOTO[firstSlug?.slug] || "",
       lat: point?.lat ?? null, lng: point?.lng ?? null,
       distance: me && point ? distanceKm(me, point) : null,
       rating: r ? Number(r.avg_rating) : null, reviews: r?.review_count ?? 0,

@@ -1,4 +1,4 @@
--- BeautyPass: locaties, salonprofielen + demodata in één keer. Plak dit volledige bestand in Supabase → SQL Editor → Run.
+-- BeautyPass: locaties, salonprofielen, foto's + demodata in één keer. Plak dit volledige bestand in Supabase → SQL Editor → Run.
 -- Vereist: 001_waitlist.sql en 002_platform.sql zijn al uitgevoerd. Veilig om opnieuw te draaien.
 
 -- Locations (postcode + coordinates), favourites and public ratings. Run after 002_platform.sql.
@@ -74,7 +74,6 @@ end $$;
 revoke execute on all functions in schema public from public, anon;
 grant execute on all functions in schema public to authenticated;
 revoke execute on function public.handle_new_user(), public.protect_profile_role(), public.log_action(text, text, text, jsonb) from authenticated;
-
 -- Salon profiles (photos, socials, opening hours), booking notes. Run after 003. Safe to run again.
 
 alter table public.salons
@@ -222,7 +221,27 @@ $$;
 revoke execute on all functions in schema public from public, anon;
 grant execute on all functions in schema public to authenticated;
 revoke execute on function public.handle_new_user(), public.protect_profile_role(), public.log_action(text, text, text, jsonb) from authenticated;
-
+-- Let salons keep photos that are already on their profile (e.g. photos added by the BeautyPass team),
+-- while new photos must still come from the salon's own storage folder. Safe to run again.
+create or replace function public.update_salon_media(p_salon uuid, p_cover text, p_gallery text[]) returns void
+language plpgsql security definer set search_path = public as $$
+declare
+  v_prefix text := '/storage/v1/object/public/salon-photos/' || p_salon::text || '/';
+  v_existing text[];
+  v_url text;
+begin
+  if not (public.is_salon_member(p_salon, true) or public.is_admin(array['ops']::public.admin_role[])) then
+    raise exception 'Geen toegang';
+  end if;
+  if coalesce(array_length(p_gallery, 1), 0) > 8 then raise exception 'Maximaal 8 foto''s in de galerij'; end if;
+  select gallery || array[cover_url] into v_existing from public.salons where id = p_salon;
+  foreach v_url in array coalesce(p_gallery, '{}') || array[coalesce(p_cover, '')] loop
+    if v_url <> '' and position(v_prefix in v_url) = 0 and not (v_url = any(coalesce(v_existing, '{}'))) then
+      raise exception 'Ongeldige foto';
+    end if;
+  end loop;
+  update public.salons set cover_url = coalesce(p_cover, ''), gallery = coalesce(p_gallery, '{}') where id = p_salon;
+end $$;
 -- BeautyPass demo data: test accounts per role, salons across Amsterdam, availability, bookings and reviews.
 -- Run in the Supabase SQL Editor AFTER the migrations 001–003. Running it again resets all demo data
 -- (fresh availability for the next 2 weeks). Remove everything with demo_cleanup.sql before launch.
@@ -488,6 +507,28 @@ begin
     $q$;
   end if;
 end $$;
+
+-- Demo photos (only when migration 004 has been run)
+do $outer$
+begin
+  if exists (select 1 from information_schema.columns where table_schema = 'public' and table_name = 'salons' and column_name = 'cover_url') then
+    execute $q$
+update public.salons s set cover_url = v.cover, gallery = v.gallery
+from (values
+  ('5a000000-0000-0000-0000-000000000001'::uuid, 'https://d8j0ntlcm91z4.cloudfront.net/user_3K0vP0LWwSjJ1THUL9zRSUshpTj/hf_20261010_155255_8c6159b6-af57-47ae-a236-7cab659e17ff.png', array['https://d8j0ntlcm91z4.cloudfront.net/user_3K0vP0LWwSjJ1THUL9zRSUshpTj/hf_20261010_155207_2aafdb3e-9e05-486a-a77d-0fed9d128437_min.webp', 'https://d8j0ntlcm91z4.cloudfront.net/user_3K0vP0LWwSjJ1THUL9zRSUshpTj/hf_20261010_155402_5dfac4f7-cae9-4057-90fb-48004e5eb764_min.webp', 'https://d8j0ntlcm91z4.cloudfront.net/user_3K0vP0LWwSjJ1THUL9zRSUshpTj/hf_20261010_155452_0c1d01a0-cd4b-4dd0-b2d3-525cc4ce7535_min.webp']),
+  ('5a000000-0000-0000-0000-000000000002'::uuid, 'https://d8j0ntlcm91z4.cloudfront.net/user_3K0vP0LWwSjJ1THUL9zRSUshpTj/hf_20261010_155326_dd188326-b1dc-4ed1-90f4-17e9d4c6c018.png', array['https://d8j0ntlcm91z4.cloudfront.net/user_3K0vP0LWwSjJ1THUL9zRSUshpTj/hf_20261010_155255_ddcc5830-6c18-43e8-9e66-a16226540cbb_min.webp', 'https://d8j0ntlcm91z4.cloudfront.net/user_3K0vP0LWwSjJ1THUL9zRSUshpTj/hf_20261010_155255_b1d6e6d8-8ff7-4563-a19b-e965e968f0d8_min.webp']),
+  ('5a000000-0000-0000-0000-000000000003'::uuid, 'https://d8j0ntlcm91z4.cloudfront.net/user_3K0vP0LWwSjJ1THUL9zRSUshpTj/hf_20261010_155255_ca9c1c7f-ae99-4b32-87b5-f2a87266229b.png', array['https://d8j0ntlcm91z4.cloudfront.net/user_3K0vP0LWwSjJ1THUL9zRSUshpTj/hf_20261010_155255_57e49157-64e7-4dc5-8343-84b57fa2fec7_min.webp']),
+  ('5a000000-0000-0000-0000-000000000004'::uuid, 'https://d8j0ntlcm91z4.cloudfront.net/user_3K0vP0LWwSjJ1THUL9zRSUshpTj/hf_20261010_155402_5dfac4f7-cae9-4057-90fb-48004e5eb764.png', array['https://d8j0ntlcm91z4.cloudfront.net/user_3K0vP0LWwSjJ1THUL9zRSUshpTj/hf_20261010_155452_0c1d01a0-cd4b-4dd0-b2d3-525cc4ce7535_min.webp', 'https://d8j0ntlcm91z4.cloudfront.net/user_3K0vP0LWwSjJ1THUL9zRSUshpTj/hf_20261010_155207_2aafdb3e-9e05-486a-a77d-0fed9d128437_min.webp']),
+  ('5a000000-0000-0000-0000-000000000005'::uuid, 'https://d8j0ntlcm91z4.cloudfront.net/user_3K0vP0LWwSjJ1THUL9zRSUshpTj/hf_20261010_155255_b1d6e6d8-8ff7-4563-a19b-e965e968f0d8.png', array['https://d8j0ntlcm91z4.cloudfront.net/user_3K0vP0LWwSjJ1THUL9zRSUshpTj/hf_20261010_155345_e86433df-a3c8-4604-bd19-cf8a1c7307a4_min.webp', 'https://d8j0ntlcm91z4.cloudfront.net/user_3K0vP0LWwSjJ1THUL9zRSUshpTj/hf_20261010_155255_ddcc5830-6c18-43e8-9e66-a16226540cbb_min.webp', 'https://d8j0ntlcm91z4.cloudfront.net/user_3K0vP0LWwSjJ1THUL9zRSUshpTj/hf_20261010_155207_2aafdb3e-9e05-486a-a77d-0fed9d128437_min.webp']),
+  ('5a000000-0000-0000-0000-000000000006'::uuid, 'https://d8j0ntlcm91z4.cloudfront.net/user_3K0vP0LWwSjJ1THUL9zRSUshpTj/hf_20261010_155255_ddcc5830-6c18-43e8-9e66-a16226540cbb.png', array['https://d8j0ntlcm91z4.cloudfront.net/user_3K0vP0LWwSjJ1THUL9zRSUshpTj/hf_20261010_155326_dd188326-b1dc-4ed1-90f4-17e9d4c6c018_min.webp']),
+  ('5a000000-0000-0000-0000-000000000007'::uuid, 'https://d8j0ntlcm91z4.cloudfront.net/user_3K0vP0LWwSjJ1THUL9zRSUshpTj/hf_20261010_155255_57e49157-64e7-4dc5-8343-84b57fa2fec7.png', array['https://d8j0ntlcm91z4.cloudfront.net/user_3K0vP0LWwSjJ1THUL9zRSUshpTj/hf_20261010_155255_ca9c1c7f-ae99-4b32-87b5-f2a87266229b_min.webp', 'https://d8j0ntlcm91z4.cloudfront.net/user_3K0vP0LWwSjJ1THUL9zRSUshpTj/hf_20261010_155402_5dfac4f7-cae9-4057-90fb-48004e5eb764_min.webp']),
+  ('5a000000-0000-0000-0000-000000000008'::uuid, 'https://d8j0ntlcm91z4.cloudfront.net/user_3K0vP0LWwSjJ1THUL9zRSUshpTj/hf_20261010_155345_e86433df-a3c8-4604-bd19-cf8a1c7307a4.png', array['https://d8j0ntlcm91z4.cloudfront.net/user_3K0vP0LWwSjJ1THUL9zRSUshpTj/hf_20261010_155452_0c1d01a0-cd4b-4dd0-b2d3-525cc4ce7535_min.webp']),
+  ('5a000000-0000-0000-0000-000000000009'::uuid, 'https://d8j0ntlcm91z4.cloudfront.net/user_3K0vP0LWwSjJ1THUL9zRSUshpTj/hf_20261010_155255_fd6cebf4-8cbc-4832-be43-2759b5e26cbc.png', array['https://d8j0ntlcm91z4.cloudfront.net/user_3K0vP0LWwSjJ1THUL9zRSUshpTj/hf_20261010_155255_ca9c1c7f-ae99-4b32-87b5-f2a87266229b_min.webp'])
+) as v(id, cover, gallery)
+where s.id = v.id
+    $q$;
+  end if;
+end $outer$;
 
 -- Overview of what was created
 select 'salons' as wat, count(*) from public.salons where is_demo

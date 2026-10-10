@@ -3,6 +3,7 @@ import { Logo } from "@/components/Logo";
 import { Flash } from "@/components/Flash";
 import { Submit } from "@/components/Submit";
 import { resetPassword, signIn, signUp } from "../actions";
+import { PHOTOS } from "@/lib/photos";
 
 export const metadata = { title: "Inloggen" };
 
@@ -13,7 +14,7 @@ export default async function LoginPage({ searchParams }: { searchParams: Promis
 
   return (
     <div className="auth">
-      <aside className="auth-side">
+      <aside className="auth-side" style={{ backgroundImage: `linear-gradient(160deg, rgba(58,24,40,.92) 20%, rgba(58,24,40,.55)), url(${PHOTOS.handsManicure.small})` }}>
         <Logo light />
         <h1>Je beauty&shy;routine, <em>geregeld.</em></h1>
         <p className="muted" style={{ position: "relative", zIndex: 1, color: "rgba(251,247,242,.7)" }}>

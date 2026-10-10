@@ -86,7 +86,7 @@
 
     /* Visual: membership pass + app preview */
     .visual { position: relative; height: 560px; }
-    .pass { position: absolute; width: 330px; aspect-ratio: 1.586; border-radius: 22px; padding: 22px 24px; left: 0; bottom: 40px; transform: rotate(-9deg); color: var(--ivory); z-index: 1; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; background: radial-gradient(120% 120% at 20% 0%, #6a3049 0%, var(--plum) 55%, #24101a 100%); box-shadow: 0 40px 70px -30px rgba(58, 24, 40, .7); animation: float 7s ease-in-out infinite; }
+    .pass { position: absolute; width: 320px; aspect-ratio: 1.586; border-radius: 22px; padding: 22px 24px; left: 0; bottom: 10px; transform: rotate(-9deg); color: var(--ivory); z-index: 1; display: flex; flex-direction: column; justify-content: space-between; overflow: hidden; background: radial-gradient(120% 120% at 20% 0%, #6a3049 0%, var(--plum) 55%, #24101a 100%); box-shadow: 0 40px 70px -30px rgba(58, 24, 40, .7); animation: float 7s ease-in-out infinite; }
     .pass::before { content: ""; position: absolute; inset: -50%; background: conic-gradient(from 0deg, transparent, rgba(227,199,159,.22), transparent 30%); animation: spin 9s linear infinite; }
     .pass::after { content: ""; position: absolute; inset: 9px; border: 1px solid rgba(227,199,159,.35); border-radius: 15px; }
     .pass > * { position: relative; z-index: 1; }
@@ -120,6 +120,19 @@
     .s-tab i { width: 20px; height: 4px; border-radius: 4px; background: #e4d9dd; }
     .s-tab i:first-child { background: var(--rose); width: 26px; }
 
+
+    .photo { position: absolute; right: 0; top: 0; width: 400px; height: 530px; margin: 0; border-radius: 30px; overflow: hidden; background: var(--blush); box-shadow: 0 60px 100px -40px rgba(58, 24, 40, .55); }
+    .photo img { width: 100%; height: 100%; object-fit: cover; display: block; animation: zoom 18s ease-in-out infinite alternate; }
+    @keyframes zoom { to { transform: scale(1.06); } }
+    .chip-float { position: absolute; z-index: 2; top: 54px; left: 6%; display: flex; gap: 10px; align-items: center; background: rgba(255,255,255,.92); backdrop-filter: blur(10px); border-radius: 18px; padding: 12px 16px 12px 12px; box-shadow: 0 20px 40px -18px rgba(58,24,40,.4); animation: float 6s ease-in-out infinite reverse; font-size: .85rem; }
+    .chip-float .ok { width: 30px; height: 30px; border-radius: 50%; background: var(--plum); color: var(--champagne); display: grid; place-items: center; font-weight: 700; }
+    .chip-float b { display: block; font-size: .85rem; }
+    .chip-float small { color: var(--muted); font-size: .76rem; }
+    .mobile-photo { display: none; }
+    @media (max-width: 900px) {
+      .mobile-photo { display: block; height: 96px; border-radius: 20px; overflow: hidden; margin: 0 0 14px; background: var(--blush); }
+      .mobile-photo img { width: 100%; height: 100%; object-fit: cover; object-position: center 35%; display: block; }
+    }
     footer { text-align: center; font-size: .74rem; color: var(--muted); padding: 0 18px max(18px, env(safe-area-inset-bottom)); }
     footer a { color: var(--muted); }
 
@@ -151,6 +164,7 @@
 
   <main>
     <section>
+      <div class="mobile-photo" aria-hidden="true"><img src="https://d8j0ntlcm91z4.cloudfront.net/user_3K0vP0LWwSjJ1THUL9zRSUshpTj/hf_20261010_155207_2aafdb3e-9e05-486a-a77d-0fed9d128437_min.webp" alt=""></div>
       <span class="kicker"><span class="dot"></span>Binnenkort in Amsterdam</span>
       <h1>Al je beauty&shy;afspraken. <em>Eén membership.</em></h1>
       <p class="lead">Elke maand een vast tegoed voor manicure, pedicure, blowout, brows en lashes, bij geselecteerde salons. Jij kiest wat je laat doen.</p>
@@ -185,18 +199,8 @@
     </section>
 
     <div class="visual" aria-hidden="true">
-      <div class="phone">
-        <div class="screen">
-          <div class="notch"></div>
-          <div class="s-hello"><small>Goedemiddag</small><b>Sophie</b></div>
-          <div class="s-card"><small>Jouw tegoed</small><b>125 credits</b><div class="s-bar"><i></i></div></div>
-          <div class="s-label">Volgende afspraak</div>
-          <div class="s-appt"><div class="s-date">DO<b>14</b></div><div><strong>BIAB manicure</strong><span>Studio in De Pijp · 14:30</span></div></div>
-          <div class="s-label">Boek iets nieuws</div>
-          <div class="s-chips"><span class="on">Blowout</span><span>Pedicure</span><span>Lash lift</span><span>Brows</span><span>Gellak</span></div>
-          <div class="s-tab"><i></i><i></i><i></i><i></i></div>
-        </div>
-      </div>
+      <figure class="photo"><img src="https://d8j0ntlcm91z4.cloudfront.net/user_3K0vP0LWwSjJ1THUL9zRSUshpTj/hf_20261010_155255_bd41a471-05c8-4604-9ced-f258ec6f3f3d_min.webp" alt="" fetchpriority="high"></figure>
+      <div class="chip-float"><span class="ok">✓</span><div><b>Geboekt: BIAB manicure</b><small>Morgen 14:30 · De Pijp</small></div></div>
       <div class="pass">
         <div class="top"><span>Founding member</span><span>✦</span></div>
         <div class="name">Beauty<i>Pass</i></div>

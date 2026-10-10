@@ -8,6 +8,7 @@ import { Flash } from "@/components/Flash";
 import { Submit } from "@/components/Submit";
 import { SlotPicker } from "@/components/SlotPicker";
 import { instagramUrl, placeholderStyle, tiktokUrl } from "@/lib/social";
+import { TREATMENT_PHOTO } from "@/lib/photos";
 import { loadMembership } from "../../data";
 import { myLocation } from "../../salons";
 import { bookSlot, toggleFavorite } from "../../actions";
@@ -29,6 +30,7 @@ export default async function SalonBooking({ params, searchParams }: { params: P
   ]);
   const treatments = (offers ?? []).map((o: any) => ({ ...o.treatments, credits: o.credits_override ?? o.treatments?.credits }))
     .filter((t: any) => t.id).sort((a: any, b: any) => a.sort - b.sort);
+  const coverUrl: string = salon.cover_url || TREATMENT_PHOTO[treatments[0]?.slug] || "";
   const preselect = treatments.find((t: any) => t.slug === sp.t && t.credits <= balance);
 
   // Day tabs: show one day at a time
@@ -48,8 +50,8 @@ export default async function SalonBooking({ params, searchParams }: { params: P
   return (
     <>
       <Link href="/app/boeken" className="small muted">← Alle salons</Link>
-      <div className="cover" style={{ margin: "12px 0 18px", ...(salon.cover_url ? {} : placeholderStyle(salon.name)) }}>
-        {salon.cover_url ? <img src={salon.cover_url} alt={`Sfeerfoto van ${salon.name}`} /> : <span className="initial">{salon.name.charAt(0)}</span>}
+      <div className="cover" style={{ margin: "12px 0 18px", ...(coverUrl ? {} : placeholderStyle(salon.name)) }}>
+        {coverUrl ? <img src={coverUrl} alt={`Sfeerfoto van ${salon.name}`} /> : <span className="initial">{salon.name.charAt(0)}</span>}
       </div>
       <div className="page-head">
         <div>

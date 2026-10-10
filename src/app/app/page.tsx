@@ -4,6 +4,7 @@ import { getContext } from "@/lib/auth";
 import { dateShort, dayKey, time } from "@/lib/format";
 import { bikeMinutes, formatDistance, routeUrl } from "@/lib/geo";
 import { placeholderStyle } from "@/lib/social";
+import { PHOTOS } from "@/lib/photos";
 import { Flash } from "@/components/Flash";
 import { StatusBadge } from "@/components/Badge";
 import { loadMembership } from "./data";
@@ -93,11 +94,11 @@ export default async function MemberHome({ searchParams }: { searchParams: Promi
             {upcoming!.length > 1 && <Link href="/app/afspraken" className="small muted">+ {upcoming!.length - 1} meer gepland →</Link>}
           </div>
         ) : (
-          <div className="card next-card empty-next">
-            <div className="label-sm">Volgende afspraak</div>
-            <p className="muted">Nog niets gepland.{active ? " Tijd voor iets moois?" : ""}</p>
-            {active && <Link href="/app/boeken?sort=soon" className="btn">Boek een behandeling</Link>}
-          </div>
+          <Link href={active ? "/app/boeken?sort=soon" : "/app/membership"} className="photo-card" style={{ backgroundImage: `linear-gradient(180deg, rgba(34,20,27,0) 30%, rgba(34,20,27,.75)), url(${PHOTOS.canalWoman.small})` }}>
+            <span className="label-sm" style={{ color: "rgba(255,255,255,.85)" }}>Nog niets gepland</span>
+            <b>Tijd voor iets moois?</b>
+            <span className="btn small" style={{ alignSelf: "flex-start" }}>{active ? "Boek een behandeling" : "Kies je membership"}</span>
+          </Link>
         )}
       </div>
 
