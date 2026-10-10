@@ -36,3 +36,12 @@ export async function POST(request: Request) {
   }
   return NextResponse.json({ ok: true });
 }
+
+// Setup check: shows whether the settings are present on this deployment, never their values
+export function GET() {
+  return NextResponse.json({
+    WAITLIST_HOOK_SECRET: Boolean(process.env.WAITLIST_HOOK_SECRET),
+    BREVO_API_KEY: Boolean(process.env.BREVO_API_KEY),
+    BREVO_LIST_ID: process.env.BREVO_LIST_ID ? Number(process.env.BREVO_LIST_ID) || "geen getal" : false,
+  });
+}
