@@ -9,15 +9,15 @@ import { getAdminContext } from "./context";
 export const metadata = { title: "Beheer" };
 
 const links = [
-  { href: "/admin", label: "Dashboard", icon: "✦", exact: true },
-  { href: "/admin/leden", label: "Leden", icon: "☺" },
-  { href: "/admin/salons", label: "Salons", icon: "✿" },
-  { href: "/admin/boekingen", label: "Boekingen", icon: "◷" },
-  { href: "/admin/wachtlijst", label: "Wachtlijst", icon: "✉" },
-  { href: "/admin/behandelingen", label: "Behandelingen", icon: "◇" },
-  { href: "/admin/plannen", label: "Memberships", icon: "◈" },
-  { href: "/admin/team", label: "Team", icon: "♛" },
-  { href: "/admin/audit", label: "Logboek", icon: "≡" },
+  { href: "/admin", label: "Dashboard", icon: "✦\uFE0E", exact: true },
+  { href: "/admin/leden", label: "Leden", icon: "☺\uFE0E" },
+  { href: "/admin/salons", label: "Salons", icon: "✿\uFE0E" },
+  { href: "/admin/boekingen", label: "Boekingen", icon: "◷\uFE0E" },
+  { href: "/admin/wachtlijst", label: "Wachtlijst", icon: "✉\uFE0E" },
+  { href: "/admin/behandelingen", label: "Behandelingen", icon: "◇\uFE0E" },
+  { href: "/admin/plannen", label: "Memberships", icon: "◈\uFE0E" },
+  { href: "/admin/team", label: "Team", icon: "♛\uFE0E" },
+  { href: "/admin/audit", label: "Logboek", icon: "≡\uFE0E" },
 ];
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {

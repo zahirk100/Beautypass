@@ -31,7 +31,7 @@ export default async function Agenda({ searchParams }: { searchParams: Promise<R
 
       <form action={addSlots} className="card grid">
         <h2>Vrije tijden toevoegen</h2>
-        <div className="form-grid">
+        <div className="form-grid agenda-form">
           <label className="field">Datum<input type="date" name="date" min={today} defaultValue={today} required /></label>
           <label className="field">Van<input type="time" name="from" defaultValue="10:00" step={900} required /></label>
           <label className="field">Tot<input type="time" name="to" defaultValue="13:00" step={900} required /></label>
@@ -56,13 +56,15 @@ export default async function Agenda({ searchParams }: { searchParams: Promise<R
                   {list.map((s: any) => {
                     const b = bySlot.get(s.starts_at);
                     return (
-                      <div key={s.id} className="row-item" style={{ padding: "10px 14px", flexWrap: "wrap" }}>
-                        <b style={{ width: 110 }}>{time(s.starts_at)}–{time(s.ends_at)}</b>
-                        <div className="grow">{b ? <>{b.member_name} · {b.treatment}{b.note && <><br /><span className="note">“{b.note}”</span></>}</> : <span className="muted">Vrij voor members</span>}</div>
-                        <StatusBadge status={b ? b.status : s.status} />
-                        {b ? <BookingActions id={b.id} status={b.status} startsAt={b.starts_at} backTo="/salon/agenda" /> : s.status !== "booked" && (
-                          <form action={deleteSlot}><input type="hidden" name="slot" value={s.id} /><Submit className="btn secondary small">Verwijder</Submit></form>
+                      <div key={s.id} className={`slot-row${b ? " booked" : ""}`}>
+                        <b className="slot-time">{time(s.starts_at)}<span>–{time(s.ends_at)}</span></b>
+                        <div className="slot-info">
+                          {b ? <><b>{b.member_name}</b><span className="small muted">{b.treatment}</span>{b.note && <span className="note">“{b.note}”</span>}</> : <span className="small muted">{s.status === "blocked" ? "Geblokkeerd" : "Vrij voor members"}</span>}
+                        </div>
+                        {b ? <StatusBadge status={b.status} /> : s.status !== "booked" && (
+                          <form action={deleteSlot}><input type="hidden" name="slot" value={s.id} /><Submit className="btn secondary small icon-btn" confirm="Deze vrije tijd verwijderen?">✕</Submit></form>
                         )}
+                        {b && <div className="slot-actions"><BookingActions id={b.id} status={b.status} startsAt={b.starts_at} backTo="/salon/agenda" /></div>}
                       </div>
                     );
                   })}

@@ -10,11 +10,11 @@ import { switchSalon } from "./actions";
 export const metadata = { title: "Salonportaal" };
 
 const links = [
-  { href: "/salon", label: "Vandaag", icon: "✦", exact: true },
-  { href: "/salon/agenda", label: "Agenda", icon: "◷" },
-  { href: "/salon/profiel", label: "Profiel", icon: "✿" },
-  { href: "/salon/uitbetalingen", label: "Geld", icon: "€" },
-  { href: "/salon/instellingen", label: "Team", icon: "☺" },
+  { href: "/salon", label: "Vandaag", icon: "✦\uFE0E", exact: true },
+  { href: "/salon/agenda", label: "Agenda", icon: "◷\uFE0E" },
+  { href: "/salon/profiel", label: "Profiel", icon: "✿\uFE0E" },
+  { href: "/salon/uitbetalingen", label: "Geld", icon: "€\uFE0E" },
+  { href: "/salon/instellingen", label: "Team", icon: "☺\uFE0E" },
 ];
 
 export default async function SalonLayout({ children }: { children: React.ReactNode }) {

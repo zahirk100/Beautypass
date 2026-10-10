@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { getContext } from "@/lib/auth";
 import { routeUrl } from "@/lib/geo";
-import { dateLong, time } from "@/lib/format";
+import { time } from "@/lib/format";
 import { Flash } from "@/components/Flash";
 import { Submit } from "@/components/Submit";
 import { StatusBadge } from "@/components/Badge";
@@ -34,18 +34,24 @@ export default async function Appointments({ searchParams }: { searchParams: Pro
           {upcoming.map((b: any) => {
             const late = new Date(b.starts_at).getTime() - now < 24 * 3600 * 1000;
             return (
-              <div className="row-item" key={b.id}>
-                <DateBox iso={b.starts_at} />
-                <Link href={`/app/afspraken/${b.id}`} className="grow" style={{ textDecoration: "none" }}>
-                  <b>{b.treatments?.name}</b>
-                  <div className="small muted">{b.salons?.name} · <span className="cap" style={{ display: "inline-block" }}>{dateLong(b.starts_at)}</span> om {time(b.starts_at)} · {b.credits} credits</div>
+              <div className="appt-card" key={b.id}>
+                <Link href={`/app/afspraken/${b.id}`} className="appt-top">
+                  <DateBox iso={b.starts_at} />
+                  <div className="appt-info">
+                    <b>{b.treatments?.name}</b>
+                    <div className="small muted">{b.salons?.name}</div>
+                    <div className="small appt-when">{time(b.starts_at)} · {b.credits} credits</div>
+                  </div>
+                  <span className="appt-chev" aria-hidden="true">›</span>
                 </Link>
-                <a className="btn secondary small" href={`/app/afspraken/${b.id}/agenda`}>Agenda</a>
-                {b.salons?.latitude != null && <a className="btn secondary small" target="_blank" rel="noopener noreferrer" href={routeUrl({ lat: b.salons.latitude, lng: b.salons.longitude })}>Route</a>}
-                <form action={cancelBooking}>
-                  <input type="hidden" name="booking" value={b.id} />
-                  <Submit className="btn danger small" confirm={late ? "Deze afspraak is binnen 24 uur. Je krijgt je credits niet terug. Toch annuleren?" : "Weet je zeker dat je wilt annuleren?"}>Annuleren</Submit>
-                </form>
+                <div className="appt-actions">
+                  <a className="btn secondary small" href={`/app/afspraken/${b.id}/agenda`}>Agenda</a>
+                  {b.salons?.latitude != null && <a className="btn secondary small" target="_blank" rel="noopener noreferrer" href={routeUrl({ lat: b.salons.latitude, lng: b.salons.longitude })}>Route</a>}
+                  <form action={cancelBooking}>
+                    <input type="hidden" name="booking" value={b.id} />
+                    <Submit className="btn danger small" confirm={late ? "Deze afspraak is binnen 24 uur. Je krijgt je credits niet terug. Toch annuleren?" : "Weet je zeker dat je wilt annuleren?"}>Annuleren</Submit>
+                  </form>
+                </div>
               </div>
             );
           })}
@@ -57,16 +63,18 @@ export default async function Appointments({ searchParams }: { searchParams: Pro
         {past.length === 0 ? <div className="card empty">Nog geen eerdere afspraken.</div> : (
           <div className="list">
             {past.map((b: any) => (
-              <div className="row-item" key={b.id} style={{ flexWrap: "wrap" }}>
-                <DateBox iso={b.starts_at} />
-                <div className="grow">
-                  <b>{b.treatments?.name}</b>
-                  <div className="small muted">{b.salons?.name} · {time(b.starts_at)} · {b.credits} credits</div>
-                </div>
-                <StatusBadge status={b.status} />
-                {b.status === "completed" && <Link href={`/app/boeken/${b.salon_id}?t=${b.treatments?.slug}`} className="btn secondary small">Boek opnieuw</Link>}
+              <div className="appt-card" key={b.id}>
+                <Link href={`/app/afspraken/${b.id}`} className="appt-top">
+                  <DateBox iso={b.starts_at} />
+                  <div className="appt-info">
+                    <b>{b.treatments?.name}</b>
+                    <div className="small muted">{b.salons?.name} · {time(b.starts_at)} · {b.credits} credits</div>
+                  </div>
+                  <StatusBadge status={b.status} />
+                </Link>
+                {b.status === "completed" && <div className="appt-actions"><Link href={`/app/boeken/${b.salon_id}?t=${b.treatments?.slug}`} className="btn secondary small">Boek opnieuw</Link></div>}
                 {b.status === "completed" && !reviewed.has(b.id) && (
-                  <details className="more" style={{ flexBasis: "100%" }}>
+                  <details className="more" style={{ padding: "0 14px 14px" }}>
                     <summary>Beoordeel deze afspraak</summary>
                     <form action={leaveReview} className="form-grid">
                       <input type="hidden" name="booking" value={b.id} />

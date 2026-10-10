@@ -412,3 +412,35 @@ input[type=radio], input[type=checkbox] { width: auto; accent-color: var(--plum)
 .photo-card { display: flex; flex-direction: column; justify-content: flex-end; gap: 8px; min-height: 210px; padding: 22px; border-radius: 24px; text-decoration: none; color: #fff; background: var(--plum) center 30% / cover no-repeat; box-shadow: 0 30px 60px -34px rgba(58,24,40,.7); }
 .photo-card b { font-family: var(--serif); font-weight: 400; font-size: 1.8rem; line-height: 1.1; }
 .photo-card .btn { background: #fff; color: var(--plum); }
+
+/* Appointment cards */
+.appt-card { background: var(--paper); border: 1px solid var(--line); border-radius: 18px; overflow: hidden; }
+.appt-top { display: flex; align-items: center; gap: 14px; padding: 14px; text-decoration: none; }
+.appt-info { flex: 1; min-width: 0; }
+.appt-info b { display: block; }
+.appt-when { font-weight: 600; color: var(--rose); margin-top: 2px; }
+.appt-chev { font-size: 1.6rem; color: var(--muted); line-height: 1; }
+.appt-actions { display: flex; gap: 8px; padding: 0 14px 14px; flex-wrap: wrap; }
+.appt-actions form { display: contents; }
+@media (max-width: 900px) {
+  .appt-actions .btn { flex: 1; }
+}
+.m-tabs .ic, .bottomnav .ic { font-family: "Segoe UI Symbol", "Apple Symbols", system-ui, sans-serif; }
+
+/* Salon agenda rows */
+.slot-row { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 4px 14px; padding: 10px 12px; border: 1px solid var(--line); border-radius: 14px; background: var(--paper); }
+.slot-row.booked { border-color: #ecd0da; background: var(--blush-soft); }
+.slot-time { font-size: .95rem; white-space: nowrap; }
+.slot-time span { font-weight: 400; color: var(--muted); font-size: .8rem; }
+.slot-info { display: grid; gap: 1px; min-width: 0; }
+.slot-info .note { justify-self: start; }
+.slot-actions { grid-column: 1 / -1; }
+.slot-actions:empty { display: none; }
+.icon-btn { width: 36px; padding: 0 !important; }
+@media (max-width: 900px) {
+  .agenda-form { grid-template-columns: 1fr 1fr; }
+  .agenda-form > label:first-child, .agenda-form > button { grid-column: 1 / -1; }
+  .slot-actions .inline-form { width: 100%; }
+  .slot-actions .inline-form > form { flex: 1; }
+  .slot-actions .btn { width: 100%; }
+}
