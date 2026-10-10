@@ -7,7 +7,9 @@
    - [`002_platform.sql`](../supabase/migrations/002_platform.sql)
    - [`003_locations_favorites.sql`](../supabase/migrations/003_locations_favorites.sql)
    - [`004_salon_profiles_notes.sql`](../supabase/migrations/004_salon_profiles_notes.sql) (foto's, socials, opmerkingen)
-   - Of in één keer 003 + 004 + demodata: [`supabase/seed/demo_alles_in_een.sql`](../supabase/seed/demo_alles_in_een.sql)
+   - [`005_media_keep_existing.sql`](../supabase/migrations/005_media_keep_existing.sql)
+   - [`006_waitlist_referrals.sql`](../supabase/migrations/006_waitlist_referrals.sql) (wachtlijstpositie + uitnodigingslinks; de landingspagina gebruikt dit)
+   - Of in één keer 003 + 004 + 005 + demodata: [`supabase/seed/demo_alles_in_een.sql`](../supabase/seed/demo_alles_in_een.sql)
 3. Wil je testen met voorbeelddata en testaccounts per rol? Zie [demo.md](demo.md).
 
 ## 2. Inloggen instellen (Supabase → Authentication → URL Configuration)

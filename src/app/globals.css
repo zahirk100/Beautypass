@@ -443,3 +443,17 @@ input[type=radio], input[type=checkbox] { width: auto; accent-color: var(--plum)
   .slot-actions .inline-form > form { flex: 1; }
   .slot-actions .btn { width: 100%; }
 }
+
+/* Legal pages (privacy) */
+.legal { min-height: 100dvh; padding: 22px 20px 60px; }
+.legal-top { max-width: 720px; margin: 0 auto 34px; }
+.legal-body { max-width: 720px; margin: 0 auto; background: var(--paper); border: 1px solid var(--line); border-radius: 24px; padding: clamp(24px, 5vw, 52px); }
+.legal-body h1 { font-size: clamp(2.3rem, 7vw, 3.2rem); margin: 4px 0 14px; }
+.legal-body h1 em { color: var(--rose); }
+.legal-body h2 { font-size: 1.5rem; margin: 34px 0 10px; }
+.legal-body p, .legal-body li { color: #3d2a33; line-height: 1.7; }
+.legal-body ul { padding-left: 1.2em; margin: 8px 0; display: grid; gap: 6px; }
+.legal-body a { color: var(--rose); }
+.legal-eyebrow { font-size: .78rem; letter-spacing: .16em; text-transform: uppercase; color: var(--muted) !important; }
+.legal-lead { font-size: 1.08rem; }
+.legal-back { margin-top: 36px; padding-top: 20px; border-top: 1px solid var(--line); }
