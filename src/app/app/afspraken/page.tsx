@@ -36,10 +36,11 @@ export default async function Appointments({ searchParams }: { searchParams: Pro
             return (
               <div className="row-item" key={b.id}>
                 <DateBox iso={b.starts_at} />
-                <div className="grow">
+                <Link href={`/app/afspraken/${b.id}`} className="grow" style={{ textDecoration: "none" }}>
                   <b>{b.treatments?.name}</b>
-                  <div className="small muted">{b.salons?.name} · {dateLong(b.starts_at)} om {time(b.starts_at)} · {b.credits} credits</div>
-                </div>
+                  <div className="small muted">{b.salons?.name} · <span className="cap" style={{ display: "inline-block" }}>{dateLong(b.starts_at)}</span> om {time(b.starts_at)} · {b.credits} credits</div>
+                </Link>
+                <a className="btn secondary small" href={`/app/afspraken/${b.id}/agenda`}>Agenda</a>
                 {b.salons?.latitude != null && <a className="btn secondary small" target="_blank" rel="noopener noreferrer" href={routeUrl({ lat: b.salons.latitude, lng: b.salons.longitude })}>Route</a>}
                 <form action={cancelBooking}>
                   <input type="hidden" name="booking" value={b.id} />

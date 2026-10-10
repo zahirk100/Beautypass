@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { can, ADMIN_WRITE } from "@/lib/auth";
-import { currentMonth, euro, monthLabel } from "@/lib/format";
+import { currentMonth, dayKey, euro, monthLabel } from "@/lib/format";
 import { channel, countBy } from "@/lib/sources";
 import { Flash } from "@/components/Flash";
 import { Submit } from "@/components/Submit";
@@ -23,6 +23,10 @@ export default async function AdminDashboard({ searchParams }: { searchParams: P
   const waitlist = wl ?? [];
   const week = waitlist.filter((w: any) => Date.now() - new Date(w.created_at).getTime() < 7 * 864e5).length;
   const channels = countBy(waitlist, (w: any) => channel(w.source)).slice(0, 6);
+  // Sign-ups per day, last 14 days
+  const days = Array.from({ length: 14 }, (_, i) => dayKey(new Date(Date.now() - (13 - i) * 864e5).toISOString()));
+  const perDay = days.map((k) => ({ k, n: waitlist.filter((w: any) => dayKey(w.created_at) === k).length }));
+  const maxDay = Math.max(1, ...perDay.map((d) => d.n));
   const activeSalons = (salons ?? []).filter((s: any) => s.status === "active").length;
   const leadSalons = (salons ?? []).filter((s: any) => s.status === "lead").length;
   const topSalons = (payouts ?? []).filter((p: any) => p.bookings > 0).sort((a: any, b: any) => b.payout_cents - a.payout_cents).slice(0, 5);
@@ -61,6 +65,14 @@ export default async function AdminDashboard({ searchParams }: { searchParams: P
             <div className="stat"><div className="label">Totaal</div><div className="value">{waitlist.length}</div></div>
             <div className="stat"><div className="label">Laatste 7 dagen</div><div className="value">+{week}</div></div>
           </div>
+          <div className="spark" role="img" aria-label={`Aanmeldingen per dag, laatste 14 dagen: ${perDay.map((d) => d.n).join(", ")}`}>
+            {perDay.map((d) => (
+              <div key={d.k} className="spark-col" title={`${new Date(d.k).toLocaleDateString("nl-NL", { day: "numeric", month: "short" })}: ${d.n} aanmeldingen`}>
+                <i style={{ height: `${Math.max(d.n ? 8 : 2, (d.n / maxDay) * 100)}%` }} />
+              </div>
+            ))}
+          </div>
+          <div className="small muted" style={{ display: "flex", justifyContent: "space-between" }}><span>14 dagen geleden</span><span>vandaag</span></div>
           <div className="list" style={{ marginTop: 14 }}>
             {channels.map(([name, n]) => (
               <div key={name}>

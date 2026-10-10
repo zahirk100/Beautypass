@@ -19,16 +19,17 @@ export async function bookSlot(fd: FormData) {
   const slot = str(fd, "slot");
   const treatment = str(fd, "treatment");
   if (!slot || !treatment) back(`/app/boeken/${salon}`, "error", "Kies een behandeling en een tijd.");
-  const { error } = await supabase.rpc("book_slot", { p_slot: slot, p_treatment: treatment, p_note: str(fd, "note").slice(0, 300) });
+  const { data, error } = await supabase.rpc("book_slot", { p_slot: slot, p_treatment: treatment, p_note: str(fd, "note").slice(0, 300) });
   if (error) back(`/app/boeken/${salon}`, "error", errorMessage(error));
   revalidatePath("/app", "layout");
-  back("/app/afspraken", "ok", "Geboekt! Je afspraak staat hieronder.");
+  redirect(`/app/afspraken/${data}?nieuw=1`);
 }
 
 export async function cancelBooking(fd: FormData) {
   const supabase = await createClient();
+  const to = str(fd, "back").startsWith("/app/afspraken") ? str(fd, "back") : "/app/afspraken";
   const { data, error } = await supabase.rpc("cancel_booking", { p_booking: str(fd, "booking") });
-  if (error) back("/app/afspraken", "error", errorMessage(error));
+  if (error) back(to, "error", errorMessage(error));
   revalidatePath("/app", "layout");
   back("/app/afspraken", "ok", data === "cancelled" ? "Geannuleerd. Je credits staan weer op je tegoed." : "Geannuleerd. Omdat het binnen 24 uur was, worden de credits niet teruggeboekt.");
 }
