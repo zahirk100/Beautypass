@@ -77,11 +77,9 @@
     .phone-wrap.open { display: block; }
     .phone-wrap input { background: rgba(251,247,242,.97); border-radius: 999px; padding: 15px 22px; }
     .form-meta { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px 20px; flex-wrap: wrap; margin-top: 16px; }
-    .consent { display: flex; gap: 10px; align-items: flex-start; font-size: .8rem; color: rgba(251,247,242,.75); cursor: pointer; line-height: 1.5; flex: 1 1 260px; }
-    .consent input { appearance: none; flex: none; width: 20px; height: 20px; border: 1.5px solid rgba(251,247,242,.5); border-radius: 6px; margin: 0; cursor: pointer; display: grid; place-items: center; background: transparent; }
-    .consent input:checked { background: var(--champagne); border-color: var(--champagne); }
-    .consent input:checked::after { content: ""; width: 5px; height: 9px; border: solid var(--plum); border-width: 0 2px 2px 0; transform: rotate(45deg) translate(-1px, -1px); }
-    .consent input:focus-visible, button:focus-visible, a:focus-visible { outline: 2px solid var(--champagne); outline-offset: 2px; }
+    .consent { font-size: .8rem; color: rgba(251,247,242,.7); line-height: 1.5; flex: 1 1 260px; margin: 0; }
+    .consent a { color: rgba(251,247,242,.9); }
+    button:focus-visible, a:focus-visible { outline: 2px solid var(--champagne); outline-offset: 2px; }
     .phone-toggle { font: 500 .8rem var(--sans); color: var(--champagne); background: none; border: 0; padding: 1px 0; cursor: pointer; white-space: nowrap; }
     .btn {
       width: 100%; position: relative; overflow: hidden; display: flex; align-items: center; justify-content: center; gap: 10px; white-space: nowrap;
@@ -237,7 +235,7 @@
         </div>
         <input type="text" name="website" class="hp" tabindex="-1" autocomplete="off" aria-hidden="true">
         <div class="form-meta">
-          <label class="consent"><input type="checkbox" id="consent" name="consent" required><span>Stuur mij mijn early-access link en updates. Afmelden kan altijd.</span></label>
+          <p class="consent">Je ontvangt je early-access link en updates per e-mail. Afmelden kan altijd. <a href="/privacy">Privacy</a></p>
           <button type="button" class="phone-toggle" id="phone-toggle" aria-expanded="false" aria-controls="phone-wrap">+ Ook een sms als de verkoop opent</button>
         </div>
         <p class="error" id="form-error" role="alert"></p>
@@ -322,7 +320,6 @@
     const email = (data.get("email") || "").trim();
     if (!name) return showError("Vul je voornaam in.");
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return showError("Vul een geldig e-mailadres in.");
-    if (!data.get("consent")) return showError("Vink het vakje aan, zodat we je je early-access link mogen sturen.");
 
     const params = new URLSearchParams(location.search);
     const payload = {
