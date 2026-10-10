@@ -242,6 +242,28 @@ begin
     ('d0000000-0000-0000-0000-000000000021', '5a000000-0000-0000-0000-000000000002');
 end $$;
 
+-- Profile details for the demo salons (only when migration 004 has been run)
+do $$
+begin
+  if exists (select 1 from information_schema.columns where table_schema = 'public' and table_name = 'salons' and column_name = 'tagline') then
+    execute $q$
+      update public.salons s set tagline = v.tagline, opening_hours = v.hours, instagram = v.ig
+      from (values
+        ('5a000000-0000-0000-0000-000000000001'::uuid, 'Natuurlijke nagels, met aandacht gemaakt', E'Di–vr 9:00–18:00\nZa 10:00–16:00\nZo & ma gesloten', 'studionoor.demo'),
+        ('5a000000-0000-0000-0000-000000000002'::uuid, 'Brows & lashes, persoonlijk advies', E'Ma–za 10:00–18:00', 'maisoneva.demo'),
+        ('5a000000-0000-0000-0000-000000000003'::uuid, 'In 45 minuten klaar voor je avond', E'Ma–vr 9:00–20:00\nZa 9:00–17:00', 'blowbarwest.demo'),
+        ('5a000000-0000-0000-0000-000000000004'::uuid, 'Klein atelier, groot in detail', E'Di–za 10:00–18:00', ''),
+        ('5a000000-0000-0000-0000-000000000005'::uuid, 'Alles onder één dak in Oost', E'Ma–za 9:00–19:00', 'glowstudiooost.demo'),
+        ('5a000000-0000-0000-0000-000000000006'::uuid, 'Brow specialists in het centrum', E'Di–za 10:00–18:00', ''),
+        ('5a000000-0000-0000-0000-000000000007'::uuid, 'Premium beauty op de Zuidas', E'Ma–vr 8:00–20:00', 'salonlumiere.demo'),
+        ('5a000000-0000-0000-0000-000000000008'::uuid, 'Pedicure & gellak, vlak bij de pont', E'Di–za 10:00–17:00', ''),
+        ('5a000000-0000-0000-0000-000000000009'::uuid, 'Licht en ruim aan het water', E'Wo–zo 10:00–18:00', '')
+      ) as v(id, tagline, hours, ig)
+      where s.id = v.id
+    $q$;
+  end if;
+end $$;
+
 -- Overview of what was created
 select 'salons' as wat, count(*) from public.salons where is_demo
 union all select 'vrije tijden', count(*) from public.slots s join public.salons x on x.id = s.salon_id where x.is_demo and s.status = 'open'

@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getContext } from "@/lib/auth";
@@ -6,6 +7,7 @@ import { bikeMinutes, distanceKm, formatDistance, routeUrl } from "@/lib/geo";
 import { Flash } from "@/components/Flash";
 import { Submit } from "@/components/Submit";
 import { SlotPicker } from "@/components/SlotPicker";
+import { instagramUrl, placeholderStyle, tiktokUrl } from "@/lib/social";
 import { loadMembership } from "../../data";
 import { myLocation } from "../../salons";
 import { bookSlot, toggleFavorite } from "../../actions";
@@ -46,9 +48,13 @@ export default async function SalonBooking({ params, searchParams }: { params: P
   return (
     <>
       <Link href="/app/boeken" className="small muted">← Alle salons</Link>
-      <div className="page-head" style={{ marginTop: 10 }}>
+      <div className="cover" style={{ margin: "12px 0 18px", ...(salon.cover_url ? {} : placeholderStyle(salon.name)) }}>
+        {salon.cover_url ? <img src={salon.cover_url} alt={`Sfeerfoto van ${salon.name}`} /> : <span className="initial">{salon.name.charAt(0)}</span>}
+      </div>
+      <div className="page-head">
         <div>
           <h1>{salon.name}</h1>
+          {salon.tagline && <p style={{ marginTop: 4 }}>{salon.tagline}</p>}
           <div className="meta" style={{ marginTop: 8 }}>
             <span>{[salon.address, salon.district].filter(Boolean).join(" · ") || "Amsterdam"}</span>
             {km != null && <span><b>{formatDistance(km)}</b> · 🚲 {bikeMinutes(km)} min</span>}
@@ -66,7 +72,19 @@ export default async function SalonBooking({ params, searchParams }: { params: P
           <span className="badge">{balance} credits</span>
         </div>
       </div>
-      {salon.description && <p className="muted" style={{ maxWidth: 680, marginBottom: 22 }}>{salon.description}</p>}
+      {(salon.gallery ?? []).length > 0 && (
+        <div className="gallery-strip" style={{ marginBottom: 18 }}>
+          {(salon.gallery as string[]).map((url) => <img key={url} src={url} alt="" loading="lazy" />)}
+        </div>
+      )}
+      {salon.description && <p className="muted" style={{ maxWidth: 680, marginBottom: 14 }}>{salon.description}</p>}
+      {(salon.instagram || salon.tiktok || salon.website) && (
+        <div className="socials" style={{ marginBottom: 22 }}>
+          {salon.instagram && <a className="chip" href={instagramUrl(salon.instagram)} target="_blank" rel="noopener noreferrer">Instagram @{salon.instagram}</a>}
+          {salon.tiktok && <a className="chip" href={tiktokUrl(salon.tiktok)} target="_blank" rel="noopener noreferrer">TikTok @{salon.tiktok}</a>}
+          {salon.website && <a className="chip" href={salon.website} target="_blank" rel="noopener noreferrer">Website</a>}
+        </div>
+      )}
       <Flash params={sp} />
 
       {!canBook && (
@@ -95,7 +113,13 @@ export default async function SalonBooking({ params, searchParams }: { params: P
             <SlotPicker days={pickerDays} />
           </div>
 
-          <div className="inline-form">
+          <div className="card">
+            <label className="field">Opmerking voor de salon <span className="hint">optioneel, bijv. een kleurwens</span>
+              <textarea name="note" maxLength={300} rows={2} placeholder="Bijv. graag een nude kleur" />
+            </label>
+          </div>
+
+          <div className="inline-form book-bar">
             <Submit className="btn">Bevestig boeking</Submit>
             <span className="small muted">Gratis annuleren tot 24 uur vooraf.</span>
           </div>
@@ -117,6 +141,18 @@ export default async function SalonBooking({ params, searchParams }: { params: P
             </div>
           )}
           <p className="small muted" style={{ marginTop: 12 }}>Alleen members die hier echt geweest zijn, kunnen een review geven.</p>
+          {salon.opening_hours && (
+            <div style={{ marginTop: 18 }}>
+              <h3 style={{ marginBottom: 6 }}>Openingstijden</h3>
+              <p className="hours">{salon.opening_hours}</p>
+            </div>
+          )}
+          {salon.address && (
+            <div style={{ marginTop: 18 }}>
+              <h3 style={{ marginBottom: 6 }}>Adres</h3>
+              <p className="hours">{salon.address}{salon.postcode ? `, ${salon.postcode.replace(/^(\d{4})/, "$1 ")}` : ""} Amsterdam</p>
+            </div>
+          )}
         </div>
       </div>
     </>

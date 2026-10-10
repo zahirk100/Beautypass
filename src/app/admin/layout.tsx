@@ -1,11 +1,24 @@
 import Link from "next/link";
 import { Logo } from "@/components/Logo";
 import { NavLink } from "@/components/NavLink";
+import { MobileTabs } from "@/components/MobileNav";
 import { roleLabel } from "@/lib/format";
 import { signOut } from "../actions";
 import { getAdminContext } from "./context";
 
 export const metadata = { title: "Beheer" };
+
+const links = [
+  { href: "/admin", label: "Dashboard", icon: "✦", exact: true },
+  { href: "/admin/leden", label: "Leden", icon: "☺" },
+  { href: "/admin/salons", label: "Salons", icon: "✿" },
+  { href: "/admin/boekingen", label: "Boekingen", icon: "◷" },
+  { href: "/admin/wachtlijst", label: "Wachtlijst", icon: "✉" },
+  { href: "/admin/behandelingen", label: "Behandelingen", icon: "◇" },
+  { href: "/admin/plannen", label: "Memberships", icon: "◈" },
+  { href: "/admin/team", label: "Team", icon: "♛" },
+  { href: "/admin/audit", label: "Logboek", icon: "≡" },
+];
 
 export default async function AdminLayout({ children }: { children: React.ReactNode }) {
   const { profile, role, salons } = await getAdminContext();
@@ -13,17 +26,7 @@ export default async function AdminLayout({ children }: { children: React.ReactN
     <div className="shell">
       <aside className="sidebar">
         <Logo light sub="Beheer" href="/admin" />
-        <nav>
-          <NavLink href="/admin" exact>Dashboard</NavLink>
-          <NavLink href="/admin/wachtlijst">Wachtlijst</NavLink>
-          <NavLink href="/admin/leden">Leden</NavLink>
-          <NavLink href="/admin/salons">Salons</NavLink>
-          <NavLink href="/admin/boekingen">Boekingen</NavLink>
-          <NavLink href="/admin/behandelingen">Behandelingen</NavLink>
-          <NavLink href="/admin/plannen">Memberships</NavLink>
-          <NavLink href="/admin/team">Team</NavLink>
-          <NavLink href="/admin/audit">Logboek</NavLink>
-        </nav>
+        <nav>{links.map((l) => <NavLink key={l.href} href={l.href} exact={l.exact}>{l.label}</NavLink>)}</nav>
         <div className="who">
           <div><b>{profile?.first_name || "Team"}</b><br />{roleLabel[role]}</div>
           <div className="inline-form">
@@ -33,7 +36,12 @@ export default async function AdminLayout({ children }: { children: React.ReactN
           </div>
         </div>
       </aside>
+      <header className="m-header">
+        <Logo light sub="Beheer" href="/admin" />
+        <div className="ctx"><b>{profile?.first_name || "Team"}</b>{roleLabel[role]} · <form action={signOut} style={{ display: "inline" }}><button className="linkbtn" style={{ color: "inherit", fontSize: "inherit" }}>uitloggen</button></form></div>
+      </header>
       <main className="main">{children}</main>
+      <MobileTabs items={links} />
     </div>
   );
 }

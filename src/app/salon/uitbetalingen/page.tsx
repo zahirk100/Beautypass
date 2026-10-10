@@ -18,11 +18,11 @@ export default async function Payouts() {
     <>
       <div className="page-head"><div><h1>Uitbetalingen</h1><p>Je ontvangt per maand de afgesproken prijs voor voltooide afspraken, no-shows en te late annuleringen.</p></div></div>
       <div className="table-wrap">
-        <table>
+        <table className="rtable">
           <thead><tr><th>Maand</th><th>Afspraken</th><th>Bedrag (incl. btw)</th></tr></thead>
           <tbody>
             {rows.map((r) => (
-              <tr key={r.month.toISOString()}><td className="cap">{monthLabel(r.month)}</td><td>{r.data?.bookings ?? 0}</td><td><b>{euro(r.data?.payout_cents ?? 0)}</b></td></tr>
+              <tr key={r.month.toISOString()}><td className="cap primary">{monthLabel(r.month)}</td><td data-label="Afspraken">{r.data?.bookings ?? 0}</td><td data-label="Bedrag"><b>{euro(r.data?.payout_cents ?? 0)}</b></td></tr>
             ))}
           </tbody>
         </table>
@@ -31,9 +31,9 @@ export default async function Payouts() {
         <h2>Deze maand</h2>
         {paid.length === 0 ? <div className="card empty">Nog geen uitbetaalbare afspraken deze maand.</div> : (
           <div className="table-wrap">
-            <table>
+            <table className="rtable">
               <thead><tr><th>Datum</th><th>Member</th><th>Behandeling</th><th>Status</th><th>Bedrag</th></tr></thead>
-              <tbody>{paid.map((b: any) => <tr key={b.id}><td>{dateShort(b.starts_at)} {time(b.starts_at)}</td><td>{b.member_name}</td><td>{b.treatment}</td><td><StatusBadge status={b.status} /></td><td>{euro(b.payout_cents)}</td></tr>)}</tbody>
+              <tbody>{paid.map((b: any) => <tr key={b.id}><td className="primary">{dateShort(b.starts_at)} {time(b.starts_at)}</td><td data-label="Member">{b.member_name}</td><td data-label="Behandeling">{b.treatment}</td><td data-label="Status"><StatusBadge status={b.status} /></td><td data-label="Bedrag">{euro(b.payout_cents)}</td></tr>)}</tbody>
             </table>
           </div>
         )}

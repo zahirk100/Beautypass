@@ -35,17 +35,16 @@ export default async function Waitlist({ searchParams }: { searchParams: Promise
         {STATUSES.map((s) => <Link key={s} href={`/admin/wachtlijst?status=${s}`} className={`chip${sp.status === s ? " on" : ""}`}><StatusBadge status={s} /></Link>)}
       </div>
       <div className="table-wrap">
-        <table>
-          <thead><tr><th>Aangemeld</th><th>Naam</th><th>E-mail</th><th>Mobiel</th><th>Kanaal</th><th>Status</th></tr></thead>
+        <table className="rtable">
+          <thead><tr><th>Naam</th><th>Aangemeld</th><th>Mobiel</th><th>Kanaal</th><th>Status</th></tr></thead>
           <tbody>
             {(rows ?? []).map((w: any) => (
               <tr key={w.id}>
-                <td>{dateShort(w.created_at)} {time(w.created_at)}</td>
-                <td>{w.name}</td>
-                <td>{w.email}</td>
-                <td>{w.phone ?? "–"}</td>
-                <td>{channel(w.source)}{w.campaign ? <span className="muted small"> · {w.campaign}</span> : null}</td>
-                <td>
+                <td className="primary"><div><b>{w.name}</b><div className="small muted">{w.email}</div></div></td>
+                <td data-label="Aangemeld">{dateShort(w.created_at)} {time(w.created_at)}</td>
+                <td data-label="Mobiel">{w.phone ?? "–"}</td>
+                <td data-label="Kanaal">{channel(w.source)}{w.campaign ? <span className="muted small"> · {w.campaign}</span> : null}</td>
+                <td data-label="Status">
                   {canEdit ? (
                     <form action={setWaitlistStatus} className="inline-form">
                       <input type="hidden" name="id" value={w.id} />
@@ -56,7 +55,7 @@ export default async function Waitlist({ searchParams }: { searchParams: Promise
                 </td>
               </tr>
             ))}
-            {(rows ?? []).length === 0 && <tr><td colSpan={6} className="empty">Geen aanmeldingen gevonden.</td></tr>}
+            {(rows ?? []).length === 0 && <tr><td colSpan={5} className="empty">Geen aanmeldingen gevonden.</td></tr>}
           </tbody>
         </table>
       </div>

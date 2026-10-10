@@ -33,16 +33,16 @@ export default async function Members({ searchParams }: { searchParams: Promise<
         {FILTERS.map(([v, l]) => <Link key={v} href={v ? `/admin/leden?f=${v}` : "/admin/leden"} className={`chip${(sp.f ?? "") === v ? " on" : ""}`}>{l}</Link>)}
       </div>
       <div className="table-wrap">
-        <table>
+        <table className="rtable">
           <thead><tr><th>Lid</th><th>Membership</th><th>Status</th><th>Credits</th><th>Volgende maand</th><th>Acties</th></tr></thead>
           <tbody>
             {rows.map((m: any) => (
               <tr key={m.user_id}>
-                <td><b>{m.first_name} {m.last_name}</b><div className="small muted">{m.email}{m.phone ? ` · ${m.phone}` : ""}</div></td>
-                <td>{m.plan_name ?? "–"}{m.founding_number ? <div className="small muted">Founding Nº {String(m.founding_number).padStart(3, "0")}</div> : null}</td>
-                <td><StatusBadge status={m.status} /></td>
-                <td><b>{m.balance}</b></td>
-                <td>{m.current_period_end ? dateShort(m.current_period_end) : "–"}</td>
+                <td className="primary"><div><Link href={`/admin/leden/${m.user_id}`}><b>{m.first_name} {m.last_name}</b></Link><div className="small muted">{m.email}{m.phone ? ` · ${m.phone}` : ""}</div></div></td>
+                <td data-label="Membership"><span>{m.plan_name ?? "–"}{m.founding_number ? <div className="small muted">Founding Nº {String(m.founding_number).padStart(3, "0")}</div> : null}</span></td>
+                <td data-label="Status"><StatusBadge status={m.status} /></td>
+                <td data-label="Credits"><b>{m.balance}</b></td>
+                <td data-label="Volgende maand">{m.current_period_end ? dateShort(m.current_period_end) : "–"}</td>
                 <td>
                   <div className="inline-form">
                     {isOps && (m.status === "pending" || m.status === "paused") && (

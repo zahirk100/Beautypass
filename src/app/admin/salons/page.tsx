@@ -47,17 +47,17 @@ export default async function Salons({ searchParams }: { searchParams: Promise<R
           <section key={status} className="section">
             <h2>{label} <span className="muted small">({list.length})</span></h2>
             <div className="table-wrap">
-              <table>
+              <table className="rtable">
                 <thead><tr><th>Salon</th><th>Wijk</th><th>Contact</th><th>Behandelingen</th><th>Beoordeling</th><th>Status</th></tr></thead>
                 <tbody>
                   {list.map((s: any) => (
                     <tr key={s.id}>
-                      <td><Link href={`/admin/salons/${s.id}`}><b>{s.name}</b></Link></td>
-                      <td>{s.district || "–"}{s.latitude == null && s.status !== "lead" ? <div className="small" style={{ color: "var(--bad)" }}>Geen locatie</div> : null}</td>
-                      <td className="small">{s.contact_name}<div className="muted">{s.contact_email} {s.contact_phone}</div></td>
-                      <td>{count(s.id)}</td>
-                      <td>{rating(s.id)}</td>
-                      <td><StatusBadge status={s.status} /></td>
+                      <td className="primary"><Link href={`/admin/salons/${s.id}`}><b>{s.name}</b></Link></td>
+                      <td data-label="Wijk"><span>{s.district || "–"}{s.latitude == null && s.status !== "lead" ? <div className="small" style={{ color: "var(--bad)" }}>Geen locatie</div> : null}</span></td>
+                      <td data-label="Contact" className="small"><span>{s.contact_name}<div className="muted">{s.contact_email} {s.contact_phone}</div></span></td>
+                      <td data-label="Behandelingen">{count(s.id)}</td>
+                      <td data-label="Beoordeling">{rating(s.id)}</td>
+                      <td data-label="Status"><StatusBadge status={s.status} /></td>
                     </tr>
                   ))}
                   {list.length === 0 && <tr><td colSpan={6} className="empty">Geen salons.</td></tr>}

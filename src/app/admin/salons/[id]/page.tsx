@@ -93,16 +93,16 @@ export default async function SalonDetail({ params, searchParams }: { params: Pr
         <h2>Behandelingen &amp; tarieven</h2>
         <p className="small muted" style={{ margin: "-6px 0 12px" }}>Uitbetaling = wat de salon per behandeling van ons ontvangt (incl. btw). Laat credits leeg voor de standaard.</p>
         <div className="table-wrap">
-          <table>
+          <table className="rtable">
             <thead><tr><th>Behandeling</th><th>Normale prijs</th><th>Standaard</th><th>Instellingen voor deze salon</th><th></th></tr></thead>
             <tbody>
               {(treatments ?? []).map((t: any) => {
                 const o = offer(t.id);
                 return (
                   <tr key={t.id} style={{ opacity: o ? 1 : .65 }}>
-                    <td><b>{t.name}</b></td>
-                    <td>{euro(t.retail_price_cents)}</td>
-                    <td className="small">{t.credits} credits · {euro(t.default_payout_cents)}</td>
+                    <td className="primary"><b>{t.name}</b></td>
+                    <td data-label="Normale prijs">{euro(t.retail_price_cents)}</td>
+                    <td data-label="Standaard" className="small">{t.credits} credits · {euro(t.default_payout_cents)}</td>
                     <td>
                       {ops ? (
                         <form action={upsertSalonTreatment} className="inline-form">
@@ -126,10 +126,10 @@ export default async function SalonDetail({ params, searchParams }: { params: Pr
       <section className="section">
         <h2>Afspraken (30 dagen terug en vooruit)</h2>
         <div className="table-wrap">
-          <table>
+          <table className="rtable">
             <thead><tr><th>Wanneer</th><th>Member</th><th>Behandeling</th><th>Status</th><th>Uitbetaling</th></tr></thead>
             <tbody>
-              {(bookings ?? []).map((b: any) => <tr key={b.id}><td>{dateShort(b.starts_at)} {time(b.starts_at)}</td><td>{b.member_name}</td><td>{b.treatment}</td><td><StatusBadge status={b.status} /></td><td>{euro(b.payout_cents)}</td></tr>)}
+              {(bookings ?? []).map((b: any) => <tr key={b.id}><td className="primary">{dateShort(b.starts_at)} {time(b.starts_at)}</td><td data-label="Member">{b.member_name}</td><td data-label="Behandeling">{b.treatment}</td><td data-label="Status"><StatusBadge status={b.status} /></td><td data-label="Uitbetaling">{euro(b.payout_cents)}</td></tr>)}
               {(bookings ?? []).length === 0 && <tr><td colSpan={5} className="empty">Geen afspraken.</td></tr>}
             </tbody>
           </table>

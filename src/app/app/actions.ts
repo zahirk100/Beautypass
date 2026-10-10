@@ -19,7 +19,7 @@ export async function bookSlot(fd: FormData) {
   const slot = str(fd, "slot");
   const treatment = str(fd, "treatment");
   if (!slot || !treatment) back(`/app/boeken/${salon}`, "error", "Kies een behandeling en een tijd.");
-  const { error } = await supabase.rpc("book_slot", { p_slot: slot, p_treatment: treatment });
+  const { error } = await supabase.rpc("book_slot", { p_slot: slot, p_treatment: treatment, p_note: str(fd, "note").slice(0, 300) });
   if (error) back(`/app/boeken/${salon}`, "error", errorMessage(error));
   revalidatePath("/app", "layout");
   back("/app/afspraken", "ok", "Geboekt! Je afspraak staat hieronder.");

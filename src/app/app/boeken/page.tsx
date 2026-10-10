@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { getContext } from "@/lib/auth";
@@ -5,6 +6,7 @@ import { bikeMinutes, formatDistance } from "@/lib/geo";
 import { Flash } from "@/components/Flash";
 import { LocateButton } from "@/components/LocateButton";
 import { Submit } from "@/components/Submit";
+import { placeholderStyle } from "@/lib/social";
 import { loadMembership } from "../data";
 import { loadSalons, myLocation, nextLabel } from "../salons";
 import { saveLocation, toggleFavorite } from "../actions";
@@ -94,8 +96,12 @@ export default async function BrowseSalons({ searchParams }: { searchParams: Pro
             return (
               <div key={s.id} className="card salon-card">
                 <div className="top">
+                  <Link href={`/app/boeken/${s.id}`} className="thumb" style={s.cover ? undefined : placeholderStyle(s.name)} aria-hidden="true" tabIndex={-1}>
+                    {s.cover ? <img src={s.cover} alt="" loading="lazy" /> : <span className="initial">{s.name.charAt(0)}</span>}
+                  </Link>
                   <div className="grow">
                     <h2><Link href={`/app/boeken/${s.id}${filterT ? `?t=${filterT.slug}` : ""}`}>{s.name}</Link></h2>
+                    {s.tagline && <p className="small muted" style={{ margin: "2px 0 6px" }}>{s.tagline}</p>}
                     <div className="meta">
                       <span>{s.district || "Amsterdam"}</span>
                       {s.distance != null && <span><b>{formatDistance(s.distance)}</b> · 🚲 {bikeMinutes(s.distance)} min</span>}

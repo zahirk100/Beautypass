@@ -12,9 +12,11 @@ export default async function MembershipPage({ searchParams }: { searchParams: P
   const sp = await searchParams;
   const { supabase, user } = await getContext();
   const { membership, balance } = await loadMembership(supabase, user.id);
-  const [{ data: plans }, { data: treatments }] = await Promise.all([
+  const [{ data: plans }, { data: treatments }, { data: ledger }] = await Promise.all([
     supabase.from("plans").select("*").eq("active", true).order("sort"),
     supabase.from("treatments").select("name, credits").eq("active", true).order("sort"),
+    supabase.from("credit_ledger").select("delta, reason, note, created_at, bookings(starts_at, salons(name), treatments(name))")
+      .eq("user_id", user.id).order("created_at", { ascending: false }).limit(30),
   ]);
 
   return (
@@ -59,6 +61,26 @@ export default async function MembershipPage({ searchParams }: { searchParams: P
             </form>
           ))}
         </div>
+      )}
+
+      {(ledger ?? []).length > 0 && (
+        <section className="section">
+          <h2>Je credits</h2>
+          <div className="card" style={{ padding: "6px 18px" }}>
+            {(ledger ?? []).map((l: any, i: number) => (
+              <div key={i} className="review" style={{ display: "flex", gap: 12, alignItems: "center" }}>
+                <div className="grow">
+                  <b className="small">{({ monthly_grant: "Maandtegoed", booking: "Boeking", refund: "Teruggeboekt", expiry: "Vervallen", adjustment: "Correctie" } as Record<string, string>)[l.reason]}</b>
+                  <div className="small muted">
+                    {l.bookings ? `${l.bookings.treatments?.name} · ${l.bookings.salons?.name}` : l.note}
+                    {" · "}{dateShort(l.created_at)}
+                  </div>
+                </div>
+                <b style={{ color: l.delta > 0 ? "var(--ok)" : "var(--ink)" }}>{l.delta > 0 ? `+${l.delta}` : l.delta}</b>
+              </div>
+            ))}
+          </div>
+        </section>
       )}
 
       <section className="section">

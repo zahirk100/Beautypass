@@ -21,16 +21,18 @@ export async function runRenewals() {
   back("/admin", "ok", `${data ?? 0} memberships verlengd met nieuwe credits.`);
 }
 
+const memberBack = (fd: FormData) => (str(fd, "back").startsWith("/admin/leden") ? str(fd, "back") : "/admin/leden");
+
 export async function activateMembership(fd: FormData) {
-  await rpc("/admin/leden", "admin_activate_membership", { p_membership: str(fd, "membership"), p_founding: fd.get("founding") === "on" }, "Membership geactiveerd en credits toegekend.");
+  await rpc(memberBack(fd), "admin_activate_membership", { p_membership: str(fd, "membership"), p_founding: fd.get("founding") === "on" }, "Membership geactiveerd en credits toegekend.");
 }
 
 export async function setMembershipStatus(fd: FormData) {
-  await rpc("/admin/leden", "admin_set_membership_status", { p_membership: str(fd, "membership"), p_status: str(fd, "status") }, "Status bijgewerkt.");
+  await rpc(memberBack(fd), "admin_set_membership_status", { p_membership: str(fd, "membership"), p_status: str(fd, "status") }, "Status bijgewerkt.");
 }
 
 export async function adjustCredits(fd: FormData) {
-  await rpc("/admin/leden", "admin_adjust_credits", { p_user: str(fd, "user"), p_delta: int(fd, "delta"), p_note: str(fd, "note") }, "Credits aangepast.");
+  await rpc(memberBack(fd), "admin_adjust_credits", { p_user: str(fd, "user"), p_delta: int(fd, "delta"), p_note: str(fd, "note") }, "Credits aangepast.");
 }
 
 export async function setWaitlistStatus(fd: FormData) {

@@ -20,16 +20,16 @@ export default async function Bookings({ searchParams }: { searchParams: Promise
       <div className="page-head"><div><h1>Boekingen</h1><p>De laatste 300 boekingen over alle salons.</p></div></div>
       <Flash params={sp} />
       <div className="table-wrap">
-        <table>
+        <table className="rtable">
           <thead><tr><th>Wanneer</th><th>Salon</th><th>Behandeling</th><th>Credits</th><th>Status</th><th></th></tr></thead>
           <tbody>
             {(data ?? []).map((b: any) => (
               <tr key={b.id}>
-                <td>{dateShort(b.starts_at)} {time(b.starts_at)}</td>
-                <td>{b.salons?.name}</td>
-                <td>{b.treatments?.name}</td>
-                <td>{b.credits}</td>
-                <td><StatusBadge status={b.status} /></td>
+                <td className="primary">{dateShort(b.starts_at)} {time(b.starts_at)}</td>
+                <td data-label="Salon">{b.salons?.name}</td>
+                <td data-label="Behandeling">{b.treatments?.name}</td>
+                <td data-label="Credits">{b.credits}</td>
+                <td data-label="Status"><StatusBadge status={b.status} /></td>
                 <td>
                   {support && b.status === "booked" && (
                     <form action={adminSetBookingStatus} className="inline-form">

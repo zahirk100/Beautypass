@@ -3,7 +3,7 @@ import { dayKey } from "@/lib/format";
 import { distanceKm, type Point } from "@/lib/geo";
 
 export type BrowseSalon = {
-  id: string; name: string; district: string; address: string; description: string;
+  id: string; name: string; district: string; address: string; description: string; tagline: string; cover: string;
   lat: number | null; lng: number | null; distance: number | null;
   rating: number | null; reviews: number; favorite: boolean;
   treatments: { id: string; slug: string; name: string; credits: number }[];
@@ -13,7 +13,7 @@ export type BrowseSalon = {
 /** Everything the member needs to compare salons: offer, rating, distance, availability and favourites. */
 export async function loadSalons(supabase: SupabaseClient, userId: string, me: Point | null): Promise<BrowseSalon[]> {
   const [{ data: salons }, { data: offers }, { data: ratings }, { data: slots }, { data: favs }] = await Promise.all([
-    supabase.from("salons").select("id, name, district, address, description, latitude, longitude").eq("status", "active").order("name"),
+    supabase.from("salons").select("id, name, district, address, description, tagline, cover_url, latitude, longitude").eq("status", "active").order("name"),
     supabase.from("salon_treatments").select("salon_id, credits_override, treatments(id, slug, name, credits, sort, active)").eq("active", true),
     supabase.rpc("salon_ratings"),
     supabase.from("slots").select("salon_id, starts_at").eq("status", "open").gt("starts_at", new Date().toISOString())
@@ -30,7 +30,7 @@ export async function loadSalons(supabase: SupabaseClient, userId: string, me: P
     const r = (ratings ?? []).find((x: any) => x.salon_id === s.id);
     const point = s.latitude != null && s.longitude != null ? { lat: s.latitude, lng: s.longitude } : null;
     return {
-      id: s.id, name: s.name, district: s.district, address: s.address, description: s.description,
+      id: s.id, name: s.name, district: s.district, address: s.address, description: s.description, tagline: s.tagline ?? "", cover: s.cover_url ?? "",
       lat: point?.lat ?? null, lng: point?.lng ?? null,
       distance: me && point ? distanceKm(me, point) : null,
       rating: r ? Number(r.avg_rating) : null, reviews: r?.review_count ?? 0,

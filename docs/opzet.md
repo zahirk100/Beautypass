@@ -6,6 +6,8 @@
    - `001_waitlist.sql` (al gedaan)
    - [`002_platform.sql`](../supabase/migrations/002_platform.sql)
    - [`003_locations_favorites.sql`](../supabase/migrations/003_locations_favorites.sql)
+   - [`004_salon_profiles_notes.sql`](../supabase/migrations/004_salon_profiles_notes.sql) (foto's, socials, opmerkingen)
+   - Of in één keer 003 + 004 + demodata: [`supabase/seed/demo_alles_in_een.sql`](../supabase/seed/demo_alles_in_een.sql)
 3. Wil je testen met voorbeelddata en testaccounts per rol? Zie [demo.md](demo.md).
 
 ## 2. Inloggen instellen (Supabase → Authentication → URL Configuration)
@@ -49,3 +51,8 @@ Zonder deze instelling werken de bevestigingslinks in de e-mails niet.
 | Inloggen (voor iedereen) | `/login` → stuurt je automatisch naar de juiste omgeving |
 
 Later kunnen dit eigen subdomeinen worden (`app.`, `salon.`, `admin.beautypass.nl`).
+
+## Als app op je telefoon
+- **iPhone (Safari):** open de site → deelknop → **Zet op beginscherm**.
+- **Android (Chrome):** menu ⋮ → **App installeren** / **Toevoegen aan startscherm**.
+De app opent dan zonder browserbalk, met het BeautyPass-icoon.

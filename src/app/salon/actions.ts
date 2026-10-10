@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { back, errorMessage, int, str } from "@/lib/actions";
 import { amsterdamToUtc } from "@/lib/format";
 import { geocodePostcode } from "@/lib/geo";
+import { handleFrom, websiteFrom } from "@/lib/social";
 import { SALON_COOKIE, getSalonContext } from "./context";
 
 export async function switchSalon(fd: FormData) {
@@ -61,18 +62,6 @@ export async function setBookingStatus(fd: FormData) {
   back(to, "ok", "Afspraak bijgewerkt.");
 }
 
-export async function updateSalonProfile(fd: FormData) {
-  const { supabase, salonId } = await getSalonContext();
-  const geo = str(fd, "postcode") ? await geocodePostcode(str(fd, "postcode")) : null;
-  if (str(fd, "postcode") && !geo) back("/salon/instellingen", "error", "Deze postcode herkennen we niet.");
-  const { error } = await supabase.rpc("update_salon_profile", {
-    p_salon: salonId, p_description: str(fd, "description"), p_address: str(fd, "address"), p_district: str(fd, "district"),
-    p_postcode: geo?.postcode ?? null, p_latitude: geo?.lat ?? null, p_longitude: geo?.lng ?? null,
-  });
-  if (error) back("/salon/instellingen", "error", errorMessage(error));
-  back("/salon/instellingen", "ok", "Salonprofiel opgeslagen.");
-}
-
 export async function addStaff(fd: FormData) {
   const { supabase, salonId } = await getSalonContext();
   const { error } = await supabase.rpc("add_salon_member", { p_salon: salonId, p_email: str(fd, "email"), p_role: "staff" });
@@ -87,4 +76,76 @@ export async function removeStaff(fd: FormData) {
   if (error) back("/salon/instellingen", "error", errorMessage(error));
   revalidatePath("/salon/instellingen");
   back("/salon/instellingen", "ok", "Medewerker verwijderd.");
+}
+
+const BUCKET = "salon-photos";
+
+export async function updateSalonDetails(fd: FormData) {
+  const { supabase, salonId } = await getSalonContext();
+  const pc = str(fd, "postcode");
+  const geo = pc && pc !== str(fd, "old_postcode") ? await geocodePostcode(pc) : null;
+  if (pc && pc !== str(fd, "old_postcode") && !geo) back("/salon/profiel", "error", "Deze postcode herkennen we niet.");
+  const { error } = await supabase.rpc("update_salon_details", {
+    p_salon: salonId, p_tagline: str(fd, "tagline"), p_description: str(fd, "description"),
+    p_address: str(fd, "address"), p_district: str(fd, "district"),
+    p_postcode: geo?.postcode ?? null, p_latitude: geo?.lat ?? null, p_longitude: geo?.lng ?? null,
+    p_opening_hours: str(fd, "opening_hours"), p_instagram: handleFrom(str(fd, "instagram")),
+    p_tiktok: handleFrom(str(fd, "tiktok")), p_website: websiteFrom(str(fd, "website")),
+  });
+  if (error) back("/salon/profiel", "error", errorMessage(error));
+  revalidatePath("/salon", "layout");
+  back("/salon/profiel", "ok", "Je salonprofiel is opgeslagen.");
+}
+
+/** Uploads one or more photos to the salon's folder and adds them as cover or to the gallery. */
+export async function uploadSalonPhoto(fd: FormData) {
+  const { supabase, salonId } = await getSalonContext();
+  const kind = str(fd, "kind") === "cover" ? "cover" : "gallery";
+  const files = fd.getAll("photo").filter((f): f is File => f instanceof File && f.size > 0);
+  if (files.length === 0) back("/salon/profiel", "error", "Kies eerst een foto.");
+  const { data: salon } = await supabase.from("salons").select("cover_url, gallery").eq("id", salonId).single();
+  const gallery: string[] = salon?.gallery ?? [];
+  if (kind === "gallery" && gallery.length + files.length > 8) back("/salon/profiel", "error", "Maximaal 8 foto's in de galerij. Verwijder eerst een foto.");
+
+  const urls: string[] = [];
+  for (const file of files.slice(0, kind === "cover" ? 1 : 8)) {
+    if (!["image/jpeg", "image/png", "image/webp"].includes(file.type)) back("/salon/profiel", "error", "Alleen jpg, png of webp.");
+    if (file.size > 3.5 * 1024 * 1024) back("/salon/profiel", "error", "Deze foto is te groot (max. 3,5 MB).");
+    const ext = file.type === "image/png" ? "png" : file.type === "image/webp" ? "webp" : "jpg";
+    const path = `${salonId}/${kind}-${crypto.randomUUID()}.${ext}`;
+    const { error } = await supabase.storage.from(BUCKET).upload(path, file, { contentType: file.type, cacheControl: "31536000" });
+    if (error) back("/salon/profiel", "error", "Uploaden lukte niet: " + error.message);
+    urls.push(supabase.storage.from(BUCKET).getPublicUrl(path).data.publicUrl);
+  }
+  const { error } = await supabase.rpc("update_salon_media", {
+    p_salon: salonId,
+    p_cover: kind === "cover" ? urls[0] : salon?.cover_url ?? "",
+    p_gallery: kind === "gallery" ? [...gallery, ...urls] : gallery,
+  });
+  if (error) back("/salon/profiel", "error", errorMessage(error));
+  if (kind === "cover" && salon?.cover_url) await removeStored(supabase, salon.cover_url);
+  revalidatePath("/salon", "layout");
+  back("/salon/profiel", "ok", kind === "cover" ? "Omslagfoto bijgewerkt." : "Foto's toegevoegd.");
+}
+
+export async function removeSalonPhoto(fd: FormData) {
+  const { supabase, salonId } = await getSalonContext();
+  const url = str(fd, "url");
+  const { data: salon } = await supabase.from("salons").select("cover_url, gallery").eq("id", salonId).single();
+  const isCover = salon?.cover_url === url;
+  const { error } = await supabase.rpc("update_salon_media", {
+    p_salon: salonId,
+    p_cover: isCover ? "" : salon?.cover_url ?? "",
+    p_gallery: (salon?.gallery ?? []).filter((u: string) => u !== url),
+  });
+  if (error) back("/salon/profiel", "error", errorMessage(error));
+  await removeStored(supabase, url);
+  revalidatePath("/salon", "layout");
+  back("/salon/profiel", "ok", "Foto verwijderd.");
+}
+
+async function removeStored(supabase: Awaited<ReturnType<typeof createClient>>, url: string) {
+  const marker = `/object/public/${BUCKET}/`;
+  const i = url.indexOf(marker);
+  if (i >= 0) await supabase.storage.from(BUCKET).remove([decodeURIComponent(url.slice(i + marker.length))]);
 }

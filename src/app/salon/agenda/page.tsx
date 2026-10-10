@@ -58,7 +58,7 @@ export default async function Agenda({ searchParams }: { searchParams: Promise<R
                     return (
                       <div key={s.id} className="row-item" style={{ padding: "10px 14px", flexWrap: "wrap" }}>
                         <b style={{ width: 110 }}>{time(s.starts_at)}–{time(s.ends_at)}</b>
-                        <div className="grow">{b ? <>{b.member_name} · {b.treatment}</> : <span className="muted">Vrij voor members</span>}</div>
+                        <div className="grow">{b ? <>{b.member_name} · {b.treatment}{b.note && <><br /><span className="note">“{b.note}”</span></>}</> : <span className="muted">Vrij voor members</span>}</div>
                         <StatusBadge status={b ? b.status : s.status} />
                         {b ? <BookingActions id={b.id} status={b.status} startsAt={b.starts_at} backTo="/salon/agenda" /> : s.status !== "booked" && (
                           <form action={deleteSlot}><input type="hidden" name="slot" value={s.id} /><Submit className="btn secondary small">Verwijder</Submit></form>
