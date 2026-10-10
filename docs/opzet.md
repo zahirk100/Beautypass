@@ -2,8 +2,11 @@
 
 ## 1. Database bijwerken (Supabase)
 1. Open je project in Supabase → **SQL Editor** → **New query**.
-2. Plak de volledige inhoud van [`supabase/migrations/002_platform.sql`](../supabase/migrations/002_platform.sql) en klik op **Run**.
-   (`001_waitlist.sql` heb je al eerder uitgevoerd.)
+2. Voer de migraties uit in volgorde, elk als eigen query (plakken → **Run**):
+   - `001_waitlist.sql` (al gedaan)
+   - [`002_platform.sql`](../supabase/migrations/002_platform.sql)
+   - [`003_locations_favorites.sql`](../supabase/migrations/003_locations_favorites.sql)
+3. Wil je testen met voorbeelddata en testaccounts per rol? Zie [demo.md](demo.md).
 
 ## 2. Inloggen instellen (Supabase → Authentication → URL Configuration)
 - **Site URL:** `https://beautypass-two.vercel.app` (later je eigen domein)

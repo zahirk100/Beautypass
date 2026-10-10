@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { back, errorMessage, int, str } from "@/lib/actions";
 import { amsterdamToUtc } from "@/lib/format";
+import { geocodePostcode } from "@/lib/geo";
 import { SALON_COOKIE, getSalonContext } from "./context";
 
 export async function switchSalon(fd: FormData) {
@@ -62,8 +63,11 @@ export async function setBookingStatus(fd: FormData) {
 
 export async function updateSalonProfile(fd: FormData) {
   const { supabase, salonId } = await getSalonContext();
+  const geo = str(fd, "postcode") ? await geocodePostcode(str(fd, "postcode")) : null;
+  if (str(fd, "postcode") && !geo) back("/salon/instellingen", "error", "Deze postcode herkennen we niet.");
   const { error } = await supabase.rpc("update_salon_profile", {
     p_salon: salonId, p_description: str(fd, "description"), p_address: str(fd, "address"), p_district: str(fd, "district"),
+    p_postcode: geo?.postcode ?? null, p_latitude: geo?.lat ?? null, p_longitude: geo?.lng ?? null,
   });
   if (error) back("/salon/instellingen", "error", errorMessage(error));
   back("/salon/instellingen", "ok", "Salonprofiel opgeslagen.");

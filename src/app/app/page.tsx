@@ -11,6 +11,11 @@ export default async function MemberHome() {
   const { data: upcoming } = await supabase
     .from("bookings").select("id, starts_at, status, salons(name, district), treatments(name)")
     .eq("user_id", user.id).eq("status", "booked").gte("starts_at", new Date().toISOString()).order("starts_at").limit(3);
+  const [{ data: favs }, { data: last }] = await Promise.all([
+    supabase.from("favorites").select("salon_id, salons(id, name, district)").eq("user_id", user.id),
+    supabase.from("bookings").select("salon_id, salons(name), treatments(name, slug)").eq("user_id", user.id).eq("status", "completed")
+      .order("starts_at", { ascending: false }).limit(1).maybeSingle(),
+  ]);
   const monthly = membership?.plans?.monthly_credits ?? 0;
   const pct = monthly ? Math.min(100, Math.round((balance / monthly) * 100)) : 0;
 
@@ -60,6 +65,37 @@ export default async function MemberHome() {
             </p>
             <p className="small muted" style={{ marginTop: 10 }}>Tot de helft van je maandtegoed gaat mee naar de volgende maand.</p>
           </div>
+        </div>
+      )}
+
+      {membership?.status === "active" && (last || (favs ?? []).length > 0) && (
+        <div className="grid two section">
+          {last && (
+            <div className="card">
+              <div className="label small muted" style={{ letterSpacing: ".14em", textTransform: "uppercase", fontWeight: 600 }}>Boek opnieuw</div>
+              <h3 style={{ margin: "8px 0 4px" }}>{(last as any).treatments?.name}</h3>
+              <p className="muted small" style={{ marginBottom: 14 }}>bij {(last as any).salons?.name}</p>
+              <Link href={`/app/boeken/${(last as any).salon_id}?t=${(last as any).treatments?.slug}`} className="btn small">Kies een tijd</Link>
+            </div>
+          )}
+          {(favs ?? []).length > 0 && (
+            <div className="card">
+              <div className="label small muted" style={{ letterSpacing: ".14em", textTransform: "uppercase", fontWeight: 600, marginBottom: 10 }}>♥ Je favorieten</div>
+              <div className="list">
+                {(favs ?? []).map((f: any) => (
+                  <Link key={f.salon_id} href={`/app/boeken/${f.salon_id}`} className="row-item" style={{ textDecoration: "none", padding: "10px 14px" }}>
+                    <div className="grow"><b>{f.salons?.name}</b><div className="small muted">{f.salons?.district}</div></div><span className="small">→</span>
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
+      {membership?.status === "active" && !profile?.postcode && (
+        <div className="flash ok section" style={{ marginBottom: 0 }}>
+          Tip: vul je postcode in bij <Link href="/app/profiel">je profiel</Link>, dan zie je meteen welke salons het dichtstbij zijn.
         </div>
       )}
 

@@ -3,6 +3,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { back, cents, errorMessage, int, str } from "@/lib/actions";
+import { geocodePostcode } from "@/lib/geo";
 
 async function rpc(path: string, fn: string, args: Record<string, unknown>, ok: string) {
   const supabase = await createClient();
@@ -42,8 +43,11 @@ export async function setWaitlistStatus(fd: FormData) {
 
 export async function createSalon(fd: FormData) {
   const supabase = await createClient();
+  const geo = str(fd, "postcode") ? await geocodePostcode(str(fd, "postcode")) : null;
+  if (str(fd, "postcode") && !geo) back("/admin/salons", "error", "Deze postcode herkennen we niet.");
   const { data, error } = await supabase.from("salons").insert({
     name: str(fd, "name"), district: str(fd, "district"), contact_name: str(fd, "contact_name"),
+    postcode: geo?.postcode ?? "", latitude: geo?.lat ?? null, longitude: geo?.lng ?? null,
     contact_email: str(fd, "contact_email"), contact_phone: str(fd, "contact_phone"), status: "lead",
   }).select("id").single();
   if (error) back("/admin/salons", "error", errorMessage(error));
@@ -54,7 +58,14 @@ export async function createSalon(fd: FormData) {
 export async function updateSalon(fd: FormData) {
   const supabase = await createClient();
   const id = str(fd, "id");
+  const location: Record<string, unknown> = {};
+  if (str(fd, "postcode") && str(fd, "postcode") !== str(fd, "old_postcode")) {
+    const geo = await geocodePostcode(str(fd, "postcode"));
+    if (!geo) back(`/admin/salons/${id}`, "error", "Deze postcode herkennen we niet.");
+    Object.assign(location, { postcode: geo.postcode, latitude: geo.lat, longitude: geo.lng });
+  }
   const { error } = await supabase.from("salons").update({
+    ...location,
     name: str(fd, "name"), district: str(fd, "district"), address: str(fd, "address"), description: str(fd, "description"),
     contact_name: str(fd, "contact_name"), contact_email: str(fd, "contact_email"), contact_phone: str(fd, "contact_phone"),
     status: str(fd, "status"), notes: str(fd, "notes"),

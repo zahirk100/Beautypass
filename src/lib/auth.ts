@@ -16,7 +16,10 @@ export async function getContext() {
   return {
     supabase,
     user,
-    profile: profile as { id: string; first_name: string; last_name: string; phone: string | null; admin_role: string | null } | null,
+    profile: profile as {
+      id: string; first_name: string; last_name: string; phone: string | null; admin_role: string | null;
+      postcode?: string | null; latitude?: number | null; longitude?: number | null;
+    } | null,
     salons: (salons ?? []) as unknown as SalonLink[],
   };
 }

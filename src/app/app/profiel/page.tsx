@@ -18,6 +18,7 @@ export default async function Profile({ searchParams }: { searchParams: Promise<
           <label className="field">Voornaam<input name="first_name" defaultValue={profile?.first_name ?? ""} required /></label>
           <label className="field">Achternaam<input name="last_name" defaultValue={profile?.last_name ?? ""} /></label>
           <label className="field">Mobiel<input name="phone" type="tel" defaultValue={profile?.phone ?? ""} /></label>
+          <label className="field">Postcode <span className="hint">om salons bij jou in de buurt te tonen</span><input name="postcode" defaultValue={profile?.postcode ?? ""} placeholder="1072 LN" /></label>
           <p className="small muted">Salons zien alleen je voornaam en de eerste letter van je achternaam.</p>
           <div><Submit>Opslaan</Submit></div>
         </form>

@@ -48,6 +48,8 @@ export default async function SalonDetail({ params, searchParams }: { params: Pr
             </label>
             <label className="field">Wijk<input name="district" defaultValue={salon.district} disabled={!ops} /></label>
             <label className="field">Adres<input name="address" defaultValue={salon.address} disabled={!ops} /></label>
+            <label className="field">Postcode <span className="hint">{salon.latitude != null ? "locatie bekend ✓" : "nodig voor afstand en kaart"}</span><input name="postcode" defaultValue={salon.postcode} disabled={!ops} /></label>
+            <input type="hidden" name="old_postcode" value={salon.postcode} />
             <label className="field">Contactpersoon<input name="contact_name" defaultValue={salon.contact_name} disabled={!ops} /></label>
             <label className="field">E-mail<input name="contact_email" defaultValue={salon.contact_email} disabled={!ops} /></label>
             <label className="field">Telefoon<input name="contact_phone" defaultValue={salon.contact_phone} disabled={!ops} /></label>

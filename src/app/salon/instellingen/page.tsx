@@ -24,6 +24,7 @@ export default async function Settings({ searchParams }: { searchParams: Promise
           <h2>Salonprofiel</h2>
           <label className="field">Wijk<input name="district" defaultValue={salon?.district ?? ""} disabled={!isOwner} /></label>
           <label className="field">Adres<input name="address" defaultValue={salon?.address ?? ""} disabled={!isOwner} /></label>
+          <label className="field">Postcode <span className="hint">members zien hiermee hoe ver je salon is</span><input name="postcode" defaultValue={salon?.postcode ?? ""} disabled={!isOwner} /></label>
           <label className="field">Over de salon<textarea name="description" defaultValue={salon?.description ?? ""} maxLength={2000} disabled={!isOwner} /></label>
           {isOwner ? <div><Submit>Opslaan</Submit></div> : <p className="small muted">Alleen de eigenaar kan het profiel aanpassen.</p>}
         </form>

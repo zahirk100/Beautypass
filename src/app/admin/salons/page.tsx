@@ -33,6 +33,7 @@ export default async function Salons({ searchParams }: { searchParams: Promise<R
           <div className="form-grid">
             <label className="field">Naam<input name="name" required /></label>
             <label className="field">Wijk<input name="district" placeholder="bijv. De Pijp" /></label>
+            <label className="field">Postcode<input name="postcode" placeholder="1072 LN" /></label>
             <label className="field">Contactpersoon<input name="contact_name" /></label>
             <label className="field">E-mail<input type="email" name="contact_email" /></label>
             <label className="field">Telefoon<input name="contact_phone" /></label>
@@ -52,7 +53,7 @@ export default async function Salons({ searchParams }: { searchParams: Promise<R
                   {list.map((s: any) => (
                     <tr key={s.id}>
                       <td><Link href={`/admin/salons/${s.id}`}><b>{s.name}</b></Link></td>
-                      <td>{s.district || "–"}</td>
+                      <td>{s.district || "–"}{s.latitude == null && s.status !== "lead" ? <div className="small" style={{ color: "var(--bad)" }}>Geen locatie</div> : null}</td>
                       <td className="small">{s.contact_name}<div className="muted">{s.contact_email} {s.contact_phone}</div></td>
                       <td>{count(s.id)}</td>
                       <td>{rating(s.id)}</td>

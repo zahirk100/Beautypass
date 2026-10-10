@@ -1,7 +1,9 @@
 "use server";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { back, errorMessage, int, str } from "@/lib/actions";
+import { geocodePostcode } from "@/lib/geo";
 
 export async function requestMembership(fd: FormData) {
   const supabase = await createClient();
@@ -46,9 +48,18 @@ export async function leaveReview(fd: FormData) {
 export async function updateProfile(fd: FormData) {
   const supabase = await createClient();
   const { data: { user } } = await supabase.auth.getUser();
-  const { error } = await supabase.from("profiles").update({
+  const update: Record<string, unknown> = {
     first_name: str(fd, "first_name").slice(0, 60), last_name: str(fd, "last_name").slice(0, 80), phone: str(fd, "phone").slice(0, 30) || null,
-  }).eq("id", user!.id);
+  };
+  const postcode = str(fd, "postcode");
+  if (postcode) {
+    const geo = await geocodePostcode(postcode);
+    if (!geo) back("/app/profiel", "error", "Deze postcode herkennen we niet. Gebruik bijvoorbeeld 1072 LN.");
+    Object.assign(update, { postcode: geo.postcode, latitude: geo.lat, longitude: geo.lng });
+  } else {
+    Object.assign(update, { postcode: null, latitude: null, longitude: null });
+  }
+  const { error } = await supabase.from("profiles").update(update).eq("id", user!.id);
   if (error) back("/app/profiel", "error", errorMessage(error));
   back("/app/profiel", "ok", "Je gegevens zijn opgeslagen.");
 }
@@ -60,4 +71,31 @@ export async function changePassword(fd: FormData) {
   const { error } = await supabase.auth.updateUser({ password });
   if (error) back("/app/profiel", "error", "Wachtwoord wijzigen lukte niet.");
   back("/app/profiel", "ok", "Je wachtwoord is gewijzigd.");
+}
+
+const safeBack = (path: string) => (path.startsWith("/app") ? path : "/app/boeken");
+
+export async function saveLocation(fd: FormData) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  const to = safeBack(str(fd, "back"));
+  const geo = await geocodePostcode(str(fd, "postcode"));
+  if (!geo) back(to, "error", "Deze postcode herkennen we niet. Gebruik bijvoorbeeld 1072 LN.");
+  await supabase.from("profiles").update({ postcode: geo.postcode, latitude: geo.lat, longitude: geo.lng }).eq("id", user!.id);
+  // Drop a temporary browser location so the saved postcode is used
+  const url = new URL(to, "http://x");
+  url.searchParams.delete("lat"); url.searchParams.delete("lng"); url.searchParams.delete("ok"); url.searchParams.delete("error");
+  url.searchParams.set("sort", "distance");
+  revalidatePath("/app", "layout");
+  redirect(url.pathname + url.search);
+}
+
+export async function toggleFavorite(fd: FormData) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  const salon = str(fd, "salon");
+  if (fd.get("on") === "1") await supabase.from("favorites").delete().eq("user_id", user!.id).eq("salon_id", salon);
+  else await supabase.from("favorites").insert({ user_id: user!.id, salon_id: salon });
+  revalidatePath("/app", "layout");
+  redirect(safeBack(str(fd, "back")));
 }

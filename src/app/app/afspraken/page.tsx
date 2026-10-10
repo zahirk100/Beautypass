@@ -1,4 +1,6 @@
+import Link from "next/link";
 import { getContext } from "@/lib/auth";
+import { routeUrl } from "@/lib/geo";
 import { dateLong, time } from "@/lib/format";
 import { Flash } from "@/components/Flash";
 import { Submit } from "@/components/Submit";
@@ -12,7 +14,7 @@ export default async function Appointments({ searchParams }: { searchParams: Pro
   const sp = await searchParams;
   const { supabase, user } = await getContext();
   const [{ data: bookings }, { data: reviews }] = await Promise.all([
-    supabase.from("bookings").select("id, salon_id, starts_at, status, credits, salons(name, district), treatments(name)")
+    supabase.from("bookings").select("id, salon_id, starts_at, status, credits, salons(name, district, latitude, longitude), treatments(name, slug)")
       .eq("user_id", user.id).order("starts_at", { ascending: false }).limit(100),
     supabase.from("reviews").select("booking_id").eq("user_id", user.id),
   ]);
@@ -38,6 +40,7 @@ export default async function Appointments({ searchParams }: { searchParams: Pro
                   <b>{b.treatments?.name}</b>
                   <div className="small muted">{b.salons?.name} · {dateLong(b.starts_at)} om {time(b.starts_at)} · {b.credits} credits</div>
                 </div>
+                {b.salons?.latitude != null && <a className="btn secondary small" target="_blank" rel="noopener noreferrer" href={routeUrl({ lat: b.salons.latitude, lng: b.salons.longitude })}>Route</a>}
                 <form action={cancelBooking}>
                   <input type="hidden" name="booking" value={b.id} />
                   <Submit className="btn danger small" confirm={late ? "Deze afspraak is binnen 24 uur. Je krijgt je credits niet terug. Toch annuleren?" : "Weet je zeker dat je wilt annuleren?"}>Annuleren</Submit>
@@ -60,6 +63,7 @@ export default async function Appointments({ searchParams }: { searchParams: Pro
                   <div className="small muted">{b.salons?.name} · {time(b.starts_at)} · {b.credits} credits</div>
                 </div>
                 <StatusBadge status={b.status} />
+                {b.status === "completed" && <Link href={`/app/boeken/${b.salon_id}?t=${b.treatments?.slug}`} className="btn secondary small">Boek opnieuw</Link>}
                 {b.status === "completed" && !reviewed.has(b.id) && (
                   <details className="more" style={{ flexBasis: "100%" }}>
                     <summary>Beoordeel deze afspraak</summary>
