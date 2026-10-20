@@ -1,0 +1,15 @@
+@font-face{font-family:BPSignature;src:url(assets/fonts/font-05.ttf) format('truetype');font-display:swap}
+.bp-invitation-v31{background:#170b0b}
+.bp-invitation-photo{mask-image:none;-webkit-mask-image:none}
+.bp-print-area{top:16.6%}
+.bp-card-monogram{height:5.8cqw;width:auto;max-width:none;margin:0 auto 1.2cqw}
+.bp-edition{margin-bottom:1.2cqw!important}
+.bp-print-area .bp-heading{font-size:7.9cqw}
+.bp-print-area .bp-signup{margin-top:1.8cqw}
+.bp-print-area .bp-email-label input:focus,.bp-print-area .bp-email-label input:focus-visible{outline:none;box-shadow:none}
+.bp-print-area .bp-signup-row:focus-within{border-bottom-color:#51343a;box-shadow:0 1px 0 #51343a}
+.bp-print-area .bp-submit:focus-visible{outline:1px solid #51343a;outline-offset:-3px}
+.bp-cuff-copy{left:29%;width:37%;bottom:4.5%;color:#fffaf1;text-shadow:0 1px 3px #5a423960}
+.bp-cuff-signature{font-family:BPSignature,cursive;font-style:normal;font-weight:400;font-size:5.4cqw;line-height:1.05;margin-bottom:.9cqw!important;white-space:nowrap}
+.bp-cuff-fine{font-family:var(--bp-fine);font-size:clamp(9px,1.65cqw,11px);line-height:1.45;font-weight:400}
+@media(max-width:480px){.bp-print-area{top:15.8%}.bp-card-monogram{height:5.5cqw;margin-bottom:1cqw}.bp-edition{font-size:1.65cqw}.bp-print-area .bp-heading{font-size:8.1cqw}.bp-card-intro{margin-top:.6cqw!important}.bp-print-area .bp-signup{margin-top:.5cqw}.bp-cuff-copy{left:28%;width:39%;bottom:4%}.bp-cuff-signature{font-size:6cqw}.bp-cuff-fine{font-size:9px}}

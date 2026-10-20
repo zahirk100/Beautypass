@@ -1,0 +1,90 @@
+@font-face{font-family:Instrument;src:url('assets/fonts/bodoni.woff') format('woff');font-style:normal;font-weight:400;font-display:swap}
+@font-face{font-family:Instrument;src:url('assets/fonts/bodoni-italic.woff') format('woff');font-style:italic;font-weight:400;font-display:swap}
+:root{--serif:Instrument,Georgia,serif}
+h1,h2,h3{font-synthesis:none;text-wrap:balance}
+h1,h2{letter-spacing:-.015em}
+p{ text-wrap:pretty }
+.keep-together{white-space:nowrap}
+.hero h1{font-size:clamp(76px,7.8vw,124px);line-height:.98;letter-spacing:-.015em}
+.hero-description{font-size:15px;line-height:1.65}
+.introduction{max-width:860px;padding-block:100px}
+.introduction h2{font-size:clamp(46px,4.9vw,76px);line-height:1.07;margin:22px 0 25px}
+.introduction>p:not(.eyebrow){max-width:43ch;font-size:15px;line-height:1.75;text-wrap:balance}
+.introduction .text-link{margin-top:22px}
+.section-heading h2{font-size:clamp(44px,4.9vw,72px);line-height:1.05}
+.section-heading>p{font-size:14px;line-height:1.7;max-width:32ch;text-wrap:balance}
+.beauty-caption h3{font-size:clamp(30px,2.7vw,42px);font-weight:400;letter-spacing:0}
+.beauty-caption p{font-size:12px}.beauty-caption .edit-index{color:var(--muted)}
+.salon-caption h3{font-size:clamp(64px,6.5vw,104px);letter-spacing:-.015em}
+.beauty-footnote{max-width:1500px;font-size:11px;text-wrap:pretty}
+/* A tangible membership chapter: object, promise, concise practical details. */
+.membership{display:grid;grid-template-columns:1.12fr 1fr;grid-template-areas:'visual heading' 'visual details';column-gap:8%;row-gap:24px;align-items:start;padding-block:110px}
+.membership-heading{grid-area:heading;padding-top:18px}
+.membership h2{font-size:clamp(45px,4.4vw,68px);line-height:1.05;letter-spacing:-.015em;margin:19px 0 23px}
+.membership-heading>p:not(.eyebrow){font-size:14px;line-height:1.75;max-width:38ch}
+.membership-visual{grid-area:visual;min-width:0;align-self:stretch;min-height:540px;background:#e9e3da;display:flex;flex-direction:column;justify-content:center;align-items:center;padding:48px 30px;overflow:hidden}
+.beauty-pass{width:100%;max-width:440px;aspect-ratio:1.586;background:#25221f;color:var(--paper);border-radius:12px;padding:28px;display:flex;flex-direction:column;justify-content:space-between;box-shadow:0 26px 35px -24px #30231970;transform:rotate(-6deg)}
+.pass-top{display:flex;align-items:flex-start;justify-content:space-between;gap:22px}.pass-top>img:first-child{width:58%;height:auto}.pass-top>.pass-signet{width:30px;height:35px;object-fit:contain}
+.pass-message{font-family:var(--serif);font-size:clamp(32px,3vw,45px);line-height:1.05;margin-block:22px}
+.pass-bottom{display:flex;justify-content:space-between;gap:12px;font-size:8px;line-height:1.5;letter-spacing:.12em;text-transform:uppercase}
+.membership-visual figcaption{margin-top:52px;font-size:10px;line-height:1.6;color:var(--muted);text-align:center;text-wrap:balance}
+.membership-details{grid-area:details;min-width:0}
+.membership-steps{margin:0}.membership-steps article{padding:16px 0;gap:18px}.membership-steps article:first-child{border-top:0;padding-top:0}
+.membership-steps h3{font-family:var(--sans);font-size:14px;font-weight:500;line-height:1.5;letter-spacing:0;margin-bottom:5px}
+.membership-steps article p{font-size:13px;line-height:1.7;max-width:35ch;text-wrap:pretty}
+.step-number{padding-top:4px;font-size:9px;color:var(--muted)}
+.membership-details>.text-link{margin-top:24px}.membership-note{font-size:10px;margin-top:14px}
+.community h2{font-size:clamp(76px,7.5vw,112px);line-height:1;letter-spacing:-.015em}
+/* One invitation, including optional interests. No separate configurator. */
+.invitation-section{grid-template-columns:.85fr 1.15fr;gap:10%;align-items:center;padding-block:110px}
+.invitation-intro{min-width:0;max-width:430px}.invitation-seal{width:37px;height:44px;object-fit:contain;margin-bottom:30px}
+.invitation-intro h2{font-size:clamp(72px,7.3vw,112px);line-height:.97;margin:24px 0 28px;letter-spacing:-.02em}
+.invitation-intro>p:not(.eyebrow){font-size:14px;line-height:1.75;color:var(--muted);max-width:35ch}
+.invitation-intro>.invitation-lead{font-size:18px!important;line-height:1.5!important;color:var(--ink)!important;margin-bottom:14px}
+.invitation-intro>.invitation-context{font-size:11px!important;margin-top:28px}
+.invitation-panel{padding:40px;background:var(--stone)}
+.invitation-panel h3{font-family:var(--sans);font-size:20px;font-weight:500;line-height:1.4;letter-spacing:-.02em;text-align:left;margin:0 0 24px}
+.invitation-panel form{margin-top:0}.preference-fieldset{min-width:0;padding:0;margin:0;border:0}
+.preference-fieldset legend{font-size:13px;line-height:1.6;font-weight:500;padding:0}
+.invitation-panel .preference-note{font-size:11px;line-height:1.6;margin-top:5px;color:var(--muted)}
+.preference-list{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:17px}
+.preference-list button,.preference-list button:first-child{min-width:0;min-height:48px;padding:11px 13px;border:1px solid #b5aca0;font-size:12px;line-height:1.5;gap:10px;background:transparent;transition:background .15s,color .15s,border-color .15s}
+.preference-list button[aria-pressed=true]{background:var(--red);border-color:var(--red);color:var(--paper);font-weight:500}
+.preference-list button:hover{border-color:var(--ink)}.preference-list button[aria-pressed=true]:hover{border-color:var(--red)}
+.preference-symbol{font-size:17px;margin:0;flex:none}
+.invitation-panel .selection-summary{font-size:11px;line-height:1.6;color:var(--red);padding:0;border:0;min-height:36px;margin-top:13px;text-align:left}
+.invitation-fields{margin-top:24px;padding-top:24px;border-top:1px solid #cec6bb}
+.form-row label{font-size:12px}.form-row input{padding-block:8px 11px}.invitation-submit{font-weight:500;font-size:13px}
+.invitation-panel .form-note{font-size:11px;line-height:1.6}.invitation-panel .prototype-note{font-size:10px;line-height:1.6;text-align:center;color:var(--muted);margin-top:8px}
+.invitation-panel .invitation-to{text-align:left;margin:0 0 16px}
+.invitation-success h3{font-family:var(--serif);font-size:44px;font-weight:400;text-align:center}.invitation-success>p{text-wrap:balance}
+.questions h2{font-family:var(--serif);font-weight:400;font-size:clamp(36px,3.6vw,56px);letter-spacing:0}.question-list summary{font-size:14px}.question-list details p{font-size:13px;text-wrap:pretty}
+@media(max-width:1100px) and (min-width:761px){.membership{column-gap:5%}.membership-visual{padding-inline:22px}.beauty-pass{padding:22px}.pass-message{font-size:34px}.invitation-section{gap:6%}.invitation-panel{padding:28px}.preference-list button{padding-inline:10px}}
+@media(max-width:760px){
+  .hero h1{font-size:clamp(56px,15vw,76px);line-height:.98;margin:18px 0 22px}.hero-content{padding-top:260px}.hero-description{font-size:14px;line-height:1.7}
+  .introduction{padding:60px 24px}.introduction h2{font-size:clamp(36px,9.8vw,48px);line-height:1.08;margin:18px 0 23px}
+  .introduction>p:not(.eyebrow){font-size:14px;line-height:1.7;max-width:37ch;text-wrap:balance}.introduction .text-link{margin-top:19px}
+  .section-heading{border-top:0;padding-top:12px;margin-bottom:26px}.section-heading h2{font-size:clamp(38px,10vw,48px);margin-top:10px}
+  .section-heading>p{font-size:13px;line-height:1.65;margin-top:14px;max-width:31ch}
+  .beauty-caption h3{font-size:32px;line-height:1.1;letter-spacing:0}.beauty-caption p{font-size:12px}.beauty-caption .edit-index{font-size:9px}
+  .salon-caption h3{font-size:38px;line-height:1.1;letter-spacing:0}.salon-caption>p:last-of-type{font-size:12px}.beauty-footnote{font-size:10px;line-height:1.65}
+  .membership{grid-template-columns:1fr;grid-template-areas:'heading' 'visual' 'details';gap:26px;padding-block:64px}
+  .membership-heading{padding-top:0}.membership h2{font-size:clamp(40px,10.6vw,52px);line-height:1.03;margin:16px 0 20px}
+  .membership-heading>p:not(.eyebrow){font-size:14px;line-height:1.7;max-width:34ch}
+  .membership-visual{min-height:0;padding:42px 24px 22px;aspect-ratio:auto}.beauty-pass{padding:21px;max-width:360px;transform:rotate(-5deg)}
+  .pass-top>.pass-signet{width:24px;height:28px}.pass-message{font-size:34px;margin-block:20px}.pass-bottom{font-size:7px;letter-spacing:.07em}.membership-visual figcaption{font-size:9px;margin-top:32px}
+  .membership-steps article{padding-block:16px}.membership-steps h3{font-size:14px}.membership-steps article p{font-size:13px;line-height:1.65;max-width:33ch}.membership-details>.text-link{margin-top:20px}.membership-note{font-size:10px;line-height:1.65}
+  .community h2{font-size:clamp(54px,14vw,72px);line-height:.99;margin:18px 0 22px}.community-content>p:not(.eyebrow){font-size:14px;line-height:1.7}.community-content{padding-bottom:38px}
+  .invitation-section{display:block;width:100%;padding:58px 24px;background:var(--stone)}
+  .invitation-intro{max-width:500px;margin:0 auto}.invitation-seal{width:31px;height:36px;margin-bottom:23px}
+  .invitation-intro h2{font-size:clamp(54px,14vw,72px);line-height:1;margin:18px 0 22px}.invitation-intro h2 br{display:none}.invitation-intro h2 em::before{content:' '}
+  .invitation-intro>p:not(.eyebrow){font-size:14px;line-height:1.7;max-width:35ch}.invitation-intro>.invitation-lead{font-size:16px!important;margin-bottom:10px}.invitation-intro>.invitation-context{margin-top:15px;font-size:11px!important}.invitation-context br{display:none}.invitation-context br::after{content:' '}
+  .invitation-panel{max-width:500px;margin:30px auto 0;padding:28px 0 0;border-top:1px solid #c8c1b7;background:none}
+  .invitation-panel h3{font-size:18px;margin-bottom:22px}.preference-list{gap:10px;margin-top:16px}.preference-list button,.preference-list button:first-child{font-size:13px;min-height:50px;padding:12px 14px}
+  .invitation-fields{margin-top:15px;padding-top:22px}.invitation-panel .selection-summary{font-size:11px;min-height:36px}
+  .invitation-success h3{font-size:40px}.questions{padding-top:56px;padding-bottom:60px}.questions h2{font-size:36px}.question-list{margin-top:24px}.question-list details{padding-block:14px}.question-list summary{font-size:14px}.question-list details p{font-size:13px;line-height:1.75}
+}
+@media(max-width:360px){.hero h1{font-size:52px}.introduction{padding-inline:20px}.invitation-section{padding-inline:20px}.invitation-intro h2{font-size:49px}.beauty-pass{padding:16px}.pass-message{font-size:30px}.preference-list button,.preference-list button:first-child{font-size:12px;padding-inline:11px}.membership-visual{padding-inline:18px}}
+/* Separate the warm community chapter from the invitation; keep all inputs together. */
+@media(max-width:760px){.invitation-section{background:var(--paper)}.invitation-panel{padding:26px 20px;background:var(--stone);border-top:0}}
+@media(max-width:360px){.preference-list{gap:8px}.preference-list button,.preference-list button:first-child{font-size:11px;padding-inline:9px;gap:5px}.preference-symbol{font-size:13px}}

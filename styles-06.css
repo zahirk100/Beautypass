@@ -1,0 +1,283 @@
+/* Two families, distinct roles: Instrument for the campaign and editorial
+   questions; DM Sans for a quieter, optically sized reading and service layer.
+   This replaces typography-v24.css; it is not loaded on top of it. */
+@font-face {
+  font-family: 'DM Sans';
+  src: url('assets/fonts/manrope-medium.woff') format('woff');
+  font-style: normal;
+  font-weight: 100 1000;
+  font-display: swap;
+}
+:root {
+  --sans: 'DM Sans', Arial, sans-serif;
+  --copy-ink: #49433e;
+  --service-ink: #5f5953;
+  --type-body: 14px;
+  --type-ui: 12px;
+  --type-label: 10px;
+}
+body {
+  font-family: var(--sans);
+  font-size: var(--type-body);
+  font-weight: 400;
+  font-optical-sizing: auto;
+  font-synthesis: none;
+}
+.eyebrow, .edit-signature, .edit-category {
+  font-family: var(--sans);
+  font-weight: 450;
+  font-size: var(--type-label);
+  line-height: 1.6;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+}
+.nav-left, .header-access, .menu-toggle {
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 450;
+  line-height: 1.5;
+  letter-spacing: .015em;
+  text-transform: none;
+}
+.header-access {gap: 0; text-underline-offset: 5px;}
+.header-access:hover {text-decoration: underline;}
+.mobile-menu a {font-size: 15px; font-weight: 400; line-height: 1.6;}
+.button, .text-link, .signup-section .invitation-submit {
+  font-family: var(--sans);
+  font-size: var(--type-ui);
+  font-weight: 450;
+  line-height: 1.5;
+  letter-spacing: .025em;
+  text-transform: none;
+}
+.button, .signup-section .invitation-submit {min-height: 50px; padding: 15px 20px; gap: 32px;}
+.button span, .text-link span {font-size: 16px; letter-spacing: 0;}
+.ui-arrow {display: block; width: 16px; height: 16px; flex: 0 0 16px;}
+.hero .button {min-width: 0; width: 212px; max-width: 100%;}
+.hero-description {
+  font-family: var(--sans);
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.65;
+  letter-spacing: 0;
+}
+.hero-caption {font-size: 11px; font-weight: 400; line-height: 1.6; letter-spacing: .015em; margin-top: 19px;}
+.hero-scroll {font-size: 10.5px; font-weight: 400; letter-spacing: .015em;}
+.hero-edition {font-size: 9px; font-weight: 450; letter-spacing: .14em; text-transform: uppercase;}
+
+/* One belief. Three short clauses form a considered block, with no nowrap
+   locks: each clause can reflow when a visitor enlarges the text. */
+.brand-manifesto {
+  padding: clamp(78px, 6.2vw, 92px) 28px clamp(82px, 6.5vw, 96px);
+  background: var(--paper);
+  color: var(--ink);
+  text-align: center;
+}
+.brand-manifesto h2 {
+  max-width: 800px;
+  margin: 0 auto;
+  font-family: var(--serif);
+  font-size: clamp(50px, 4.6vw, 68px);
+  font-weight: 400;
+  line-height: 1.06;
+  letter-spacing: -.015em;
+}
+.brand-manifesto h2 em {font-weight: 400;}
+.manifesto-copy {
+  max-width: 510px;
+  margin: 28px auto 0;
+  font-family: var(--sans);
+  font-size: 14.5px;
+  font-weight: 400;
+  line-height: 1.85;
+  letter-spacing: 0;
+  color: var(--copy-ink);
+}
+.copy-line {display: block; text-wrap: balance;}
+
+/* Captions share the same baseline and two-line rhythm. The breaks follow
+   meaningful word groups, rather than a mechanical word count. */
+.edit-copy h3 {text-wrap: pretty;}
+.edit-category {font-size: 10.5px; line-height: 1.65; letter-spacing: .10em;}
+.edit-signature {font-size: 10px; letter-spacing: .16em;}
+
+/* The email address is a single visible label. It stays associated with the
+   field and floats above entered text; input itself stays 16px on phones. */
+.signup-section {padding-block: 88px 82px;}
+.signup-inner {max-width: 450px;}
+.signup-seal {width: 26px; height: 31px; margin-bottom: 25px;}
+.signup-section h2 {font-size: clamp(54px, 5.1vw, 74px); margin: 16px 0 20px; line-height: 1.06;}
+.signup-section .signup-lead {
+  max-width: 360px;
+  margin-inline: auto;
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.8;
+  letter-spacing: 0;
+  color: var(--copy-ink);
+}
+.signup-section form {max-width: 360px; margin: 30px auto 0;}
+.signup-section .email-field {position: relative; margin-bottom: 16px;}
+.signup-section .email-field input {
+  display: block;
+  width: 100%;
+  min-height: 62px;
+  padding: 1.65em 0 .6em;
+  font-family: var(--sans);
+  font-size: 16px;
+  font-weight: 400;
+  line-height: 1.5;
+  letter-spacing: 0;
+  color: var(--ink);
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid #8b8378;
+  border-radius: 0;
+}
+.signup-section .email-field label {
+  position: absolute;
+  left: 0;
+  top: 1.5em;
+  margin: 0;
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  letter-spacing: 0;
+  text-transform: none;
+  color: var(--service-ink);
+  cursor: text;
+  transition: top .15s ease, font-size .15s ease;
+}
+.signup-section .email-field input:focus + label,
+.signup-section .email-field input:not(:placeholder-shown) + label {
+  top: .18em;
+  font-size: 10.5px;
+}
+.signup-section .email-field input:focus {outline: 2px solid var(--red); outline-offset: 5px;}
+.signup-section .invitation-submit {margin: 0;}
+.signup-section .invitation-success > p:not(.eyebrow) {font-size: 14px; line-height: 1.8; color: var(--copy-ink);}
+
+/* Short serif questions create an editorial reading tier between the display
+   title and the smaller sans answers. Answers remain naturally left aligned. */
+.questions {
+  max-width: 1160px;
+  grid-template-columns: minmax(0, .8fr) minmax(0, 1.3fr);
+  gap: clamp(50px, 8vw, 112px);
+  padding-top: 18px;
+  padding-bottom: 88px;
+}
+.questions h2 {font-family: var(--serif); font-size: clamp(38px, 3.4vw, 48px); font-weight: 400; margin: 14px 0 0; line-height: 1.1; letter-spacing: -.01em;}
+.question-list {min-width: 0; margin: 0;}
+.question-list details {padding: 0;}
+.question-list summary {
+  min-height: 76px;
+  padding: 22px 0;
+  gap: 28px;
+  font-family: var(--serif);
+  font-size: 25px;
+  font-weight: 400;
+  line-height: 1.25;
+  letter-spacing: 0;
+  color: var(--ink);
+  align-items: center;
+}
+.question-list summary .question-title,
+.question-list summary .question-title span {font: inherit; letter-spacing: inherit; text-wrap: pretty;}
+.question-list summary .question-title {min-width: 0; flex: 1; display: block;}
+.question-list details[open] summary span {transform: none;}
+.question-list summary .question-toggle {display: block; position: relative; flex: 0 0 14px; width: 14px; height: 14px;}
+.question-toggle::before, .question-toggle::after {
+  content: ''; position: absolute; background: currentColor;
+}
+.question-toggle::before {left: 1px; right: 1px; top: 6px; height: 1px;}
+.question-toggle::after {top: 1px; bottom: 1px; left: 6px; width: 1px; transition: transform .15s ease;}
+details[open] .question-toggle::after {transform: scaleY(0);}
+.question-list details p {
+  max-width: 53ch;
+  margin: 0 0 24px;
+  padding: 0 28px 0 0;
+  font-family: var(--sans);
+  font-size: 13.5px;
+  font-weight: 400;
+  line-height: 1.85;
+  letter-spacing: 0;
+  color: var(--copy-ink);
+  text-wrap: pretty;
+}
+
+/* A quiet three-column colophon. One wordmark, one small invitation; no
+   competing city headline, repeated slogan or fourth sales column. */
+.site-footer {padding-top: 58px;}
+.footer-main {
+  max-width: 1160px;
+  grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr);
+  gap: 56px;
+  padding-bottom: 48px;
+  align-items: start;
+}
+.footer-brand {grid-column: auto; padding: 0;}
+.footer-wordmark {width: 208px; min-height: 44px;}
+.footer-launch {font-family: var(--serif); font-size: 23px; font-weight: 400; line-height: 1.3; letter-spacing: 0; margin: 12px 0 8px;}
+.footer-access-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 24px;
+  min-height: 44px;
+  font-size: 12px;
+  font-weight: 450;
+  line-height: 1.5;
+  letter-spacing: .015em;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 5px;
+}
+.footer-access-link .ui-arrow {width: 13px; height: 13px; flex-basis: 13px;}
+.footer-label {font-family: var(--sans); font-size: 12px; font-weight: 500; line-height: 1.5; letter-spacing: 0; text-transform: none; margin: 12px 0 14px; color: var(--ink);}
+.footer-nav a {min-height: 40px; font-family: var(--sans); font-size: 12.5px; font-weight: 400; line-height: 1.65; letter-spacing: 0; color: var(--service-ink);}
+.footer-bottom {max-width: 1160px; padding-block: 14px 18px; gap: 20px;}
+.footer-bottom, .footer-bottom p {font-size: 10px; font-weight: 400; line-height: 1.7; letter-spacing: 0; color: var(--service-ink);}
+.footer-bottom > a {font-size: 10.5px; font-weight: 400; letter-spacing: 0;}
+
+@media (max-width: 900px) {
+  .footer-main {grid-template-columns: 1.4fr 1fr 1fr; gap: 32px;}
+  .footer-wordmark {width: 184px;}
+}
+@media (max-width: 760px) {
+  .menu-toggle, .header-access {font-size: 10.5px; letter-spacing: .01em;}
+  .hero-description {font-size: 14px; line-height: 1.7;}
+  .hero-caption {font-size: 10.5px; margin-top: 17px;}
+  .brand-manifesto {padding: 64px 24px 68px;}
+  .brand-manifesto h2 {font-size: clamp(40px, 11.4vw, 56px); line-height: 1.07;}
+  .manifesto-copy {max-width: 370px; margin-top: 25px; font-size: 13.5px; line-height: 1.9;}
+  .edit-category {font-size: 10.5px; letter-spacing: .09em;}
+  .edit-signature {font-size: 10px;}
+  .signup-section {padding: 66px 24px 64px;}
+  .signup-seal {width: 24px; height: 28px; margin-bottom: 23px;}
+  .signup-section h2 {font-size: clamp(46px, 12vw, 60px); margin: 15px 0 19px;}
+  .signup-section .signup-lead {font-size: 13.5px; line-height: 1.8;}
+  .signup-section form {margin-top: 26px;}
+  .questions {display: block; padding-top: 10px; padding-bottom: 66px;}
+  .questions h2 {font-size: 38px; margin: 0;}
+  .question-list {margin-top: 28px;}
+  .question-list summary {min-height: 72px; font-size: 23px; padding: 22px 0; gap: 20px;}
+  .question-list details p {font-size: 14px; line-height: 1.8; max-width: 46ch; padding-right: 20px; margin-bottom: 23px;}
+  .site-footer {padding-top: 38px;}
+  .footer-main {grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px 22px; padding-bottom: 34px;}
+  .footer-brand {grid-column: 1 / -1;}
+  .footer-wordmark {width: 194px;}
+  .footer-launch {font-size: 22px; margin-top: 10px; margin-bottom: 5px;}
+  .footer-label {font-size: 12px; margin: 0 0 8px;}
+  .footer-nav a {font-size: 12px; min-height: 44px;}
+  .footer-bottom {align-items: flex-start; gap: 8px; padding-block: 20px;}
+  .footer-bottom p {font-size: 10px;}
+}
+@media (max-width: 360px) {
+  .brand-manifesto {padding-inline: 20px;}
+  .brand-manifesto h2 {font-size: 40px;}
+  .manifesto-copy {font-size: 13px; line-height: 1.9;}
+  .signup-section {padding-inline: 20px;}
+  .footer-main {gap: 26px 18px;}
+  .footer-nav a {font-size: 11.5px;}
+}

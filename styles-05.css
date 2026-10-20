@@ -1,0 +1,212 @@
+/* The introduction sets the campaign's point of view before the image sequence. */
+.introduction {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  align-items: center;
+  gap: clamp(40px, 5vw, 80px);
+  max-width: 1440px;
+  padding: 80px clamp(28px, 6vw, 96px);
+  text-align: left;
+}
+.introduction h2 {
+  margin: 0;
+  font-size: clamp(46px, 4.6vw, 68px);
+  line-height: 1.08;
+  letter-spacing: -.015em;
+  color: var(--ink);
+  text-wrap: balance;
+}
+.introduction > p.brand-belief {
+  max-width: 52ch;
+  margin: 0;
+  color: var(--ink);
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.85;
+  text-wrap: balance;
+}
+
+/* Three viewport-height chapters: 2 / 1 / 2 images, with equal-weight diptychs. */
+.beauty-edit {
+  --edit-header-height: 68px;
+  --edit-height: calc(100vh - var(--edit-header-height));
+  --edit-inset: clamp(30px, 4vw, 72px);
+  --edit-bottom: clamp(40px, 5vh, 64px);
+  --edit-display: clamp(56px, 5.2vw, 88px);
+  --campaign-cocoa: #3d2b20;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  background: var(--campaign-cocoa);
+}
+@supports (height: 100svh) {
+  .beauty-edit {--edit-height: calc(100svh - var(--edit-header-height));}
+}
+@supports (height: 100dvh) {
+  .beauty-edit {--edit-height: calc(100dvh - var(--edit-header-height));}
+}
+.edit-spread {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin: 0;
+  padding: 0;
+  gap: 0;
+}
+.edit-scene {
+  position: relative;
+  isolation: isolate;
+  display: flex;
+  align-items: flex-end;
+  min-width: 0;
+  min-height: max(500px, var(--edit-height));
+  overflow: hidden;
+  color: var(--paper);
+  background: var(--campaign-cocoa);
+}
+.edit-scene .edit-visual,
+.edit-scene picture.edit-visual > img {
+  display: block;
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: cover;
+  object-position: var(--edit-position, 50% 25%);
+}
+
+/* The lower light falloff protects white captions without veiling the eyes. */
+.edit-scene::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(0deg, rgb(17 13 11 / 78%), rgb(17 13 11 / 50%) 35%, transparent 60%);
+}
+.edit-copy {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  padding: 180px var(--edit-inset) var(--edit-bottom);
+}
+.edit-copy h3 {
+  margin: 0;
+  color: inherit;
+  font-family: var(--serif);
+  font-size: var(--edit-display);
+  font-weight: 400;
+  line-height: 1.02;
+  letter-spacing: -.015em;
+  text-wrap: balance;
+}
+.edit-copy h3 em {font-weight: 400;}
+.edit-category {
+  margin: 18px 0 0;
+  color: inherit;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.65;
+  letter-spacing: .025em;
+}
+.edit-signature {
+  position: absolute;
+  z-index: 2;
+  top: clamp(30px, 3vw, 52px);
+  left: var(--edit-inset);
+  right: var(--edit-inset);
+  color: inherit;
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.6;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+}
+.edit-scene-nails {--edit-position: 50% 20%;}
+.edit-scene-nails::after {
+  background: linear-gradient(180deg, rgb(17 13 11 / 65%), rgb(17 13 11 / 62%) 76px, transparent 190px),
+              linear-gradient(0deg, rgb(17 13 11 / 72%), rgb(17 13 11 / 28%) 32%, transparent 55%);
+}
+.edit-scene-brows {--edit-position: 50% 25%;}
+.edit-scene-skin {--edit-position: 50% 30%;}
+.edit-scene-smooth {--edit-position: 53% 30%;}
+
+.edit-scene-hair {
+  --edit-position: 50% 0%;
+  --edit-display: clamp(84px, 7.2vw, 128px);
+  align-items: center;
+}
+.edit-scene-hair::after {
+  background: linear-gradient(90deg, rgb(23 15 11 / 32%), transparent 55%);
+}
+.edit-scene-hair .edit-copy {width: 49%; padding-block: 64px;}
+
+@media (max-width: 900px), (orientation: portrait) {
+  .introduction {
+    display: block;
+    max-width: 720px;
+    padding: 56px 26px 60px;
+  }
+  .introduction h2 {
+    margin: 0 0 22px;
+    font-size: clamp(38px, 9.8vw, 58px);
+    line-height: 1.08;
+  }
+  .introduction > p.brand-belief {
+    max-width: 48ch;
+    font-size: 14px;
+    line-height: 1.85;
+  }
+  .beauty-edit {
+    --edit-inset: 26px;
+    --edit-bottom: 36px;
+    --edit-display: clamp(52px, 15.4vw, 76px);
+  }
+  .edit-spread {display: block;}
+  .edit-scene {width: 100%; margin: 0;}
+  .edit-category {margin-top: 16px;}
+  .edit-signature {top: 29px; font-size: 10px;}
+}
+
+@media (max-width: 760px) {
+  .beauty-edit {--edit-header-height: 64px;}
+}
+
+/* Portrait hair uses its existing art-directed portrait, preserving the rollers and coffee. */
+@media (orientation: portrait) {
+  .edit-scene-hair {
+    --edit-position: 50% 25%;
+    --edit-display: clamp(58px, 16.4vw, 82px);
+    align-items: flex-end;
+  }
+  .edit-scene-hair::after {
+    background: linear-gradient(0deg, rgb(22 15 11 / 78%), rgb(22 15 11 / 32%) 32%, transparent 54%);
+  }
+  .edit-scene-hair .edit-copy {width: 100%; padding: 180px var(--edit-inset) var(--edit-bottom);}
+}
+
+@media (max-width: 360px) {
+  .introduction {padding-inline: 22px;}
+  .beauty-edit {--edit-inset: 22px; --edit-bottom: 30px;}
+}
+
+/* A low landscape viewport still allows the picture and caption to coexist. */
+@media (orientation: landscape) and (max-height: 600px) {
+  .beauty-edit {--edit-display: 52px; --edit-bottom: 32px;}
+  .edit-scene-hair {--edit-display: 72px;}
+  .edit-scene-hair .edit-copy {width: 49%; padding-block: 40px;}
+}
+
+@media (orientation: landscape) and (max-height: 600px) and (min-width: 700px) {
+  .edit-spread {display: grid;}
+}
+
+@media (orientation: landscape) and (max-width: 699px) {
+  .edit-spread .edit-scene {min-height: max(500px, 100vw);}
+}
+
+@media (min-width: 2000px) and (min-aspect-ratio: 2/1) {
+  .edit-scene-nails {--edit-position: 50% 45%;}
+  .edit-scene-smooth {--edit-position: 53% 45%;}
+}

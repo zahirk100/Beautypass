@@ -1,0 +1,19 @@
+BEAUTYPASS — VOLLEDIGE WEBSITEBACK-UP V33
+21 oktober 2026
+
+Pak de volledige ZIP uit. Open daarna index.html in Safari of een andere browser.
+Laat de HTML, CSS, JavaScript en de map assets bij elkaar staan.
+
+INHOUD
+index.html: de complete laatste website.
+styles.css en styles-02.css t/m styles-15.css: de opmaak in oorspronkelijke volgorde.
+app.js, interactions.js en beautypass-sections.js: de interacties.
+assets: alle gebruikte afbeeldingen, logo, favicon, lettertypen en vectoren.
+assets/beautypass-signature.svg: losse bewerkbare signatuur.
+BESTANDEN.json: overzicht met controlesommen van de uitgepakte bronnen.
+
+Deze back-up bevat de laatste compacte signatuur, de horizontale First access-pijl
+en de tekst: Je uitnodiging volgt per e-mail.
+
+Het aanmeldformulier is een ontwerpvoorbeeld. Het verzendt of bewaart geen
+e-mailadressen. Voor echte aanmeldingen moet een dienst worden gekoppeld.

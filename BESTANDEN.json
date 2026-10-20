@@ -1,0 +1,222 @@
+[
+  {
+    "file": "assets/beautypass-vector-01.svg",
+    "sha256": "d14602e916264943161e271498a20253ce191c9d0b4d528b690d539b30730133",
+    "bytes": 332
+  },
+  {
+    "file": "assets/fonts/bodoni.woff",
+    "sha256": "87c34ca319334035d8efcde53a20492348c65567c2fa083f27f23f3398a23e27",
+    "bytes": 32144
+  },
+  {
+    "file": "assets/fonts/manrope-medium.woff",
+    "sha256": "bcd7c32005809eb23ee52e4fc03a74c9c3671975228c458fa183e041e8435368",
+    "bytes": 95512
+  },
+  {
+    "file": "assets/fonts/bodoni-italic.woff",
+    "sha256": "f49d8fc319cc4d364d8b870f8b0a396b75e0dbf439c9f58fee23dc050a1ede7b",
+    "bytes": 33416
+  },
+  {
+    "file": "assets/cover-v3.webp",
+    "sha256": "c5e2d21a8b9d1b9052be1b0ddd18eae2df0db63e6db5ce0737af1183cf91a903",
+    "bytes": 171642
+  },
+  {
+    "file": "assets/fonts/font-01.ttf",
+    "sha256": "498efd461f6ddfcb7a111bf9a565709d2085d48201d501ead960d93e84ffbb88",
+    "bytes": 70012
+  },
+  {
+    "file": "assets/fonts/font-02.ttf",
+    "sha256": "08939b8bdf534afec24ae0ef5e03f948940cd9a8fe08e7fecbad040e62327385",
+    "bytes": 71592
+  },
+  {
+    "file": "assets/fonts/font-03.ttf",
+    "sha256": "51a92565dd3184764d0bddde5a5bd75771c39737bed7a9c8edb9e6dec213c878",
+    "bytes": 56856
+  },
+  {
+    "file": "assets/fonts/font-04.ttf",
+    "sha256": "75dbed113f54422891e95c12af7d48cc315bae722984ba2507642a239bf4278f",
+    "bytes": 56872
+  },
+  {
+    "file": "assets/fonts/font-01.otf",
+    "sha256": "fd41669443616a7ae890c42e53a58f47fa24a940fd1e367acaff665cf5b6e9d8",
+    "bytes": 98200
+  },
+  {
+    "file": "assets/fonts/font-05.ttf",
+    "sha256": "67a7abc298ce9d368b2c00fcbff52ec54be948889b8a59032ae80ca3322e5b34",
+    "bytes": 49140
+  },
+  {
+    "file": "assets/beautypass-wordmark-v6-small-ink.svg",
+    "sha256": "5de25813591c76816ed4ee80261878ab72c4a436b8e05e80162de281e5d05e70",
+    "bytes": 1369
+  },
+  {
+    "file": "assets/nails-v21-960.webp",
+    "sha256": "dc1d97e53fa6bf1b18bc57bc8c614bac1b69856630d44e9c8bd6b1695ce64ded",
+    "bytes": 305650
+  },
+  {
+    "file": "assets/nails-v21.webp",
+    "sha256": "2b6e8a5925c3b390c2f17559f0005f051e71180c6c5285404e1f79abd1b3a5e4",
+    "bytes": 322768
+  },
+  {
+    "file": "assets/nails-mobile-v21.webp",
+    "sha256": "032e129d8477a78667a869e87485f06109e245ee671b72a99ce576d11fad06af",
+    "bytes": 314306
+  },
+  {
+    "file": "assets/nails-mobile-v21-640.webp",
+    "sha256": "60ead1c3d18ad68c0113c7a546624205dac4e628e62677383a3a45b661e4acc3",
+    "bytes": 172934
+  },
+  {
+    "file": "assets/brows-v23.webp",
+    "sha256": "5bb270f71a9c6789209d56a77fb45e748ab1adf715105b023337a227944621dc",
+    "bytes": 181508
+  },
+  {
+    "file": "assets/brows-v23-640.webp",
+    "sha256": "45a6e5803b5e79e90e12f7a519a10ac89e6ff71f4dc6691accef0453a64f785b",
+    "bytes": 85094
+  },
+  {
+    "file": "assets/blowouts-mobile-v19-640.webp",
+    "sha256": "40cab05da96d9429d407045dfa7eb91354cc42552683d3294ca8bd7f6109cdd0",
+    "bytes": 30040
+  },
+  {
+    "file": "assets/blowouts-mobile-v19.webp",
+    "sha256": "08839fc1c2c63470aa45fc8356a497f9cfb24684a98442506adde51c36c93f42",
+    "bytes": 127110
+  },
+  {
+    "file": "assets/blowouts-v18.webp",
+    "sha256": "16986ef92adbcb1df1f8f4898f0a821c354f6746ed0761528e2be303b6718d5e",
+    "bytes": 138290
+  },
+  {
+    "file": "assets/blowouts-v18-960.webp",
+    "sha256": "2c10fb13b51cef7f64be1d324300199885b9bfabd07909fb2499d77d2a26c21a",
+    "bytes": 58148
+  },
+  {
+    "file": "assets/skincare-v21.webp",
+    "sha256": "4cc19c620883526a0fb975925cf58921154d697134e3b41bd00b219fedad874f",
+    "bytes": 225032
+  },
+  {
+    "file": "assets/skincare-v21-640.webp",
+    "sha256": "092d9024d2f249175828b7d12d9e4f2c7952b98cd8c3da75ba2948ef3bf938b1",
+    "bytes": 122812
+  },
+  {
+    "file": "assets/smooth-v23.webp",
+    "sha256": "5f1249539c1f8f3ff39d9a133767e9cce69524550b4ddcac97d34752403ed67c",
+    "bytes": 210936
+  },
+  {
+    "file": "assets/smooth-v23-640.webp",
+    "sha256": "28f2fc758120bac4d57b550d07462b383dc13edace1a7a9a0a2422d56c1880c5",
+    "bytes": 96336
+  },
+  {
+    "file": "assets/tour-arrival-mobile-v26-640.webp",
+    "sha256": "5c2d7804185d74eb053caa20f1dc63b492b6c9aff64bfd8e6139d7525405ea3d",
+    "bytes": 49354
+  },
+  {
+    "file": "assets/tour-arrival-mobile-v26.webp",
+    "sha256": "c12d3d4d29ab8a8308bce6e4b9dec7cece7e8c58e5f4466c5ed54590ec2a1770",
+    "bytes": 240176
+  },
+  {
+    "file": "assets/tour-arrival-v26.webp",
+    "sha256": "3451ca0484c4a84d76dfe0df60d86d18a85fc0a8f032b8d3536d27529b836b7a",
+    "bytes": 234210
+  },
+  {
+    "file": "assets/tour-arrival-v26-960.webp",
+    "sha256": "4b9529800610dcefdc8592e1f242515244d52797ce0c7b41f9900c92f27f7991",
+    "bytes": 110944
+  },
+  {
+    "file": "assets/tour-lounge-mobile-v26-640.webp",
+    "sha256": "f0c815817a0b6df069a426a66f7d41d91f6271322d3273c4cdf7d5a245e92073",
+    "bytes": 61802
+  },
+  {
+    "file": "assets/tour-lounge-mobile-v26.webp",
+    "sha256": "5b7d760a68cb1d9a6194733fe52c2b9c3ec3e4f7cc27d9250a0600394c11e5d0",
+    "bytes": 308704
+  },
+  {
+    "file": "assets/tour-lounge-v26.webp",
+    "sha256": "4b1313a7dccc52dca992113657b31a29941a53e21effe3c1b46b91fb26a080be",
+    "bytes": 298092
+  },
+  {
+    "file": "assets/tour-lounge-v26-960.webp",
+    "sha256": "87c7a63b743669765dcf67e6fc6ad2c8369a7bff66f78c5b482d27dd53703d35",
+    "bytes": 134832
+  },
+  {
+    "file": "assets/tour-solo-mobile-v26-640.webp",
+    "sha256": "155a65be23a15a00cb63aab0ef6d5cfb408401e11c23fc45382e1c994bc3c751",
+    "bytes": 32548
+  },
+  {
+    "file": "assets/tour-solo-mobile-v26.webp",
+    "sha256": "22e5c1cae341565ed8cdeb62bc9f9511d98c1fd4d8b272f6eea3a5ca478783ac",
+    "bytes": 130224
+  },
+  {
+    "file": "assets/tour-solo-v26.webp",
+    "sha256": "12ca005de5116f108cb2308780b15d6ac3df2b7150fd43f802e41ae071574ca4",
+    "bytes": 125612
+  },
+  {
+    "file": "assets/tour-solo-v26-960.webp",
+    "sha256": "af4770ce31fb79e0794fa18f83115757dec1aa2eedc3808ae031a214078d4616",
+    "bytes": 62374
+  },
+  {
+    "file": "assets/tour-duo-mobile-v26-640.webp",
+    "sha256": "708fc58dc2ce14e76e34cd3a667207cc595840f7cf26b84ade800a91d93fa42e",
+    "bytes": 38866
+  },
+  {
+    "file": "assets/tour-duo-mobile-v26.webp",
+    "sha256": "16a504a5070138ef59b50a19caa3c5f7955f858eab505a54903ba23b53b641c7",
+    "bytes": 143920
+  },
+  {
+    "file": "assets/tour-duo-v26.webp",
+    "sha256": "d3afa749df9daa40e167bfce7cb8fc6c0fb7cd98c9b6e26598f0b388686dedd4",
+    "bytes": 139278
+  },
+  {
+    "file": "assets/tour-duo-v26-960.webp",
+    "sha256": "524e4c0edcf33aa05034e5a3f1df1f09955eb210de439f9db39155e8e114fcb2",
+    "bytes": 70520
+  },
+  {
+    "file": "assets/invitation-glove.png",
+    "sha256": "98f3702920bb5daf739e0261a36fa3912b1350344657407664411ba3b2574318",
+    "bytes": 1898379
+  },
+  {
+    "file": "assets/beautypass-vector-03.svg",
+    "sha256": "c598a97d19b67ff370f34896512635ebdae72cdc15dc8439946fcc0fcd10477e",
+    "bytes": 256
+  }
+]

@@ -1,0 +1,46 @@
+/* Opening: viewport-sized background, with room to grow at large text settings. */
+.hero{display:flex;align-items:center;height:auto;min-height:100vh;min-height:100dvh}
+.hero-content{top:auto;transform:none;padding-top:140px;padding-bottom:110px}
+/* A quiet editorial spread: the place and feeling, rather than a payment object. */
+.membership-campaign{display:grid;grid-template-columns:42% 58%;background:#f0ede7;margin-top:80px}
+.membership-editorial{align-self:center;padding:72px clamp(32px,5vw,88px);min-width:0}
+.membership-editorial h2{font-size:clamp(44px,4.6vw,72px);line-height:1.06;letter-spacing:-.015em;margin:24px 0}
+.membership-copy{font-size:14px;line-height:1.85;color:#514b45}
+.membership-editorial .text-link{margin-top:32px;gap:24px}
+.membership-scene{min-width:0;overflow:hidden}
+.membership-scene img{width:100%;height:100%;min-height:650px;max-height:900px;object-fit:cover;object-position:50% 60%;aspect-ratio:1/1.03}
+/* The invitation is one centered action, without competing columns or choices. */
+.signup-section{background:var(--paper);padding:100px 24px 90px}
+.signup-inner{max-width:480px;margin-inline:auto;text-align:center}
+.signup-seal{width:30px;height:35px;margin:0 auto 28px}
+.signup-section h2{font-size:clamp(54px,5.5vw,80px);line-height:1.06;letter-spacing:-.015em;margin:17px 0}
+.signup-lead{font-size:14px;line-height:1.7;color:#625b54;text-wrap:balance}
+.signup-section form{margin:34px auto 0;max-width:420px;text-align:left}
+.signup-section .form-row{margin-bottom:20px}
+.signup-section .form-row label{font-size:12px}
+.signup-section .form-row input{font-size:16px;min-height:50px}
+.signup-section .invitation-submit{font-size:13px;font-weight:500;min-height:54px;margin:0}
+.signup-note{font-size:11px;line-height:1.6;text-align:center;color:#625b54;margin-top:16px}
+.signup-section .prototype-note{font-size:10px;line-height:1.6;text-align:center;color:#625b54;margin-top:6px}
+.signup-section .invitation-success h3{font-size:60px;line-height:1.1;margin:20px 0;font-family:var(--serif)}
+.signup-section .invitation-success>p:not(.eyebrow){font-size:14px;line-height:1.7;color:#625b54}
+.signup-section .reset-form{margin-top:28px;background:none;border-top:0;border-left:0;border-right:0}
+@media(max-width:1000px) and (min-width:761px){.membership-editorial{padding-inline:30px}.membership-copy{font-size:13px}.membership-scene img{min-height:590px}}
+@media(max-width:760px){
+ .hero{min-height:100vh;min-height:100dvh;align-items:flex-end}
+ .hero-content{padding:210px 24px max(38px,env(safe-area-inset-bottom))}
+ .membership-campaign{grid-template-columns:1fr;margin-top:44px}
+ .membership-scene{grid-row:1}
+ .membership-scene img{height:auto;min-height:0;max-height:none;aspect-ratio:4/5;object-position:50% 58%}
+ .membership-editorial{padding:38px 26px 44px;text-align:center}
+ .membership-editorial h2{font-size:clamp(40px,10.5vw,54px);line-height:1.06;margin:17px 0 20px}
+ .membership-copy{font-size:13px;line-height:1.85}
+ .membership-editorial .text-link{margin-top:25px;font-size:12px}
+ .signup-section{padding:58px 24px 60px}
+ .signup-seal{width:25px;height:30px;margin-bottom:23px}
+ .signup-section h2{font-size:clamp(46px,12vw,62px);margin:15px 0 17px}
+ .signup-lead{font-size:13px}
+ .signup-section form{margin-top:28px}
+ .signup-section .invitation-success h3{font-size:48px}
+}
+@media(max-width:360px){.hero-content{padding-inline:20px}.membership-editorial{padding-inline:20px}.signup-section{padding-inline:20px}}

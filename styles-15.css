@@ -1,0 +1,13 @@
+/* Refined pen rhythm and form interaction, scoped to the invitation */
+.bp-cuff-signature{width:25cqw;margin-bottom:1.1cqw!important}
+.bp-print-area .bp-submit,.bp-print-area .bp-submit:hover,.bp-print-area .bp-submit:active,.bp-print-area .bp-submit:focus,.bp-print-area .bp-submit *{text-decoration:none!important}
+.bp-print-area .bp-submit{font-weight:400!important;gap:10px;transition:color .18s ease}
+.bp-print-area .bp-submit:hover{color:#795d50!important}
+.bp-print-area .bp-submit:focus:not(:focus-visible){outline:none;box-shadow:none}
+.bp-print-area .bp-submit:focus-visible{outline:1px solid #796558;outline-offset:3px;border-radius:0}
+.bp-print-area .bp-arrow{display:inline-flex;width:19px;height:16px;align-items:center;flex:none;transition:transform .18s ease}
+.bp-print-area .bp-arrow svg{display:block;width:19px;height:16px}
+@media(hover:hover){.bp-print-area .bp-submit:hover .bp-arrow{transform:translateX(2px)}}
+.bp-print-area .bp-signup-note{font-family:var(--bp-fine);font-size:clamp(9px,1.7cqw,11px);font-weight:400;letter-spacing:.015em;line-height:1.4;color:#65574a;margin-top:1.6cqw!important}
+@media(max-width:480px){.bp-cuff-signature{width:27cqw}.bp-print-area .bp-signup-note{font-size:9px;margin-top:1cqw!important}.bp-print-area .bp-arrow,.bp-print-area .bp-arrow svg{width:17px}}
+@media(prefers-reduced-motion:reduce){.bp-print-area .bp-arrow,.bp-print-area .bp-submit{transition:none}}

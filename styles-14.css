@@ -1,0 +1,11 @@
+/* Invitation refinement: intimate signature on cuff, small house emblem on card */
+.bp-print-area .bp-card-monogram{display:block;height:4.7cqw;width:auto;max-width:none;margin:.6cqw auto 2.5cqw;opacity:.9}
+.bp-cuff-copy{left:27%;width:38%;bottom:4.8%;text-align:center;color:#fffaf1}
+.bp-cuff-signature{width:27cqw;margin:0 auto 1.25cqw!important}
+.bp-cuff-fine{font-family:var(--bp-fine);font-weight:400;font-style:normal;font-size:clamp(9px,1.65cqw,11px);line-height:1.4;letter-spacing:.025em}
+@media(max-width:480px){
+.bp-print-area .bp-card-monogram{height:4.7cqw;margin:.6cqw auto 2.5cqw}
+.bp-cuff-copy{left:26%;width:40%;bottom:4.8%}
+.bp-cuff-signature{width:29cqw;margin-bottom:1.5cqw!important}
+.bp-cuff-fine{font-size:9px;line-height:1.4}
+}

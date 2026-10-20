@@ -1,0 +1,16 @@
+/* V33 — scoped invitation typography; original page typography preserved */
+.bp-print-area .bp-card-wordmark{display:block;width:29cqw;height:auto;max-width:none;margin:1.2cqw auto 2.9cqw}
+.bp-cuff-copy{left:25%;width:50%;bottom:4.5%;text-align:center;color:#fffaf1;text-shadow:none}
+.bp-cuff-signature{width:25cqw;margin:0 auto 1.1cqw!important;line-height:0}
+.bp-cuff-signature svg{display:block;width:100%;height:auto;overflow:visible}
+.bp-cuff-fine{font-family:var(--bp-fine);font-size:clamp(9px,1.6cqw,10.5px);line-height:1.45;font-weight:400;letter-spacing:.01em}
+.bp-print-area .bp-email-label input{font-family:var(--sans);font-size:12px;font-weight:400;letter-spacing:.015em;color:#493e38}
+.bp-print-area .bp-email-label input::placeholder{font:inherit;letter-spacing:inherit;color:#75675e;opacity:1}
+@media(max-width:480px){
+.bp-print-area .bp-card-wordmark{width:29cqw;margin:1cqw auto 2.7cqw}
+.bp-cuff-copy{left:22%;width:56%;bottom:4%}
+.bp-cuff-signature{width:29cqw;margin-bottom:1.5cqw!important}
+.bp-cuff-fine{font-size:9px;line-height:1.4}
+.bp-print-area .bp-email-label{position:relative;height:44px;min-width:0;overflow:hidden}
+.bp-print-area .bp-email-label input{font-size:16px;transform:scale(.75);transform-origin:left center;width:133.333%;max-width:none;height:44px;min-height:44px}
+}
