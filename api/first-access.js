@@ -1,7 +1,37 @@
 'use strict';
 
+
+function classifyBrevoError(details) {
+  const message = String(details.message || '').toLowerCase();
+  if (/\bip\b|ip address|whitelist/.test(message)) return 'ip_restricted';
+  if (/key.*not found|key.*invalid|invalid.*key|unrecognised.*key|unrecognized.*key/.test(message)) return 'invalid_api_key';
+  if (/not activated|not active|inactive/.test(message)) return 'inactive_resource';
+  if (/template/.test(message)) return 'template_configuration';
+  if (/credit/.test(message)) return 'insufficient_credits';
+  return 'unclassified';
+}
+// Temporary, read-only startup check. Only categorical results go to private
+// runtime logs. No account data, keys, addresses or provider messages are logged.
+// No new HTTP endpoint or response fields are added.
+let diagnostic;
+async function checkBrevoAuthentication() {
+  try {
+    const response = await fetch('https://api.brevo.com/v3/account', {
+      headers: { 'api-key': process.env.BREVO_API_KEY || '', Accept: 'application/json' },
+      signal: AbortSignal.timeout(8000)
+    });
+    const details = await response.json().catch(() => ({}));
+    console.warn('first_access_auth_check', {
+      status: response.status,
+      reason: response.ok ? 'authenticated' : classifyBrevoError(details)
+    });
+  } catch { console.warn('first_access_auth_check', { reason: 'connection_failed' }); }
+}
+
 // API keys stay in Vercel environment variables, never in browser code.
 module.exports = async function handler(req, res) {
+  if (!diagnostic) diagnostic = checkBrevoAuthentication();
+  await diagnostic;
   res.setHeader('Cache-Control', 'no-store');
   const reply = (status, data) => res.status(status).json(data);
   if (req.method !== 'POST') {
@@ -46,7 +76,7 @@ module.exports = async function handler(req, res) {
       const details = await response.json().catch(() => ({}));
       const allowed = ['unauthorized', 'permission_denied', 'document_not_found', 'invalid_parameter', 'duplicate_parameter', 'not_enough_credits'];
       console.warn('first_access_provider_error', { status: response.status,
-        code: allowed.includes(details.code) ? details.code : 'provider_error' });
+        code: allowed.includes(details.code) ? details.code : 'provider_error', reason: classifyBrevoError(details) });
       return reply(response.status === 429 ? 429 : 502, { ok: false });
     }
     return reply(200, { ok: true, confirmationRequired: true });
