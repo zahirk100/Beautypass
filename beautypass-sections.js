@@ -93,8 +93,8 @@
         // A resolved promise alone is not evidence of a successful signup.
         if (!result || result.ok !== true) throw new Error('Signup was not confirmed.');
         complete = true; input.readOnly = true;
-        buttonText.textContent = 'You’re on the list';
-        announce('Je staat op de lijst. Je ontvangt per e-mail bericht over First access.', 'success');
+        buttonText.textContent = 'Check je e-mail';
+        announce('Bevestig je aanmelding via de link in je e-mail.', 'success');
       } catch (_) {
         buttonText.textContent = idleText; button.disabled = false;
         announce('Aanmelden is nog niet gelukt. Probeer het opnieuw.', 'error');
@@ -115,4 +115,27 @@
   global.BeautyPassSections = Object.freeze({ mount });
 })(window);
 
-BeautyPassSections.mount(document.querySelector('[data-bp-sections]'), {mode:'preview'});
+const signupRoot = document.querySelector('[data-bp-sections]');
+const signupForm = signupRoot.querySelector('[data-bp-form]');
+const trapLabel = document.createElement('label');
+trapLabel.hidden = true;
+trapLabel.textContent = 'Laat dit veld leeg';
+const trap = document.createElement('input');
+trap.name = 'website';
+trap.tabIndex = -1;
+trap.autocomplete = 'off';
+trapLabel.appendChild(trap);
+signupForm.appendChild(trapLabel);
+BeautyPassSections.mount(signupRoot, {
+  mode: 'live',
+  async submitFirstAccess({ email }) {
+    const response = await fetch('/api/first-access', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, website: trap.value }),
+      signal: AbortSignal.timeout(15000)
+    });
+    if (!response.ok) throw new Error('Signup request failed');
+    return response.json();
+  }
+});
