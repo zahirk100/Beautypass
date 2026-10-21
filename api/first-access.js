@@ -42,7 +42,13 @@ module.exports = async function handler(req, res) {
       signal: AbortSignal.timeout(10000)
     });
     // Never report a successful subscription on a provider failure.
-    if (!response.ok) return reply(response.status === 429 ? 429 : 502, { ok: false });
+    if (!response.ok) {
+      const details = await response.json().catch(() => ({}));
+      const allowed = ['unauthorized', 'permission_denied', 'document_not_found', 'invalid_parameter', 'duplicate_parameter', 'not_enough_credits'];
+      console.warn('first_access_provider_error', { status: response.status,
+        code: allowed.includes(details.code) ? details.code : 'provider_error' });
+      return reply(response.status === 429 ? 429 : 502, { ok: false });
+    }
     return reply(200, { ok: true, confirmationRequired: true });
-  } catch { return reply(502, { ok: false }); }
+  } catch { console.warn('first_access_connection_error'); return reply(502, { ok: false }); }
 };
