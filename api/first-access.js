@@ -11,29 +11,8 @@ function classifyBrevoError(details) {
   return 'unclassified';
 }
 
-
-let templateCheck;
-async function inspectTemplate() {
-  try {
-    const response = await fetch('https://api.brevo.com/v3/smtp/templates/' + Number(process.env.BREVO_DOI_TEMPLATE_ID), {
-      headers: { 'api-key': process.env.BREVO_API_KEY || '', Accept: 'application/json' },
-      signal: AbortSignal.timeout(8000)
-    });
-    const data = await response.json().catch(() => ({}));
-    console.warn('first_access_template_check', {
-      status: response.status,
-      active: data.isActive === true,
-      doi: data.doiTemplate === true,
-      hasDoubleOptin: (data.htmlContent || '').includes('{{ doubleoptin }}'),
-      hasDoiUrl: (data.htmlContent || '').includes('{{ params.DOIurl }}')
-    });
-  } catch { console.warn('first_access_template_check', {status:'connection_failed'}); }
-}
-
 // API keys stay in Vercel environment variables, never in browser code.
 module.exports = async function handler(req, res) {
-  if (!templateCheck) templateCheck = inspectTemplate();
-  await templateCheck;
   res.setHeader('Cache-Control', 'no-store');
   const reply = (status, data) => res.status(status).json(data);
   if (req.method !== 'POST') {
