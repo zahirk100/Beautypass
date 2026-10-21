@@ -1,9 +1,11 @@
-/* English opening copy. Typography and photography inherit the existing site. */
-.hero .hero-description {margin-bottom: 14px;}
-.hero-location {font-family: var(--sans); font-size: 11px; font-weight: 400; line-height: 1.6; letter-spacing: .015em; margin: 0 0 22px;}
-.hero .hero-caption {max-width: 310px; line-height: 1.7; margin-top: 16px; text-wrap: pretty;}
-.brand-manifesto .manifesto-copy .copy-line:last-child {margin-top: 10px;}
+/* A quieter opening: one description, one action, one continuous introduction.
+   Photography, display type and text sizes inherit the existing site. */
+.hero .hero-description {margin-bottom: 28px;}
+.brand-manifesto .manifesto-copy {
+  max-width: 38ch;
+  text-wrap: balance;
+}
 @media (max-width: 760px) {
-  .hero .hero-caption {max-width: 280px; margin-inline: auto;}
-  .hero-location {margin-bottom: 20px;}
+  .hero .hero-description {margin-bottom: 26px;}
+  .brand-manifesto .manifesto-copy {max-width: 35ch;}
 }
