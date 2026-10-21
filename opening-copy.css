@@ -1,11 +1,24 @@
-/* A quieter opening: one description, one action, one continuous introduction.
-   Photography, display type and text sizes inherit the existing site. */
-.hero .hero-description {margin-bottom: 28px;}
-.brand-manifesto .manifesto-copy {
-  max-width: 38ch;
-  text-wrap: balance;
+/* The hero's short supporting line belongs to the campaign typography.
+   Reading copy and interface labels retain the established sans serif. */
+.hero .hero-description {
+  font-family: var(--serif);
+  font-size: clamp(22px, 1.8vw, 26px);
+  font-weight: 400;
+  font-style: normal;
+  font-synthesis: none;
+  line-height: 1.35;
+  letter-spacing: 0;
+  margin-bottom: 28px;
 }
+.hero .hero-copy-line {display: block;}
+/* Each line carries one thought. Nonbreaking spaces protect the short
+   phrases if text enlargement or a very narrow viewport requires reflow. */
+.brand-manifesto .manifesto-copy {
+  max-width: 510px;
+  text-wrap: initial;
+}
+.brand-manifesto .manifesto-line {display: block; text-wrap: balance;}
 @media (max-width: 760px) {
-  .hero .hero-description {margin-bottom: 26px;}
-  .brand-manifesto .manifesto-copy {max-width: 35ch;}
+  .hero .hero-description {font-size: 20px; margin-bottom: 26px;}
+  .brand-manifesto .manifesto-copy {max-width: 370px;}
 }
