@@ -1,0 +1,35 @@
+/* Variant B changes only the two existing CSS shades. The source image,
+   crop, type, dimensions and copy are identical to variant A. */
+.hero.hero-refined::before {
+  background: linear-gradient(180deg, rgba(9,7,6,.38) 0, rgba(9,7,6,.27) 80px, transparent 180px);
+}
+.hero.hero-refined .hero-shade {
+  background: linear-gradient(90deg, rgba(9,7,6,.58) 0%, rgba(9,7,6,.20) 32%, rgba(9,7,6,.04) 52%, transparent 64%);
+}
+@media (max-width: 760px) {
+  .hero.hero-refined .hero-shade {
+    background: linear-gradient(180deg, transparent 24%, rgba(18,12,9,.08) 37%, rgba(18,12,9,.40) 50%, rgba(18,12,9,.74) 68%, rgba(18,12,9,.90) 100%);
+  }
+}
+
+/* Review controls sit outside the two unaltered website compositions. */
+.hero-comparison {background: var(--paper);}
+.review-intro {padding: 52px max(24px,5.2vw) 34px; max-width: 1100px; margin: auto;}
+.review-intro .review-kicker {font-size: 10px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted);}
+.review-intro h1 {font-size: clamp(36px,4.6vw,62px); line-height: 1.08; margin: 13px 0 18px;}
+.review-intro > p:last-of-type {max-width: 650px; font-size: 13px; line-height: 1.8; color: var(--copy-ink);}
+.review-links {display:flex; flex-wrap:wrap; gap: 12px 28px; margin-top: 24px; font-size: 12px;}
+.review-links a {padding-block: 8px; text-decoration: underline; text-underline-offset: 5px;}
+.review-caption {padding: 23px max(24px,5.2vw); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap: 12px 28px; background: var(--paper); scroll-margin-top: 0;}
+.review-caption h2 {font-family:var(--sans); font-size: 13px; font-weight: 400; line-height:1.6; letter-spacing:0;}
+.review-caption p {font-size: 11px; color: var(--muted); margin-top: 3px;}
+.review-caption a {font-size: 11px; padding-block: 8px; text-decoration:underline; text-underline-offset:4px;}
+.review-scene {position:relative;}
+.hero-comparison .review-scene > .site-header {position:absolute; top:0; left:0; width:100%; background:transparent; color:var(--paper); border-color:transparent;}
+.review-outro {padding:30px 24px 44px; text-align:center; font-size:12px; color:var(--muted); border-top:1px solid var(--line);}
+.review-outro a {text-decoration:underline; text-underline-offset:5px;}
+@media (max-width:760px) {
+  .review-intro {padding-top:32px;}
+  .review-caption {padding-block:18px;}
+  .review-caption h2 {font-size:12px;}
+}
