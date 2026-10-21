@@ -57,7 +57,10 @@ module.exports = async function handler(req, res) {
       const details = await response.json().catch(() => ({}));
       const allowed = ['unauthorized', 'permission_denied', 'document_not_found', 'invalid_parameter', 'duplicate_parameter', 'not_enough_credits'];
       console.warn('first_access_provider_error', { status: response.status,
-        code: allowed.includes(details.code) ? details.code : 'provider_error', reason: classifyBrevoError(details) });
+        code: allowed.includes(details.code) ? details.code : 'provider_error', reason: classifyBrevoError(details),
+        templateDetail: /template/i.test(String(details.message || ''))
+          ? String(details.message).replace(/[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}/gi, '[email]').replace(/https?:\/\/\S+/gi, '[url]').replace(/xkeysib-\S+/gi, '[key]').slice(0,240)
+          : undefined });
       return reply(response.status === 429 ? 429 : 502, { ok: false });
     }
     return reply(200, { ok: true, confirmationRequired: true });
