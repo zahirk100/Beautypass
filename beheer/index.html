@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<title>BeautyPass · Beheer</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;background:#faf9f6;font-family:"Manrope",system-ui,sans-serif;color:#1d1a17;-webkit-font-smoothing:antialiased}
+a{color:#4b2e22}a:hover{color:#1d1a17}
+code{font-family:ui-monospace,monospace;font-size:.92em;background:#f3efe8;padding:1px 5px;border-radius:5px}
+@keyframes bpFade{from{opacity:0}to{opacity:1}}
+@keyframes aSlide{from{transform:translateX(40px);opacity:0}to{transform:none;opacity:1}}
+@keyframes aIn{from{transform:translateY(6px);opacity:0}to{transform:none;opacity:1}}
+@keyframes bpToast{0%{transform:translate(-50%,20px);opacity:0}10%,88%{transform:translate(-50%,0);opacity:1}100%{transform:translate(-50%,10px);opacity:0}}
+.a-row{transition:background .12s}.a-row:hover{background:#f6f2ec}
+.a-slot:hover{background:#f6f2ec;cursor:pointer}
+.a-btn:hover:not(:disabled){filter:brightness(.94)}
+.a-nav{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:12px;font-size:13.5px;font-weight:600;color:#5f5850;cursor:pointer;transition:background .12s}
+.a-nav:hover{background:#efe9e0}.a-nav.on{background:#1d1a17;color:#fff}
+.shell{display:grid;grid-template-columns:240px minmax(0,1fr);min-height:100vh}
+.side{border-right:1px solid #e6e0d6;padding:24px 14px;display:flex;flex-direction:column;gap:4px;position:sticky;top:0;height:100vh;box-sizing:border-box;background:#f6f3ee}
+.main{padding:32px clamp(16px,4vw,48px) 60px;max-width:1280px;width:100%;box-sizing:border-box}
+@media (max-width:860px){.shell{grid-template-columns:1fr}.side{position:static;height:auto;flex-direction:row;flex-wrap:wrap;border-right:none;border-bottom:1px solid #e6e0d6}.side .brand,.side .foot{display:none}.a-nav span{display:none}}
+</style>
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+<script src="/app-prototype/bp-store.js"></script>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel" src="/app-prototype/bp-ui.jsx"></script>
+<script type="text/babel" src="/app-prototype/admin-a.jsx"></script>
+<script type="text/babel" src="/app-prototype/admin-b.jsx"></script>
+<script type="text/babel">
+const NAV=[['dash','Dashboard','grid'],['agenda','Agenda','cal'],['members','Members','users'],['plans','Memberships','layers'],['team','Team & roosters','team'],['waitlist','First access','mail'],['settings','Instellingen','cog']];
+function Admin(){const s=useBP();const [page,setPage]=React.useState(()=>localStorage.getItem('bp-admin-page')||'dash');const [param,setParam]=React.useState(null);const [drawer,setDrawer]=React.useState(null);const [toast,setToast]=React.useState(null);
+React.useEffect(()=>{localStorage.setItem('bp-admin-page',page);},[page]);
+React.useEffect(()=>{if(!toast)return;const t=setTimeout(()=>setToast(null),2800);return()=>clearTimeout(t);},[toast]);
+const api={go:(p,x)=>{setPage(p);setParam(x||null);setDrawer(null);window.scrollTo(0,0);},param,clearParam:()=>setParam(null),open:d=>setDrawer(d),close:()=>setDrawer(null),toast:m=>setToast({m,k:Date.now()})};
+const P={dash:<Dashboard/>,agenda:<Agenda/>,members:<Members/>,plans:<PlansAdmin/>,team:<Team/>,waitlist:<Waitlist/>,settings:<Settings/>}[page];
+const failed=s.members.filter(m=>m.status==='betaling mislukt').length;const wait=s.waitlist.filter(w=>w.status==='wachtend').length;
+return <ACtx.Provider value={api}><div className="shell"><nav className="side"><div className="brand" style={{padding:'4px 14px 22px'}}><img src={WORDMARK} alt="BeautyPass" style={{height:15}}/><div style={{fontSize:11,letterSpacing:1.6,textTransform:'uppercase',color:BPC.ink3,fontWeight:600,marginTop:8}}>Beheer · Amsterdam</div></div>
+{NAV.map(([k,l,i])=><div key={k} className={'a-nav'+(page===k?' on':'')} onClick={()=>api.go(k)} title={l}><Ico n={i} s={18}/><span style={{flex:1}}>{l}</span>{k==='members'&&failed>0&&<span style={{fontSize:11,background:page===k?'#fff':BPC.bord,color:page===k?BPC.bord:'#fff',borderRadius:99,padding:'1px 7px'}}>{failed}</span>}{k==='waitlist'&&<span style={{fontSize:11,opacity:.6}}>{wait}</span>}</div>)}
+<div className="foot" style={{marginTop:'auto',display:'grid',gap:10,padding:'0 6px'}}><a href="/member/" style={{fontSize:12.5,fontWeight:600,textDecoration:'none',padding:'10px 8px'}}>Open member app →</a><div style={{display:'flex',alignItems:'center',gap:10,padding:'10px 8px',borderTop:`1px solid ${BPC.line}`}}><Avatar name="Beheer Team" size={32}/><div style={{flex:1}}><div style={{fontSize:13,fontWeight:600}}>hallo@beautypass.nl</div><div style={{fontSize:11.5,color:BPC.ink3}}>Eigenaar</div></div></div>
+<div onClick={()=>{BP.reset();api.toast('Demo-data gereset');}} style={{fontSize:11.5,color:BPC.ink3,cursor:'pointer',padding:'0 8px'}}>Demo-data resetten</div></div></nav>
+<main className="main" key={page} style={{animation:'aIn .25s'}}>{P}</main></div>
+<Drawer open={!!drawer} onClose={api.close}>{drawer&&(drawer.k==='appt'?<ApptDrawer id={drawer.id}/>:drawer.k==='member'?<MemberDrawer id={drawer.id}/>:drawer.k==='tr'?<TrDrawer id={drawer.id}/>:drawer.k==='new'?<NewAppt {...drawer}/>:null)}</Drawer>
+{toast&&<div key={toast.k} style={{position:'fixed',bottom:28,left:'50%',zIndex:200,background:BPC.ink,color:'#fff',fontSize:13.5,fontWeight:600,padding:'12px 20px',borderRadius:99,animation:'bpToast 2.8s forwards',boxShadow:'0 10px 30px rgba(0,0,0,.2)'}}>{toast.m}</div>}
+</ACtx.Provider>;}
+ReactDOM.createRoot(document.getElementById('root')).render(<Admin/>);
+</script>
+</body>
+</html>
