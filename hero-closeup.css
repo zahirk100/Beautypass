@@ -1,6 +1,15 @@
-/* Mobile campaign: the original close-up, with a quieter arrival and a
-   lower, compact message. Keep desktop artwork and typography unchanged. */
+/* Original close-up: a compact message, followed by one action and its
+   opening context. Keep the photograph and established type families. */
 .hero-picture {position:absolute;inset:0;display:block;}
+.hero-access-group {display:flex;flex-direction:column;align-items:flex-start;gap:8px;}
+.hero-context {
+  font-family:var(--sans);
+  font-size:10px;
+  font-weight:400;
+  line-height:1.5;
+  letter-spacing:.025em;
+  color:var(--paper);
+}
 
 @media (max-width:760px) {
   .hero {
@@ -29,29 +38,24 @@
   .hero .hero-shade {
     inset:0;
     height:auto;
-    background:linear-gradient(180deg,transparent 28%,rgba(21,13,9,.05) 38%,rgba(21,13,9,.4) 50%,rgba(21,13,9,.67) 66%,rgba(21,13,9,.68) 82%,rgba(21,13,9,.58) 100%);
+    background:linear-gradient(180deg,transparent 25%,rgba(21,13,9,.06) 35%,rgba(21,13,9,.46) 48%,rgba(21,13,9,.74) 63%,rgba(21,13,9,.78) 82%,rgba(21,13,9,.7) 100%);
   }
   .hero .hero-content {
-    padding:max(250px,49.5svh) 24px max(40px,10svh,env(safe-area-inset-bottom));
+    padding:max(230px,54svh) 20px max(40px,8svh,env(safe-area-inset-bottom));
     text-align:center;
-  }
-  .hero .hero-content>.eyebrow {
-    font-size:9px;
-    line-height:1.5;
-    letter-spacing:.17em;
   }
   .hero h1 {
     font-size:clamp(48px,14.8vw,62px);
     line-height:1.02;
     letter-spacing:-.015em;
-    margin:18px 0 18px;
+    margin:0 0 18px;
   }
   .hero .hero-description {
-    font-size:13.5px;
+    font-size:14px;
     line-height:1.5;
-    margin:0 0 10px;
+    margin:0 0 15px;
   }
-  .hero .hero-copy-line {display:block;}
+  .hero-access-group {align-items:center;}
   .hero-access {margin-left:0;min-width:112px;min-height:48px;font-size:13px;}
 
   .site-header {height:56px;}
