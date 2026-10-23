@@ -1,20 +1,21 @@
-/* The brand promise reads as two closely matched lines over the original
-   campaign image. A short Roman caption explains the membership below. */
+/* Presentation study: open capitals, a narrower italic continuation and
+   a closer membership caption make the promise read as a single unit. */
 .hero-picture {position:absolute;inset:0;display:block;}
-.hero h1 .hero-title-first {display:block;font-size:.885em;line-height:1.03;letter-spacing:-.01em;}
-/* Both faces retain weight 400. The longer italic phrase is composed as
-   one line, with a width slightly below the capitals above it. */
-.hero h1 em {display:block;font-size:.72em;margin-top:5px;line-height:1.05;}
+.hero h1 {margin-bottom:18px;}
+.hero h1 .hero-title-first {display:block;font-size:.8em;line-height:1.03;letter-spacing:.025em;}
+/* Keep the genuine regular and italic faces at weight 400; use spacing
+   and proportion, rather than artificial weight, to establish hierarchy. */
+.hero h1 em {display:block;font-size:.66em;margin-top:6px;line-height:1.05;letter-spacing:-.012em;}
 /* Nimbus Roman is already used for the invitation fine print. Its quieter
    proportions distinguish the caption without introducing another font. */
 .hero .hero-description {
   font-family:BPFineSerif,"Times New Roman",serif;
-  font-size:clamp(18px,1.45vw,21px);
+  font-size:clamp(20px,1.65vw,23px);
   font-weight:400;
   font-style:normal;
   line-height:1.4;
-  letter-spacing:.005em;
-  margin:0 0 16px;
+  letter-spacing:.015em;
+  margin:0 0 28px;
 }
 .hero-access-group {display:flex;flex-direction:column;align-items:flex-start;gap:8px;}
 .hero-context {
@@ -76,14 +77,14 @@
     font-size:clamp(43px,13.25vw,55px);
     line-height:.98;
     letter-spacing:-.015em;
-    margin:0 0 22px;
+    margin:0 0 14px;
   }
-  .hero h1 .hero-title-first {font-size:.98em;}
-  .hero h1 em {font-size:.8em;}
+  .hero h1 .hero-title-first {font-size:.94em;letter-spacing:.035em;}
+  .hero h1 em {font-size:.76em;}
   .hero .hero-description {
-    font-size:clamp(15px,4.1vw,17px);
+    font-size:clamp(17px,4.6vw,19px);
     line-height:1.4;
-    margin:0 0 12px;
+    margin:0 0 24px;
   }
   .hero-access-group {align-items:center;gap:5px;}
   .hero-access {margin-left:0;min-width:112px;min-height:48px;font-size:13px;}
