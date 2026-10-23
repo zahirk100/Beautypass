@@ -19,8 +19,9 @@
   <link rel="stylesheet" href="styles-06.css">
   <link rel="stylesheet" href="styles-07.css">
   <link rel="stylesheet" href="styles-08.css">
-  <link rel="preload" as="image" href="assets/cover-v3.webp" fetchpriority="high">
-<link rel="stylesheet" href="styles-09.css"><link rel="stylesheet" href="styles-10.css"><link rel="stylesheet" href="styles-11.css"><link rel="stylesheet" href="styles-12.css"><link rel="stylesheet" href="styles-13.css"><link rel="stylesheet" href="styles-14.css"><link rel="stylesheet" href="styles-15.css"><link rel="stylesheet" href="opening-copy.css?v=mobile-composition-20261023"></head>
+  <link rel="preload" as="image" href="assets/cover-v3.webp" media="(min-width:761px), (orientation:landscape)" fetchpriority="high">
+  <link rel="preload" as="image" href="assets/cover-portrait-v1.webp" media="(max-width:760px) and (orientation:portrait)" fetchpriority="high">
+<link rel="stylesheet" href="styles-09.css"><link rel="stylesheet" href="styles-10.css"><link rel="stylesheet" href="styles-11.css"><link rel="stylesheet" href="styles-12.css"><link rel="stylesheet" href="styles-13.css"><link rel="stylesheet" href="styles-14.css"><link rel="stylesheet" href="styles-15.css"><link rel="stylesheet" href="opening-copy.css?v=mobile-composition-20261023"><link rel="stylesheet" href="hero-portrait.css?v=20261023-1"></head>
 <body>
   <a class="skip-link" href="#main">Naar de inhoud</a>
   <header class="site-header is-fixed">
@@ -41,7 +42,10 @@
   </header>
   <main id="main">
     <section class="hero" id="top" lang="en" aria-labelledby="hero-title">
-      <img class="hero-image" src="assets/cover-v3.webp" alt="Sunlit skin, glossy lips and a nude manicure with espresso tips." width="1672" height="940" fetchpriority="high">
+      <picture class="hero-picture">
+        <source media="(max-width:760px) and (orientation:portrait)" srcset="assets/cover-portrait-v1.webp" width="941" height="1672">
+        <img class="hero-image" src="assets/cover-v3.webp" alt="Sunlit skin, glossy lips and a nude manicure with espresso tips." width="1672" height="940" fetchpriority="high">
+      </picture>
       <div class="hero-shade" aria-hidden="true"></div>
       <div class="hero-content">
         <p class="eyebrow" lang="en">Amsterdam · Opening soon</p>
