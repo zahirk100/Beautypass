@@ -1,9 +1,19 @@
-/* Approved campaign composition: a compact type hierarchy and clear space
-   for the wordmark, using the original close-up throughout. */
+/* Keep the established campaign image and title. The short Roman caption
+   forms a separate reading level below the expressive display lettering. */
 .hero-picture {position:absolute;inset:0;display:block;}
 .hero h1 .hero-title-first {display:block;font-size:.885em;line-height:1.03;letter-spacing:-.01em;}
 .hero h1 em {display:block;margin-top:3px;line-height:.98;}
-.hero .hero-description {font-family:var(--serif);font-size:18px;line-height:1.3;letter-spacing:0;}
+/* Nimbus Roman is already used for the invitation fine print. Its quieter
+   proportions distinguish the caption without introducing another font. */
+.hero .hero-description {
+  font-family:BPFineSerif,"Times New Roman",serif;
+  font-size:clamp(18px,1.45vw,21px);
+  font-weight:400;
+  font-style:normal;
+  line-height:1.4;
+  letter-spacing:.005em;
+  margin:0 0 16px;
+}
 .hero-access-group {display:flex;flex-direction:column;align-items:flex-start;gap:8px;}
 .hero-context {
   font-family:var(--sans);
@@ -57,19 +67,19 @@
     background:linear-gradient(180deg,transparent 25%,rgba(21,13,9,.06) 35%,rgba(21,13,9,.46) 48%,rgba(21,13,9,.74) 63%,rgba(21,13,9,.78) 82%,rgba(21,13,9,.7) 100%);
   }
   .hero .hero-content {
-    padding:max(230px,56svh) 20px max(42px,10svh,env(safe-area-inset-bottom));
+    padding:max(230px,53svh) 20px max(42px,10svh,env(safe-area-inset-bottom));
     text-align:center;
   }
   .hero h1 {
     font-size:clamp(43px,13.25vw,55px);
     line-height:.98;
     letter-spacing:-.015em;
-    margin:0 0 10px;
+    margin:0 0 22px;
   }
   .hero .hero-description {
-    font-size:clamp(16px,4.58vw,18px);
-    line-height:1.3;
-    margin:0 0 8px;
+    font-size:clamp(15px,4.1vw,17px);
+    line-height:1.4;
+    margin:0 0 12px;
   }
   .hero-access-group {align-items:center;gap:5px;}
   .hero-access {margin-left:0;min-width:112px;min-height:48px;font-size:13px;}
