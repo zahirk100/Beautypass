@@ -38,12 +38,56 @@
 }
 .brand-manifesto .manifesto-line {display: block; text-wrap: balance;}
 @media (max-width: 760px) {
-  .hero {min-height: 100svh;}
-  .hero .hero-content {
-    padding-top: 200px;
-    padding-bottom: max(clamp(112px, 20svh, 184px), env(safe-area-inset-bottom));
+  /* Keep the original photograph. A wider mobile framing gives the eye,
+     manicure and lips room above the campaign message. */
+  .hero {
+    --mobile-photo-height: 58svh;
+    --mobile-hero-ink: #17110e;
+    height: auto;
+    min-height: 100svh;
+    overflow: hidden;
+    background: var(--mobile-hero-ink);
   }
-  .hero .hero-description {font-size: 14px; margin-bottom: 14px;}
+  .hero::before {
+    height: 110px;
+    background: linear-gradient(180deg, rgba(15,10,8,.64), rgba(15,10,8,.15) 65%, transparent);
+  }
+  .hero .hero-image {
+    top: 20px;
+    bottom: auto;
+    height: var(--mobile-photo-height);
+    min-height: 0;
+    object-position: 100% 50%;
+    -webkit-mask-image: linear-gradient(180deg, transparent, black 7%, black 100%);
+    mask-image: linear-gradient(180deg, transparent, black 7%, black 100%);
+  }
+  .hero .hero-shade {
+    inset: 20px 0 auto;
+    height: var(--mobile-photo-height);
+    background: linear-gradient(180deg, transparent 0%, transparent 75%, rgba(23,17,14,.14) 83%, rgba(23,17,14,.74) 96%, var(--mobile-hero-ink) 100%);
+  }
+  .hero .hero-content {
+    /* Reserve image space in normal flow, so narrow screens and enlarged
+       text can extend the section instead of clipping the access link. */
+    padding: max(250px, calc(var(--mobile-photo-height) - 36px)) 24px max(42px, 10svh, env(safe-area-inset-bottom));
+  }
+  .hero .hero-content > .eyebrow {
+    font-size: 9px;
+    line-height: 1.5;
+    letter-spacing: .14em;
+  }
+  .hero h1 {
+    font-size: clamp(48px, 13.2vw, 54px);
+    line-height: .98;
+    margin: 12px 0 14px;
+  }
+  .hero .hero-description {
+    font-size: 14px;
+    line-height: 1.5;
+    margin: 0 0 8px;
+  }
+  .hero .hero-copy-line {display: block;}
   .hero-access {min-width: 112px; margin-left: 0;}
+  .wordmark {width: clamp(134px, 40.2vw, 158px);}
   .brand-manifesto .manifesto-copy {max-width: 370px;}
 }
