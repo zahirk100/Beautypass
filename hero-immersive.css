@@ -1,0 +1,19 @@
+/* Mobile composition study: the original photograph remains a continuous full-height image.
+   Only this preview page loads these overrides; the homepage is unchanged. */
+@media(max-width:760px){
+.hero{height:auto;min-height:100svh;background:#1c1612;align-items:flex-end;}
+.hero .hero-image{inset:0;width:100%;height:100%;min-height:0;object-fit:cover;object-position:78% 50%;mask-image:none;-webkit-mask-image:none;}
+.hero::before{height:112px;background:linear-gradient(180deg,rgba(12,9,7,.26),transparent);}
+.hero .hero-shade{inset:0;height:auto;background:linear-gradient(0deg,rgba(12,8,6,.54),rgba(12,8,6,.28) 28%,transparent 57%),linear-gradient(90deg,rgba(12,8,6,.26),transparent 82%);}
+.hero .hero-content{padding:max(260px,45svh) 26px max(38px,7svh);text-align:left;}
+.hero .hero-content>.eyebrow{font-size:9px;line-height:1.5;letter-spacing:.12em;}
+.hero h1{font-size:clamp(43px,12.2vw,52px);line-height:1.01;letter-spacing:-.015em;margin:12px 0 16px;}
+.hero .hero-description{font-size:13px;line-height:1.55;margin:0 0 10px;}
+.hero .hero-copy-line{display:block;}
+.hero-access{margin-left:-8px;min-width:0;justify-content:flex-start;font-size:12px;}
+.site-header,.site-header.is-scrolled{padding-inline:24px;}
+.wordmark{position:static;left:auto;transform:none;order:0;width:clamp(130px,36vw,148px);}
+.menu-toggle{order:2;margin-left:auto;text-align:right;}
+.header-access{display:none;}
+.site-header.is-scrolled .header-access{display:inline-flex;order:1;margin-left:auto;margin-right:16px;}
+}
