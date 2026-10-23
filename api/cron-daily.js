@@ -1,0 +1,47 @@
+// Daily at 07:00 (vercel.json): reminders for tomorrow, memberships that end, pauses that end, downgrades.
+import { timingSafeEqual } from 'node:crypto';
+import { db, one, env, mollie, money, webhookUrl, todayAms, addMonths } from './_lib.js';
+import { mails, sendMail } from './_mail.js';
+
+const same = (a, b) => { const x = Buffer.from(String(a)), y = Buffer.from(String(b)); return x.length === y.length && timingSafeEqual(x, y); };
+
+export default async function cron(req, res) {
+  const auth = (req.headers.authorization || '').replace(/^Bearer\s+/i, '');
+  if (!env('CRON_SECRET') || !same(auth, env('CRON_SECRET'))) return res.status(401).end();
+  const today = todayAms(), tomorrow = todayAms(1);
+  const done = { reminders: 0, ended: 0, resumed: 0, downgraded: 0 };
+  try {
+    await db().rpc('release_expired_holds');
+    // Reminders for tomorrow's appointments (members who want them)
+    const from = new Date(tomorrow + 'T00:00:00+01:00').toISOString(), to = new Date(addMonths(tomorrow, 0) + 'T23:59:59+02:00').toISOString();
+    const appts = await one(db().from('appointments').select('*, treatments(name), staff(name), members(name,email,prefs)')
+      .eq('status', 'gepland').eq('is_primary', true).eq('confirmed', true).is('reminder_sent_at', null).gte('starts_at', from).lte('starts_at', to));
+    const settings = await one(db().from('settings').select('cancel_hours').eq('id', 1).single());
+    for (const a of appts) {
+      if (new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Amsterdam' }).format(new Date(a.starts_at)) !== tomorrow) continue;
+      if (a.members.prefs && a.members.prefs.reminders === false) continue;
+      await sendMail({ email: a.members.email, name: a.members.name }, mails.reminder(a.members, { ...a, treatment: a.treatments.name, staff: a.staff.name, cancel_hours: settings.cancel_hours }));
+      await one(db().from('appointments').update({ reminder_sent_at: new Date().toISOString() }).eq('id', a.id));
+      done.reminders++;
+    }
+    // Cancelled memberships whose paid period is over
+    const ending = await one(db().from('members').select('id').lte('cancel_at', today).neq('status', 'opgezegd'));
+    for (const m of ending) { await one(db().from('members').update({ status: 'opgezegd' }).eq('id', m.id)); done.ended++; }
+    // Pauses that end today: start billing again
+    const paused = await one(db().from('members').select('*').eq('status', 'gepauzeerd').lte('paused_until', today));
+    for (const m of paused) try {
+      const plan = await one(db().from('plans').select('*').eq('id', m.next_plan_id || m.plan_id).single());
+      const sub = await mollie('POST', `/customers/${m.mollie_customer_id}/subscriptions`, { amount: money(plan.price), interval: '1 month', startDate: today,
+        description: `BeautyPass ${plan.name}`, mandateId: m.mandate_id || undefined, webhookUrl: webhookUrl(), metadata: { member_id: m.id } });
+      await one(db().from('members').update({ status: 'actief', paused_until: null, plan_id: plan.id, next_plan_id: null, mollie_subscription_id: sub.id, next_payment_date: addMonths(today, 1) }).eq('id', m.id));
+      done.resumed++;
+    } catch (e) { console.error('cron_resume_failed', m.id, e && e.message); done.failed = (done.failed || 0) + 1; }
+    // Downgrades start with the new period (normally already done by the webhook of that month's payment)
+    const down = await one(db().from('members').select('id,next_plan_id,next_payment_date').not('next_plan_id', 'is', null).lte('next_payment_date', today));
+    for (const m of down) { await one(db().from('members').update({ plan_id: m.next_plan_id, next_plan_id: null }).eq('id', m.id)); done.downgraded++; }
+    return res.status(200).json({ ok: true, ...done });
+  } catch (e) {
+    console.error('cron_error', e && e.message);
+    return res.status(500).json({ ok: false, ...done });
+  }
+}

@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="nl">
+<head>
+<meta charset="utf-8">
+<meta name="robots" content="noindex, nofollow">
+<title>BeautyPass · Word member</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+html,body{margin:0;height:100%;background:#ebe6dd;font-family:"Manrope",system-ui,sans-serif;color:#1d1a17;-webkit-font-smoothing:antialiased}
+a{color:#4b2e22}a:hover{color:#1d1a17}
+.bp-scroll{scrollbar-width:none}.bp-scroll::-webkit-scrollbar{display:none}
+@keyframes bpIn{from{transform:translateX(24px);opacity:0}to{transform:none;opacity:1}}
+@keyframes bpFade{from{opacity:0}to{opacity:1}}
+@keyframes bpUp{from{transform:translateY(100%)}to{transform:none}}
+@keyframes bpSpin{to{transform:rotate(360deg)}}
+@keyframes bpToast{0%{transform:translate(-50%,-20px);opacity:0}12%,85%{transform:translate(-50%,0);opacity:1}100%{transform:translate(-50%,-10px);opacity:0}}
+.stage{min-height:100vh;display:flex;align-items:center;justify-content:center;gap:40px;padding:20px;box-sizing:border-box}
+.side{width:220px;display:flex;flex-direction:column;gap:14px}
+.side h1{font-family:"Cormorant Garamond",serif;font-weight:500;font-size:34px;line-height:1;margin:0}
+.side h1 em{font-weight:400}
+.side p{font-size:13px;line-height:1.5;color:#5f5850;margin:0}
+.sw{display:flex;flex-direction:column;gap:6px}
+.sw button{font:600 13px "Manrope",sans-serif;text-align:left;padding:10px 14px;border-radius:12px;border:1px solid #d8d0c3;background:#faf9f6;color:#1d1a17;cursor:pointer}
+.sw button.on{background:#1d1a17;color:#fff;border-color:#1d1a17}
+@media (max-width:760px){.side{display:none}}
+body.web{background:#faf9f6}
+@keyframes aIn{from{transform:translateY(6px);opacity:0}to{transform:none;opacity:1}}
+@keyframes wToast{0%{transform:translate(-50%,20px);opacity:0}10%,88%{transform:translate(-50%,0);opacity:1}100%{transform:translate(-50%,10px);opacity:0}}
+.w-btn:hover:not(:disabled){filter:brightness(.94)}
+.w-link{cursor:pointer;color:#5f5850;font-size:13px;font-weight:600}.w-link:hover{color:#1d1a17}
+.w-chip{padding:9px 16px;border-radius:99px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid;transition:all .15s}
+.w-tile{cursor:pointer;transition:transform .2s}.w-tile:hover{transform:translateY(-3px)}
+.w-rowh:hover{background:#f6f2ec}
+.w-navi{padding:9px 16px;border-radius:99px;font-size:13.5px;font-weight:600;color:#5f5850;cursor:pointer}.w-navi:hover{background:#efe9e0}.w-navi.on{background:#1d1a17;color:#fff}
+@media (max-width:980px){.w-grid2,.w-book{grid-template-columns:1fr!important}.w-onb{grid-template-columns:1fr!important}.w-onb-img{display:none}}
+@media (max-width:860px){.w-nav{display:none!important}}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="module" src="/src/onboarding/main.jsx"></script>
+
+</body>
+</html>

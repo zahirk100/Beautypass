@@ -41,3 +41,15 @@ const statusTone=s=>({actief:'ok',gepland:'neutral',afgerond:'ok','betaling misl
 function Toggle({on,onChange}){return <div onClick={()=>onChange(!on)} style={{width:44,height:26,borderRadius:13,background:on?BPC.esp:BPC.line2,position:'relative',cursor:'pointer',transition:'background .2s',flexShrink:0}}><div style={{position:'absolute',top:3,left:on?21:3,width:20,height:20,borderRadius:10,background:'#fff',boxShadow:'0 1px 3px rgba(0,0,0,.2)',transition:'left .2s'}}></div></div>;}
 function Avatar({name,size=36,bg=BPC.espSoft,color=BPC.esp}){const i=name.split(' ').filter(w=>w[0]===w[0].toUpperCase()).map(w=>w[0]).slice(0,2).join('');return <div style={{width:size,height:size,borderRadius:size/2,background:bg,color,display:'flex',alignItems:'center',justifyContent:'center',fontFamily:BPC.serif,fontSize:size*0.42,fontWeight:600,flexShrink:0}}>{i}</div>;}
 Object.assign(window,{BPC,WORDMARK,useBP,Ico,Serif,Eyebrow,Pill,statusTone,Toggle,Avatar});
+
+/* ---------- Real-data helpers ---------- */
+// Free start times for a treatment on a day, straight from the database (same check as booking)
+function useSlots(tid,date,skip){const [st,setSt]=React.useState({loading:false,map:{}});const s=useBP();const stamp=s.appointments.length+'|'+(s.appointments[0]&&s.appointments[0].id);
+React.useEffect(()=>{if(!tid||!date){setSt({loading:false,map:{}});return;}let live=true;setSt(x=>({...x,loading:true}));
+BP.act.slotsFor(tid,date,skip).then(rows=>{if(live)setSt({loading:false,map:Object.fromEntries((rows||[]).map(r=>[r.slot,r.staff_ids||[]]))});}).catch(()=>{if(live)setSt({loading:false,map:{}});});return()=>{live=false;};},[tid,date,skip,stamp]);return st;}
+// "Zet in agenda": a calendar file for the appointment
+function downloadIcs(a){const t=BP.tr(a.treatmentId);const s=new Date(a.startsAt);const e=new Date(s.getTime()+t.dur*60000);const f=d=>d.toISOString().replace(/[-:]/g,'').replace(/\.\d{3}/,'');
+const body=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//BeautyPass//NL','BEGIN:VEVENT','UID:'+a.id+'@beautypass.nl','DTSTAMP:'+f(new Date()),'DTSTART:'+f(s),'DTEND:'+f(e),'SUMMARY:'+t.name+' · BeautyPass','LOCATION:BeautyPass house\\, Amsterdam','END:VEVENT','END:VCALENDAR'].join('\r\n');
+const url=URL.createObjectURL(new Blob([body],{type:'text/calendar'}));const l=document.createElement('a');l.href=url;l.download='beautypass-afspraak.ics';document.body.appendChild(l);l.click();l.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);}
+function Loading({label}){return <div style={{minHeight:'100vh',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:18,background:BPC.paper,fontFamily:BPC.sans,color:BPC.ink2}}><img src={WORDMARK} alt="BeautyPass" style={{height:15}}/><div style={{width:28,height:28,borderRadius:14,border:`2.5px solid ${BPC.line}`,borderTopColor:BPC.esp,animation:'bpSpin .8s linear infinite'}}></div>{label&&<div style={{fontSize:13}}>{label}</div>}</div>;}
+Object.assign(window,{useSlots,downloadIcs,Loading});

@@ -1,80 +1,24 @@
+import { readFileSync, readdirSync, statSync } from 'node:fs';
+import { join } from 'node:path';
 import globals from 'globals';
 
-// The screens share components through window (see src/shared/globals.js); list them so
-// no-undef catches any name that is used but never exported.
+// The screens share components through window (see src/shared/globals.js). Collect every name a
+// file exports with Object.assign(window, {…}) so no-undef catches names that are never exported.
+const files = (dir) => readdirSync(dir).flatMap((f) => (statSync(join(dir, f)).isDirectory() ? files(join(dir, f)) : [join(dir, f)]));
+const shared = {};
+for (const f of files('src').filter((f) => /\.(js|jsx)$/.test(f))) {
+  for (const m of readFileSync(f, 'utf8').matchAll(/Object\.assign\(window,\s*\{([^}]*)\}/g)) {
+    for (const n of m[1].split(',').map((x) => x.trim()).filter(Boolean)) shared[n] = 'readonly';
+  }
+}
+
 export default [
   {
     files: ['src/**/*.{js,jsx}'],
     languageOptions: {
       ecmaVersion: 2022, sourceType: 'module',
       parserOptions: { ecmaFeatures: { jsx: true } },
-      globals: { ...globals.browser,
-      ABtn: 'readonly',
-      ACtx: 'readonly',
-      AHead: 'readonly',
-      AInput: 'readonly',
-      APanel: 'readonly',
-      ASelect: 'readonly',
-      Agenda: 'readonly',
-      Appointments: 'readonly',
-      ApptCard: 'readonly',
-      ApptDetail: 'readonly',
-      ApptDrawer: 'readonly',
-      Avatar: 'readonly',
-      BP: 'readonly',
-      BPC: 'readonly',
-      Book: 'readonly',
-      Btn: 'readonly',
-      Card: 'readonly',
-      Dashboard: 'readonly',
-      Drawer: 'readonly',
-      Eyebrow: 'readonly',
-      Field: 'readonly',
-      Home: 'readonly',
-      IOSDevice: 'readonly',
-      IOSGlassPill: 'readonly',
-      IOSKeyboard: 'readonly',
-      IOSList: 'readonly',
-      IOSListRow: 'readonly',
-      IOSNavBar: 'readonly',
-      IOSStatusBar: 'readonly',
-      Ico: 'readonly',
-      IncludedTag: 'readonly',
-      MCtx: 'readonly',
-      MemberCard: 'readonly',
-      MemberDrawer: 'readonly',
-      MemberWeb: 'readonly',
-      Members: 'readonly',
-      Membership: 'readonly',
-      NewAppt: 'readonly',
-      Onboarding: 'readonly',
-      Payments: 'readonly',
-      Pill: 'readonly',
-      Plans: 'readonly',
-      PlansAdmin: 'readonly',
-      Profile: 'readonly',
-      React: 'readonly',
-      ReactDOM: 'readonly',
-      RoutineEdit: 'readonly',
-      Row: 'readonly',
-      Screen: 'readonly',
-      Segmented: 'readonly',
-      Serif: 'readonly',
-      Settings: 'readonly',
-      Sheet: 'readonly',
-      Stat: 'readonly',
-      Table: 'readonly',
-      Team: 'readonly',
-      Thumb: 'readonly',
-      Toggle: 'readonly',
-      TrDrawer: 'readonly',
-      WORDMARK: 'readonly',
-      Waitlist: 'readonly',
-      lowestPlanFor: 'readonly',
-      statusTone: 'readonly',
-      useA: 'readonly',
-      useBP: 'readonly',
-      useM: 'readonly' },
+      globals: { ...globals.browser, ...shared, BP: 'readonly', React: 'readonly', ReactDOM: 'readonly' },
     },
     rules: { 'no-undef': 'error' },
   },

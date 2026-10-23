@@ -1,5 +1,4 @@
-'use strict';
-
+import { createClient } from '@supabase/supabase-js';
 
 function classifyBrevoError(details) {
   const message = String(details.message || '').toLowerCase();
@@ -12,7 +11,18 @@ function classifyBrevoError(details) {
 }
 
 // API keys stay in Vercel environment variables, never in browser code.
-module.exports = async function handler(req, res) {
+// Also keep the sign-up in our own waitlist (Beheer → Wachtlijst). Best effort: Brevo stays leading.
+async function saveToWaitlist(email) {
+  const url = process.env.SUPABASE_URL, key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SECRET_KEY;
+  if (!url || !key) return;
+  try {
+    const db = createClient(url, key, { auth: { persistSession: false, autoRefreshToken: false } });
+    const { error } = await db.from('waitlist').insert({ email: email.toLowerCase(), source: 'website' });
+    if (error && error.code !== '23505') console.warn('first_access_waitlist_error', error.code);
+  } catch { console.warn('first_access_waitlist_error'); }
+}
+
+export default async function handler(req, res) {
   res.setHeader('Cache-Control', 'no-store');
   const reply = (status, data) => res.status(status).json(data);
   if (req.method !== 'POST') {
@@ -63,6 +73,7 @@ module.exports = async function handler(req, res) {
           : undefined });
       return reply(response.status === 429 ? 429 : 502, { ok: false });
     }
+    await saveToWaitlist(email);
     return reply(200, { ok: true, confirmationRequired: true });
   } catch { console.warn('first_access_connection_error'); return reply(502, { ok: false }); }
-};
+}
