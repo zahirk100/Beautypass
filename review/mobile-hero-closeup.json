@@ -1,0 +1,53 @@
+{
+  "date": "2026-10-23",
+  "decision": {
+    "image": "Original assets/cover-v3.webp restored; generated portrait is no longer loaded on the homepage.",
+    "layout": "Full-bleed photograph, centered lower campaign copy, gradual warm shadow; existing type families retained.",
+    "initial_mobile_header": "Only centered wordmark; Menu and header First access hidden visually until scrolling more than 32px or keyboard focus. Hero First access remains visible.",
+    "logo": "clamp(136px,37.7vw,156px): 148.16px at 393px viewport. Scrolled logo clamp(126px,36vw,146px).",
+    "reason": "Long light-stroke wordmark needs more width than short dense marks; removal of adjacent controls provides emphasis without oversizing."
+  },
+  "references": [
+    {
+      "brand": "Merrachi",
+      "url": "https://merrachi.com/",
+      "observed_mobile_rule": ".logosize width:112px under 992px",
+      "takeaway": "Slender centered wordmark and separated lower campaign message."
+    },
+    {
+      "brand": "Dior Fashion",
+      "url": "https://www.dior.com/nl_nl/fashion",
+      "observed_mobile_rule": ".logo width:4.125rem",
+      "takeaway": "Compact four-letter serif wordmark; width cannot be copied to a nine-letter thin wordmark."
+    },
+    {
+      "brand": "Lancome",
+      "url": "https://www.lancome.nl/",
+      "observed_mobile_rule": ".l-header__logo .c-logo max-width:4rem",
+      "takeaway": "Compact commerce header; avoid transferring its utility-led scale to a campaign arrival."
+    },
+    {
+      "brand": "Louis Vuitton",
+      "url": "https://eu.louisvuitton.com/eng-e1/homepage",
+      "observed_mobile_rule": ".lv-header__logo width:9.625rem below 48rem",
+      "takeaway": "Long wordmark provides relevant proportion reference, while keeping brand type untouched."
+    },
+    {
+      "brand": "Chanel",
+      "url": "https://www.chanel.com/nl/",
+      "observed_mobile_rule": ".cc-header-top-bar__logo svg width:106px below 961px",
+      "takeaway": "Heavier letterforms hold presence at a smaller width; surrounding space matters."
+    }
+  ],
+  "validation": {
+    "mobile_viewports": [
+      "320x568",
+      "393x660",
+      "430x812"
+    ],
+    "hero_cta": "Visible without scrolling at all three sizes; existing invitation anchor preserved.",
+    "keyboard": "Tab focus reveals header controls.",
+    "menu": "Open and close verified.",
+    "scope": "Homepage HTML and dedicated mobile hero CSS only; desktop uses existing image and composition."
+  }
+}
