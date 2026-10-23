@@ -37,6 +37,9 @@
   text-wrap: initial;
 }
 .brand-manifesto .manifesto-line {display: block; text-wrap: balance;}
+/* Keep complete phrases together when a sentence needs a second line.
+   At larger text sizes each phrase can still reflow within the container. */
+.brand-manifesto .manifesto-phrase {display: inline-block; max-width: 100%;}
 @media (max-width: 760px) {
   /* Keep the original photograph. A wider mobile framing gives the eye,
      manicure and lips room above the campaign message. */
