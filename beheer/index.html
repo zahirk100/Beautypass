@@ -18,6 +18,11 @@ code{font-family:ui-monospace,monospace;font-size:.92em;background:#f3efe8;paddi
 .a-row{transition:background .12s}.a-row:hover{background:#f6f2ec}
 .a-slot:hover{background:#f6f2ec;cursor:pointer}
 .a-btn:hover:not(:disabled){filter:brightness(.94)}
+/* iOS gives date/time fields their own minimum width and centred text; keep them inside the grid */
+input[type=date],input[type=time]{-webkit-appearance:none;appearance:none;min-width:0;text-align:left}
+input[type=date]::-webkit-date-and-time-value{text-align:left}
+/* 16px on phones, otherwise iOS zooms in on every field */
+@media (max-width:860px){select,input,textarea{font-size:16px!important}}
 .a-nav{display:flex;align-items:center;gap:12px;padding:10px 14px;border-radius:12px;font-size:13.5px;font-weight:600;color:#5f5850;cursor:pointer;transition:background .12s}
 .a-nav:hover{background:#efe9e0}.a-nav.on{background:#1d1a17;color:#fff}
 .shell{display:grid;grid-template-columns:240px minmax(0,1fr);min-height:100vh}

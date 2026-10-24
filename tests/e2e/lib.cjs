@@ -10,7 +10,7 @@ async function otp(email, after = 0) {
   }
   throw new Error('no otp for ' + email);
 }
-const sql = (q) => require('child_process').execFileSync('docker', ['exec', 'supabase_db_Beautypass', 'psql', '-U', 'postgres', '-tAc', q]).toString().trim();
+const sql = (q) => require('child_process').execFileSync('docker', ['exec', 'supabase_db_Beautypass', 'psql', '-U', 'postgres', '-tAc', q], { stdio: ['ignore', 'pipe', 'pipe'] }).toString().trim();
 const D = { viewport: { width: 1440, height: 900 } }, M = devices['iPhone 13'];
 async function page(b, opts) {
   const ctx = await b.newContext(opts); const p = await ctx.newPage();

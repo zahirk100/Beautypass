@@ -91,7 +91,7 @@ return <div onClick={onClick} style={{background:BPC.esp,color:'#fff',borderRadi
 <div style={{fontFamily:BPC.serif,fontSize:34,fontWeight:500,margin:'26px 0 4px'}}>{plan.name}</div>
 <div style={{fontSize:13,opacity:.75,marginBottom:16}}>Nog {left} van {lim} behandelingen deze maand</div>
 <div style={{display:'flex',gap:5}}>{Array.from({length:lim}).map((_,i)=><div key={i} style={{flex:1,height:4,borderRadius:2,background:i<used?'rgba(255,255,255,.3)':'#fff'}}></div>)}</div>
-<div style={{fontSize:11.5,opacity:.6,marginTop:10}}>Vernieuwt op {end.toLocaleDateString('nl-NL',{day:'numeric',month:'long'})}</div></div>;}
+<div style={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:10,marginTop:12}}><div style={{fontSize:11.5,opacity:.6}}>Vernieuwt op {end.toLocaleDateString('nl-NL',{day:'numeric',month:'long'})}</div>{me.checkinCode&&<PassButton/>}</div></div>;}
 function ApptCard({a,onClick,compact}){const t=BP.tr(a.treatmentId),c=BP.cat(t.cat),st=BP.staff(a.staffId);return <div onClick={onClick} style={{display:'flex',gap:14,alignItems:'center',background:BPC.card,border:`1px solid ${BPC.line}`,borderRadius:20,padding:12,cursor:'pointer'}}>
 <Thumb src={c.img} size={compact?56:72} r={14}/><div style={{flex:1,minWidth:0}}><div style={{fontSize:12,color:BPC.ink3,textTransform:'capitalize'}}>{BP.fmtDate(a.date,{weekday:'short',day:'numeric',month:'short'})} · {a.time}</div>
 <div style={{fontFamily:BPC.serif,fontSize:21,fontWeight:600,margin:'2px 0',lineHeight:1.1}}>{t.name}</div><div style={{fontSize:12,color:BPC.ink2}}>met {st.name.split(' ')[0]} · {a.room}</div></div>

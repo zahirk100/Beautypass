@@ -3,6 +3,7 @@ import '../shared/globals.js';
 import '../shared/bp-api.js';
 import '../shared/ios-frame.jsx';
 import '../shared/bp-ui.jsx';
+import '../shared/pass.jsx';
 import './member-a.jsx';
 import './member-b.jsx';
 import './member-web.jsx';

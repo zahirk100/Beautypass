@@ -2,7 +2,7 @@ const BPC={paper:'#faf9f6',paper2:'#f3efe8',card:'#ffffff',line:'#e6e0d6',line2:
 serif:'"Cormorant Garamond", "Times New Roman", serif',sans:'"Manrope", -apple-system, system-ui, sans-serif'};
 const WORDMARK='/assets/beautypass-wordmark-v6-small-ink.svg';
 function useBP(){const [s,setS]=React.useState(BP.get());React.useEffect(()=>BP.subscribe(x=>setS({...x})),[]);return s;}
-const ICONS={
+const ICONS={scan:'M4 8V5.5A1.5 1.5 0 0 1 5.5 4H8M16 4h2.5A1.5 1.5 0 0 1 20 5.5V8M20 16v2.5a1.5 1.5 0 0 1-1.5 1.5H16M8 20H5.5A1.5 1.5 0 0 1 4 18.5V16M7 12h10',
 home:'M3 10.5L12 3l9 7.5V20a1 1 0 01-1 1h-5v-6h-6v6H4a1 1 0 01-1-1z',
 cal:'M4 6h16v14H4zM4 10h16M8 3v4M16 3v4',
 plus:'M12 5v14M5 12h14',

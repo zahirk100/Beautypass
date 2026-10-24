@@ -2,13 +2,15 @@
 import '../shared/globals.js';
 import '../shared/bp-api.js';
 import '../shared/bp-ui.jsx';
+import '../shared/pass.jsx';
 import './admin-a.jsx';
 import './admin-b.jsx';
+import './checkin.jsx';
 import '../shared/login.jsx';
 
-const NAV=[['dash','Dashboard','grid'],['agenda','Agenda','cal'],['members','Members','users'],['plans','Memberships','layers'],['team','Team & roosters','team'],['waitlist','First access','mail'],['settings','Instellingen','cog']];
+const NAV=[['dash','Dashboard','grid'],['checkin','Check-in','scan'],['agenda','Agenda','cal'],['members','Members','users'],['plans','Memberships','layers'],['team','Team & roosters','team'],['waitlist','First access','mail'],['settings','Instellingen','cog']];
 // Menu items need the matching right (Beheer → Instellingen → Rollen & rechten); the database enforces the same
-function Admin(){const s=useBP();const nav=NAV.filter(([k])=>BP.can(k)||(k==='team'&&BP.can('team')));
+function Admin(){const s=useBP();const nav=NAV.filter(([k])=>BP.can(k==='checkin'?'agenda':k));
 const [page,setPageS]=React.useState(()=>{const p=localStorage.getItem('bp-admin-page');return nav.some(([k])=>k===p)?p:(nav[0]||['agenda'])[0];});const setPage=p=>setPageS(nav.some(([k])=>k===p)?p:(nav[0]||['agenda'])[0]);const [param,setParam]=React.useState(null);const [drawer,setDrawer]=React.useState(null);const [toast,setToast]=React.useState(null);
 React.useEffect(()=>{localStorage.setItem('bp-admin-page',page);},[page]);
 React.useEffect(()=>{if(!toast)return;const t=setTimeout(()=>setToast(null),2800);return()=>clearTimeout(t);},[toast]);
@@ -16,13 +18,13 @@ const api={go:(p,x)=>{setPage(p);setParam(x||null);setDrawer(null);window.scroll
 run:(promise,ok)=>Promise.resolve(promise).then(r=>{if(ok)setToast({m:typeof ok==='function'?ok(r):ok,k:Date.now()});return r;}).catch(e=>{setToast({m:e.message,k:Date.now()});})};
 React.useEffect(()=>{BP.onError(m=>setToast({m,k:Date.now()}));},[]);
 const roleName=(s.settings.roles.find(r=>r.id===s.role)||{}).name||s.role;const who=(s.profile&&s.profile.email)||'';
-const P={dash:<Dashboard/>,agenda:<Agenda/>,members:<Members/>,plans:<PlansAdmin/>,team:<Team/>,waitlist:<Waitlist/>,settings:<Settings/>}[page];
+const P={dash:<Dashboard/>,checkin:<Checkin/>,agenda:<Agenda/>,members:<Members/>,plans:<PlansAdmin/>,team:<Team/>,waitlist:<Waitlist/>,settings:<Settings/>}[page];
 const failed=s.members.filter(m=>m.status==='betaling mislukt').length;const wait=s.waitlist.filter(w=>w.status==='wachtend').length;
 const badge=k=>k==='members'&&failed>0?failed:k==='waitlist'&&wait>0?wait:0;
 const logout=async()=>{await BP.auth.signOut();location.replace('/beheer/');};
 const [menu,setMenu]=React.useState(false);const [sheet,setSheet]=React.useState(false);
 // Phone tabs: at most five; the rest sits under "Meer"
-const SHORT={dash:'Overzicht',agenda:'Agenda',members:'Members',plans:'Plans',team:'Team',waitlist:'Access',settings:'Instellingen'};
+const SHORT={dash:'Overzicht',checkin:'Check-in',agenda:'Agenda',members:'Members',plans:'Plans',team:'Team',waitlist:'Access',settings:'Instellingen'};
 const short=nav.map(([k,l,i])=>[k,SHORT[k]||l,i]);const more=short.length>5?short.slice(4):[];const tabs=short.length>5?[...short.slice(0,4),['more','Meer','dots']]:short;
 return <ACtx.Provider value={api}><div className="shell">
 {/* Phone: top bar with account menu, tabs at the bottom */}

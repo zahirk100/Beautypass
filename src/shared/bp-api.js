@@ -46,12 +46,12 @@ const mapAppt = (a, rooms) => {
     memberId: a.member_id, treatmentId: a.treatment_id, staffId: a.staff_id, roomId: a.room_id,
     room: (rooms.find((r) => r.id === a.room_id) || {}).name || a.room_id,
     status: a.status, note: a.note || '', paid: Number(a.paid_amount) || 0, late: a.late_cancel,
-    confirmed: a.confirmed, holdUntil: a.hold_until,
+    confirmed: a.confirmed, holdUntil: a.hold_until, checkedInAt: a.checked_in_at || null,
   };
 };
 const mapMember = (m, teamNotes = {}) => ({
   id: m.id, userId: m.user_id, name: m.name, email: m.email || '', phone: m.phone || '', plan: m.plan_id, nextPlan: m.next_plan_id,
-  status: m.status, since: m.since, pausedUntil: m.paused_until, cancelAt: m.cancel_at, nextPayment: m.next_payment_date,
+  status: m.status, since: m.since, pausedUntil: m.paused_until, cancelAt: m.cancel_at, nextPayment: m.next_payment_date, checkinCode: m.checkin_code || '',
   mollie: m.mollie_subscription_id || m.mollie_customer_id || '—', mandate: m.mandate_method || '—', mandateLabel: m.mandate_label || '',
   routine: m.routine || [], prefs: m.prefs || {}, notes: m.notes || '', teamNote: teamNotes[m.id] || '',
 });
@@ -331,6 +331,10 @@ const act = {
   setUserRole: async (userId, role) => { await q(supabase.rpc('owner_set_role', { p_user: userId, p_role: role })); await loadTeamData(); },
   inviteStaff: async (email, role) => { const r = await api('team-invite', { email, role }); await loadTeamData(); return r; },
   mollieCheck: () => api('mollie-check'),
+  // Check-in with the member pass (Beheer → Check-in)
+  checkin: (code) => q(supabase.rpc('team_checkin', { p_code: code })),
+  arrive: async (id) => { await q(supabase.rpc('team_checkin_arrive', { p_appointment: id })); await loadTeamData(); },
+  newCheckinCode: async () => { await q(supabase.rpc('member_new_checkin_code')); await loadMemberSelf(); },
   demoCharge: async (memberId, outcome) => { await api('demo-charge', { member_id: memberId, outcome }); await loadTeamData(); },
   // The invoice needs the session token, so it is fetched and shown as a blob (the window opens first, or popup blockers step in)
   openInvoice: async (paymentId) => {
