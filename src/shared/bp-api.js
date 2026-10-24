@@ -387,7 +387,13 @@ const fallbackPlan = { id: '', name: '—', price: 0, perMonth: 0, included: [],
 
 const BP = {
   get: () => state, subscribe: (f) => { subs.add(f); return () => subs.delete(f); },
-  // Days a member can book: today (while the salon is still open for at least another hour) up to bookingDays ahead
+  // Why today is missing from the booking days (null when today can be booked or the salon is closed today anyway)
+  todayClosedNote: () => {
+    const st = state.settings, t = todayAms(), h = st.hours[(new Date(t + 'T12:00:00').getDay() + 6) % 7];
+    if (!h || !h[1] || (st.closedDates || []).includes(t) || BP.bookDays().includes(t)) return null;
+    return `Voor vandaag kun je niet meer online boeken (we zijn open tot ${h[2]}). Bel of loop gerust binnen.`;
+  },
+  // Days a member can book: today (while the salon is still open for at least another two hours) up to bookingDays ahead
   bookDays: () => {
     const st = state.settings, n = st.bookingDays || 14, out = [];
     const nowAms = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Amsterdam', hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date());
