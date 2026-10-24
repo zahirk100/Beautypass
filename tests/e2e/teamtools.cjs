@@ -95,6 +95,8 @@ const nav = (p, label) => p.getByText(label, { exact: true }).locator('visible=t
 
   console.log('7. feedback');
   const done = L.sql(`select id from appointments where member_id='${id2}' and is_primary order by starts_at limit 1`);
+  // earlier runs can leave an appointment at exactly that moment yesterday (the exclusion constraints would refuse)
+  L.sql(`update appointments set status='geannuleerd', cancel_reason='team' where id <> '${done}' and status <> 'geannuleerd' and starts_at < now() - interval '1 day' + interval '45 minutes' and ends_at > now() - interval '1 day'`);
   L.sql(`update appointments set status='afgerond', starts_at = now() - interval '1 day', ends_at = now() - interval '1 day' + interval '45 minutes', review_asked_at=null where id='${done}'`);
   L.sql(`delete from reviews where appointment_id='${done}'`);
   await m2.reload({ waitUntil: 'networkidle' }); await m2.waitForTimeout(800);

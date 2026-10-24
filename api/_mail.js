@@ -61,8 +61,14 @@ export const mails = {
     subject: 'Je betaling voor BeautyPass is niet gelukt',
     html: layout({ preheader: 'Werk je betaling bij om te blijven boeken.', eyebrow: 'Betaling', title: 'Even', it: 'bijwerken.',
       body: p(`${first(m.name)}, de maandelijkse incasso van ${b(eur(plan.price))} voor je ${esc(plan.name)}-membership is niet gelukt. Zolang dit openstaat, kun je geen nieuwe afspraken boeken.`)
-        + button(APP_URL() + '/member/', 'Betaalmethode bijwerken')
-        + `<p style="margin:16px 0 0;font-size:13px;color:#958c80;">We proberen het ook zelf nog een keer. Vragen? Antwoord op deze mail.</p>` }),
+        + button(APP_URL() + '/member/', 'Nu betalen')
+        + `<p style="margin:16px 0 0;font-size:13px;color:#958c80;">Je kunt het openstaande bedrag direct in de app betalen. Vragen? Antwoord op deze mail.</p>` }),
+  }),
+  paidTooLate: (m, x) => ({
+    subject: 'Je betaling komt terug',
+    html: layout({ preheader: 'Je reservering was al verlopen; we storten het bedrag terug.', eyebrow: 'Betaling', title: 'Even', it: 'teruggestort.',
+      body: p(`${first(m.name)}, je betaling van ${b(eur(x.amount))} voor ${b(esc(x.treatment))} kwam binnen nadat je reservering was verlopen. We storten het bedrag terug; dat duurt meestal een paar werkdagen.`)
+        + button(APP_URL() + '/member/', 'Plan opnieuw') }),
   }),
   slotFree: (m, w) => ({
     subject: `Er is plek: ${w.treatment} op ${w.dateText}`,

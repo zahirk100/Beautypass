@@ -19,6 +19,7 @@ Then, with Playwright available:
 | `flows.cjs` | cancel, paid single treatment with hold, refund, invoice, failed direct debit → "betaling mislukt", roles |
 | `api.mjs` | upgrade/downgrade, pause/resume, new payment method, cancel, cron, waitlist and team invites, permissions |
 | `beheer.cjs` | team booking, team notes, team cancel, specialist view, staff drawer |
+| `audit.cjs` | no leaks (staff logins, others' usage), paying a failed month yourself, undoing a cancellation, unpaid reservations (retry, lapse, refund when paid too late), unpaid upgrade reverted, pause cancels appointments in the unpaid period |
 | `sweep.cjs` | screenshots of every screen (member web + app, Beheer desktop + mobile) |
 
 Screenshots go to `tests/e2e/shots/` (ignored by git).

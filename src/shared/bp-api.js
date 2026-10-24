@@ -42,11 +42,13 @@ const set = (patch) => { state = { ...state, ...patch }; emit(); };
 // ───────────────────────────── Mapping (database → prototype shape) ─────────────────────────────
 const mapAppt = (a, rooms) => {
   const { date, time } = localParts(a.starts_at);
+  // An unpaid reservation whose hold has ended is gone, even before the server has tidied it up
+  const lapsed = a.status === 'gepland' && !a.confirmed && !(a.hold_until && new Date(a.hold_until) > new Date());
   return {
     id: a.id, groupId: a.group_id, primary: a.is_primary, date, time, startsAt: a.starts_at,
     memberId: a.member_id, treatmentId: a.treatment_id, staffId: a.staff_id, roomId: a.room_id,
     room: (rooms.find((r) => r.id === a.room_id) || {}).name || a.room_id,
-    status: a.status, note: a.note || '', paid: Number(a.paid_amount) || 0, late: a.late_cancel,
+    status: lapsed ? 'geannuleerd' : a.status, unpaid: a.status === 'gepland' && !a.confirmed && !lapsed, note: a.note || '', paid: Number(a.paid_amount) || 0, late: a.late_cancel,
     confirmed: a.confirmed, holdUntil: a.hold_until, checkedInAt: a.checked_in_at || null, kids: a.kids || 0,
   };
 };
@@ -89,7 +91,7 @@ async function loadCatalog() {
     q(supabase.from('treatments').select('*').order('sort')),
     q(supabase.from('plans').select('*').order('sort')),
     q(supabase.from('plan_treatments').select('*')),
-    q(supabase.from('staff').select('id,user_id,name,role_title,color,workdays,active,created_at').order('created_at')),
+    q(supabase.from('staff').select('id,name,role_title,color,workdays,active,created_at').order('created_at')),
     q(supabase.from('staff_skills').select('*')),
     q(supabase.from('rooms').select('*').order('sort')),
     q(supabase.from('settings').select('*').eq('id', 1).single()),
@@ -98,7 +100,8 @@ async function loadCatalog() {
   const treatments = trs.map((t) => ({ id: t.id, cat: t.category_id, name: t.name, dur: t.duration_min, price: Number(t.price), room: t.room, active: t.active }));
   const planList = plans.map((p) => ({ id: p.id, name: p.name, price: Number(p.price), perMonth: p.per_month, interval: '1 month', active: p.active, desc: p.description,
     included: pt.filter((x) => x.plan_id === p.id).map((x) => x.treatment_id) }));
-  const team = staff.filter((s) => s.active).map((s) => ({ id: s.id, userId: s.user_id, name: s.name, role: s.role_title, color: s.color,
+  // Which login belongs to a specialist is team-only (staff_links); unknown until the team data is loaded
+  const team = staff.filter((s) => s.active).map((s) => ({ id: s.id, userId: state.staffLinks ? state.staffLinks[s.id] || null : undefined, name: s.name, role: s.role_title, color: s.color,
     days: (s.workdays || []).map((d) => (d ? 1 : 0)), skills: skills.filter((k) => k.staff_id === s.id).map((k) => k.category_id) }));
   set({
     categories, treatments, plans: planList, team, rooms,
@@ -146,6 +149,7 @@ async function loadTeamData() {
     roles: q(supabase.from('role_perms').select('*')),
     usage: can('members') ? q(supabase.rpc('month_usage')).catch(() => []) : Promise.resolve([]),
     reviews: can('members') || can('team') ? q(supabase.from('reviews').select('*').order('created_at', { ascending: false }).limit(500)).catch(() => []) : Promise.resolve([]),
+    links: q(supabase.rpc('staff_links')).catch(() => q(supabase.from('staff').select('staff_id:id,user_id'))).catch(() => null),
     absence: q(supabase.from('staff_absence').select('*').gte('ends', addDays(todayAms(), -1)).order('starts')).catch(() => []),
   };
   const r = Object.fromEntries(await Promise.all(Object.entries(jobs).map(async ([k, p]) => [k, await p])));
@@ -155,7 +159,9 @@ async function loadTeamData() {
     ? r.members.map((m) => ({ ...mapMember(m, notes), monthLimit: limits[m.id] }))
     : r.members.map((m) => ({ ...mapMember({ id: m.id, name: m.name, plan_id: m.plan_id, status: 'actief', since: null, prefs: { drink: m.drink }, notes: m.notes }), used: m.used, limit: m.month_limit }));
   const order = ['owner', 'manager', 'desk', 'specialist'];
+  const links = r.links ? Object.fromEntries(r.links.map((x) => [x.staff_id, x.user_id])) : null;
   set({
+    ...(links ? { staffLinks: links, team: state.team.map((t) => ({ ...t, userId: links[t.id] || null })) } : {}),
     appointments: r.appts.map((a) => mapAppt(a, state.rooms)), members, allowances: r.allow,
     waitlist: r.waitlist.map((w) => ({ id: w.id, email: w.email, date: w.created_at.slice(0, 10), source: w.source, interest: w.interest || [], status: w.status, round: w.round })),
     payments: r.payments.map((p) => ({ ...mapPayment(p), memberId: p.member_id })),
@@ -331,7 +337,7 @@ const act = {
     set({ team: replaceIn(state.team, id, patch) });
     const t = state.team.find((x) => x.id === id);
     later('staff' + id, async () => {
-      await q(supabase.from('staff').update({ name: t.name, role_title: t.role, color: t.color, workdays: t.days.map(Boolean), user_id: t.userId || null }).eq('id', id));
+      await q(supabase.from('staff').update({ name: t.name, role_title: t.role, color: t.color, workdays: t.days.map(Boolean), ...(t.userId !== undefined ? { user_id: t.userId || null } : {}) }).eq('id', id));
       // Skills are written as the full set (several quick toggles collapse into one save)
       const del = state.categories.map((c) => c.id).filter((c) => !t.skills.includes(c));
       if (t.skills.length) await q(supabase.from('staff_skills').upsert(t.skills.map((c) => ({ staff_id: id, category_id: c })), { onConflict: 'staff_id,category_id', ignoreDuplicates: true }));

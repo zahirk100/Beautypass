@@ -9,7 +9,7 @@ export default async function cron(req, res) {
   const auth = (req.headers.authorization || '').replace(/^Bearer\s+/i, '');
   if (!env('CRON_SECRET') || !same(auth, env('CRON_SECRET'))) return res.status(401).end();
   const today = todayAms(), tomorrow = todayAms(1);
-  const done = { reminders: 0, reviews: 0, ended: 0, resumed: 0, downgraded: 0 };
+  const done = { reminders: 0, completed: 0, reviews: 0, ended: 0, resumed: 0, downgraded: 0 };
   try {
     await db().rpc('release_expired_holds');
     // Reminders for tomorrow's appointments (members who want them)
@@ -24,6 +24,12 @@ export default async function cron(req, res) {
       await one(db().from('appointments').update({ reminder_sent_at: new Date().toISOString() }).eq('id', a.id));
       done.reminders++;
     }
+    // Checked in and over: completed, so the team does not have to close every appointment by hand
+    try {
+      const closed = await one(db().from('appointments').update({ status: 'afgerond', updated_at: new Date().toISOString() })
+        .eq('status', 'gepland').not('checked_in_at', 'is', null).lt('ends_at', new Date().toISOString()).select('id,is_primary'));
+      done.completed = closed.filter((x) => x.is_primary).length;
+    } catch (e) { console.error('cron_complete_failed', e && e.message); }
     // "Hoe was je behandeling?" for yesterday's completed treatments (once, members who want mails)
     try {
       const yday = todayAms(-1);

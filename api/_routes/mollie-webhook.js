@@ -14,6 +14,21 @@ async function applyMandate(m, customerId, mandateId) {
   return { mandate_id: mandateId, mandate_method: methodName[md.method] || md.method, mandate_label: label };
 }
 
+// A one-off payment that arrived when there was no reservation any more: refund it (claimed first, so once)
+async function refundUnused(row, p, m) {
+  const claimed = await one(db().from('payments').update({ status: 'terugbetaald' }).eq('id', row.id).eq('status', 'betaald').select());
+  if (!claimed.length) return;
+  try {
+    await mollie('POST', `/payments/${p.id}/refunds`, { amount: p.amount, description: 'BeautyPass · reservering verlopen' });
+    await sendMail({ email: m.email, name: m.name }, mails.paidTooLate(m, { treatment: row.description, amount: row.amount }));
+    await db().from('audit_log').insert({ action: 'refund_lapsed', entity: 'payment', entity_id: row.id, details: {} });
+  } catch (e) {
+    console.error('refund_failed', row.id, e && e.message);
+    await one(db().from('payments').update({ status: 'betaald' }).eq('id', row.id));
+    await db().from('audit_log').insert({ action: 'refund_failed', entity: 'payment', entity_id: row.id, details: { error: String(e && e.message).slice(0, 200) } });
+  }
+}
+
 // Applies the current state of a Mollie payment to our data (also used directly by the demo checkout)
 export async function applyPayment(id) {
   const p = await mollie('GET', '/payments/' + id);
@@ -51,10 +66,12 @@ export async function applyPayment(id) {
       const next = p.subscriptionId ? (await mollie('GET', `/customers/${p.customerId}/subscriptions/${p.subscriptionId}`).catch(() => ({}))).nextPaymentDate : null;
       // A paid monthly debit starts the new period: a requested downgrade takes effect now
       await one(db().from('members').update({ ...(m.status === 'betaling mislukt' ? { status: 'actief' } : {}), ...(next ? { next_payment_date: next } : {}),
-        ...(m.next_plan_id ? { plan_id: m.next_plan_id, next_plan_id: null } : {}) }).eq('id', m.id));
+        ...(m.next_plan_id && !meta.settle ? { plan_id: m.next_plan_id, next_plan_id: null } : {}) }).eq('id', m.id));
     } else if (row.kind === 'los' && row.appointment_group) {
-      await one(db().from('appointments').update({ confirmed: true, hold_until: null, updated_at: new Date().toISOString() })
-        .eq('group_id', row.appointment_group).eq('status', 'gepland'));
+      const ok = await one(db().from('appointments').update({ confirmed: true, hold_until: null, updated_at: new Date().toISOString() })
+        .eq('group_id', row.appointment_group).eq('status', 'gepland').select('id'));
+      // Paid after the reservation had lapsed (or was cancelled): nothing to confirm, so the money goes back
+      if (!ok.length) await refundUnused(row, p, m);
     } else if (row.kind === 'verificatie' && m.mollie_subscription_id) {
       // New payment method: move the subscription to the new mandate
       await mollie('PATCH', `/customers/${p.customerId}/subscriptions/${m.mollie_subscription_id}`, { mandateId: p.mandateId });
@@ -64,15 +81,26 @@ export async function applyPayment(id) {
       const to = meta.plan;
       if (to) await one(db().from('members').update({ plan_id: to, next_plan_id: null }).eq('id', m.id));
     }
+    // Paying an open amount yourself (status "betaling mislukt") also gives a new mandate: use it from now on
+    if (meta.settle && p.mandateId) {
+      if (m.mollie_subscription_id) await mollie('PATCH', `/customers/${p.customerId}/subscriptions/${m.mollie_subscription_id}`, { mandateId: p.mandateId }).catch((e) => console.warn('settle_mandate', e.message));
+      await one(db().from('members').update(await applyMandate(m, p.customerId, p.mandateId)).eq('id', m.id));
+    }
   } else if (['failed', 'expired', 'canceled'].includes(p.status)) {
     if (row.status !== 'mislukt') await one(db().from('payments').update({ status: 'mislukt' }).eq('id', row.id));
-    if (row.kind === 'maand' && m.status === 'actief') {
+    if (row.kind === 'maand' && m.status === 'actief' && !meta.settle) {
       await one(db().from('members').update({ status: 'betaling mislukt' }).eq('id', m.id));
       if (plan) await sendMail({ email: m.email, name: m.name }, mails.paymentFailed(m, plan));
-    } else if (row.kind === 'los' && row.appointment_group) {
-      await one(db().from('appointments').update({ status: 'geannuleerd', cancel_reason: 'vervallen', updated_at: new Date().toISOString() })
-        .eq('group_id', row.appointment_group).eq('confirmed', false));
+    } else if (row.kind === 'upgrade' && meta.from && m.plan_id === meta.plan) {
+      // The prorated upgrade was not paid: back to the previous membership and amount
+      const from = (await one(db().from('plans').select('*').eq('id', meta.from)))[0];
+      if (from) {
+        await one(db().from('members').update({ plan_id: from.id }).eq('id', m.id));
+        if (m.mollie_subscription_id) await mollie('PATCH', `/customers/${m.mollie_customer_id}/subscriptions/${m.mollie_subscription_id}`, { amount: money(from.price), description: `BeautyPass ${from.name}` }).catch((e) => console.warn('upgrade_revert', e.message));
+        await db().from('audit_log').insert({ action: 'upgrade_reverted', entity: 'member', entity_id: m.id, details: { from: meta.plan, to: from.id } });
+      }
     }
+    // A failed one-off payment keeps its reservation until the hold ends, so the member can try again
   }
 }
 

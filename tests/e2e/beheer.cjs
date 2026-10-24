@@ -59,12 +59,13 @@ const mails = async () => (await fetch(L.MOCK + '/mock/mails')).json();
   const r2 = await sp.evaluate((id) => BP.supabase.rpc('team_book_appointment', { p_member: id, p_treatment: 'blowout', p_date: '2030-01-01', p_time: '10:00' }).then((x) => x.error && x.error.message), mid);
   L.check(/rechten/.test(r2 || ''), 'specialist kan niet inplannen: ' + r2);
   console.log('5. team-drawer: naam wijzigen + login koppelen (eigenaar)');
+  L.sql("update staff set name='Noor' where name='Noor de Vries' and id::text not like 'd3e00000%'");   // demo data has its own Noor de Vries
   const o = await L.page(b, L.D); await login(o, '/beheer/', 'owner@beautypass-test.nl', 'Team-12345');
   await o.getByText('Team & roosters', { exact: true }).locator('visible=true').first().click();
   await o.getByText('Noor', { exact: true }).locator('visible=true').first().click();
   const inp = o.locator('div[style*="position: fixed"] input').first();
   await inp.fill('Noor de Vries'); await o.waitForTimeout(1200);
-  L.check(L.sql("select count(*) from staff where name='Noor de Vries'") === '1', 'naam opgeslagen, focus bleef in het veld');
+  L.check(L.sql("select count(*) from staff where name='Noor de Vries' and id::text not like 'd3e00000%'") === '1', 'naam opgeslagen, focus bleef in het veld');
   for (const [k, x] of Object.entries({ mem, a, sp, o })) if (x.errs.length) console.log('  errs', k, x.errs.slice(0, 3));
   await b.close();
 })().catch((e) => { console.error(e); process.exit(1); });

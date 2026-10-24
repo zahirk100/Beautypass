@@ -122,21 +122,35 @@ return <div onClick={onClick} style={{background:BPC.esp,color:'#fff',borderRadi
 <div style={{fontSize:13,opacity:.75,marginBottom:16}}>Nog {left} van {lim} behandelingen deze maand</div>
 <div style={{display:'flex',gap:5}}>{Array.from({length:lim}).map((_,i)=><div key={i} style={{flex:1,height:4,borderRadius:2,background:i<used?'rgba(255,255,255,.3)':'#fff'}}></div>)}</div>
 <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',gap:10,marginTop:12}}><div style={{fontSize:11.5,opacity:.6}}>Vernieuwt op {end.toLocaleDateString('nl-NL',{day:'numeric',month:'long'})}</div>{me.checkinCode&&<PassButton/>}</div></div>;}
+// What needs attention in the membership: an open payment, a running cancellation, a pause
+function MembershipNotice({Button,toast,wide}){const s=useBP();const me=BP.mem(s.me),plan=BP.plan(me.plan);const [busy,setBusy]=React.useState(false);
+const d=x=>x?new Date(x+'T12:00:00').toLocaleDateString('nl-NL',{day:'numeric',month:'long'}):'';
+const run=(action,msg)=>{setBusy(true);BP.act.membership(action,{}).then(r=>{if(r&&r.checkoutUrl){window.location.href=r.checkoutUrl;return;}setBusy(false);toast(msg);}).catch(e=>{setBusy(false);toast(e.message);});};
+let bad=false,text=null,btn=null;
+if(me.status==='betaling mislukt'){bad=true;text=`Je laatste betaling van ${BP.eur(plan.price)} is niet gelukt. Zodra die betaald is, kun je weer boeken binnen je membership.`;btn=['Nu betalen',()=>run('settle')];}
+else if(me.cancelAt&&me.status!=='opgezegd'){text=`Je hebt opgezegd. Je membership loopt tot ${d(me.cancelAt)}; daarna stopt de incasso.`;btn=['Opzegging intrekken',()=>run('uncancel','Fijn dat je blijft. Je membership loopt door.')];}
+else if(me.status==='gepauzeerd'){text=`Je membership is gepauzeerd tot ${d(me.pausedUntil)}. Daarna gaat de incasso weer door.`;}
+if(!text)return null;
+return <div style={{display:'flex',flexDirection:wide?'row':'column',alignItems:wide?'center':'stretch',gap:12,padding:16,borderRadius:18,background:bad?BPC.bordSoft:BPC.goldSoft,color:bad?BPC.bord:BPC.ink,fontSize:13.5,lineHeight:1.5}}><div style={{flex:1}}>{text}</div>{btn&&<Button small kind={bad?'primary':'ghost'} disabled={busy} onClick={btn[1]}>{btn[0]}</Button>}</div>;}
+const UnpaidPill=()=><Pill tone="warn">nog betalen</Pill>;
+// Pay a reserved single treatment (again, e.g. after cancelling at Mollie) while the time is still held
+const payNow=(a,toast)=>BP.act.payAppointment(a.groupId).then(r=>{window.location.href=r.checkoutUrl;}).catch(e=>toast(e.message));
+
 function ApptCard({a,onClick,compact}){const t=BP.tr(a.treatmentId),c=BP.cat(t.cat),st=BP.staff(a.staffId);return <div onClick={onClick} style={{display:'flex',gap:14,alignItems:'center',background:BPC.card,border:`1px solid ${BPC.line}`,borderRadius:20,padding:12,cursor:'pointer'}}>
 <Thumb src={c.img} size={compact?56:72} r={14}/><div style={{flex:1,minWidth:0}}><div style={{fontSize:12,color:BPC.ink3,textTransform:'capitalize'}}>{BP.fmtDate(a.date,{weekday:'short',day:'numeric',month:'short'})} · {a.time}</div>
 <div style={{fontFamily:BPC.serif,fontSize:21,fontWeight:600,margin:'2px 0',lineHeight:1.1}}>{t.name}</div><div style={{fontSize:12,color:BPC.ink2}}>met {st.name.split(' ')[0]} · {a.room}</div></div>
-{a.status!=='gepland'?<Pill tone={statusTone(a.status)}>{a.status}</Pill>:<Ico n="chev" s={16} c={BPC.ink3}/>}</div>;}
+{a.unpaid?<UnpaidPill/>:a.status!=='gepland'?<Pill tone={statusTone(a.status)}>{a.status}</Pill>:<Ico n="chev" s={16} c={BPC.ink3}/>}</div>;}
 function Home(){const s=useBP();const m=useM();const me=BP.mem(s.me),plan=BP.plan(me.plan);const h=new Date().getHours();
 const next=s.appointments.filter(a=>a.memberId===me.id&&a.status==='gepland'&&a.date>=BP.today).sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time))[0];
 const routine=(me.routine||[]).map(BP.tr).filter(t=>t.cat);const day=(new Date().getDay()+6)%7;const hrs=s.settings.hours[day]||['',''];
 return <div style={{padding:'66px 20px 110px'}}>
 <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:22}}><img src={WORDMARK} alt="BeautyPass" style={{height:15}}/><div onClick={()=>m.setTab('profile')} style={{cursor:'pointer'}}><Avatar name={me.name} size={36}/></div></div>
 <Eyebrow>{h<12?'Goedemorgen':h<18?'Goedemiddag':'Goedenavond'}</Eyebrow><Serif size={40} style={{margin:'6px 0 22px'}} it="time for you.">{me.name.split(' ')[0]},</Serif>
-<MemberCard s={s} me={me} plan={plan} onClick={()=>m.setTab('membership')}/>
+<MemberCard s={s} me={me} plan={plan} onClick={()=>m.setTab('membership')}/><div style={{marginTop:16}}><MembershipNotice Button={Btn} toast={m.toast}/></div>
 {(()=>{const r=BP.toReview();return r?<div onClick={()=>m.push({k:'appt',id:r.id})} style={{display:'flex',alignItems:'center',gap:12,marginTop:18,padding:14,borderRadius:18,background:BPC.goldSoft,cursor:'pointer'}}><span style={{fontSize:22,color:BPC.gold}}>★</span><div style={{flex:1}}><div style={{fontSize:14,fontWeight:600}}>Hoe was je {BP.tr(r.treatmentId).name}?</div><div style={{fontSize:12.5,color:BPC.ink2}}>Geef je beoordeling in een paar seconden</div></div><Ico n="chev" s={16} c={BPC.ink3}/></div>:null;})()}
 <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline',margin:'28px 0 12px'}}><Serif size={24}>Je volgende moment</Serif>{next&&<span onClick={()=>m.setTab('appts')} style={{fontSize:13,color:BPC.ink2,cursor:'pointer'}}>Alles</span>}</div>
 {next?<ApptCard a={next} onClick={()=>m.push({k:'appt',id:next.id})}/>:<Card style={{textAlign:'center',padding:24}}><div style={{fontSize:14,color:BPC.ink2,marginBottom:14}}>Je hebt nog niets gepland.</div><Btn onClick={()=>m.setTab('book')}>Plan een behandeling</Btn></Card>}
 {routine.length>0&&<><div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline',margin:'28px 0 12px'}}><Serif size={24}>Snel boeken</Serif><span onClick={()=>m.push({k:'routine'})} style={{fontSize:13,color:BPC.ink2,cursor:'pointer'}}>Routine aanpassen</span></div>
 <div className="bp-scroll" style={{display:'flex',gap:10,overflowX:'auto',margin:'0 -20px',padding:'0 20px'}}>{routine.map(t=>{const c=BP.cat(t.cat);return <div key={t.id} onClick={()=>m.push({k:'book',tid:t.id})} style={{width:136,flexShrink:0,cursor:'pointer'}}><div style={{position:'relative'}}><img src={c.img} alt="" style={{width:136,height:160,objectFit:'cover',borderRadius:18,display:'block'}}/>{!plan.included.includes(t.id)&&<div style={{position:'absolute',top:8,left:8}}><Pill tone="warn">Niet inbegrepen</Pill></div>}</div><div style={{fontSize:13,fontWeight:600,marginTop:8}}>{t.name}</div><div style={{fontSize:12,color:BPC.ink3}}>{t.dur} min</div></div>;})}</div></>}
 <Card style={{marginTop:28,display:'flex',gap:14,alignItems:'center'}}><Thumb src="/assets/tour-arrival-v26.webp" size={56}/><div style={{flex:1}}><div style={{fontSize:14,fontWeight:600}}>The BeautyPass house</div><div style={{fontSize:12.5,color:BPC.ink2,marginTop:2}}>{hrs[1]?`Vandaag open ${hrs[1]} – ${hrs[2]}`:'Vandaag gesloten'} · Amsterdam</div></div></Card></div>;}
-Object.assign(window,{WatchDay,ReviewForm,KidsPicker,useKidsFree,SheetFixed,ScreenWide,MCtx,useM,Btn,Screen,Sheet,Card,Row,Field,IncludedTag,Thumb,lowestPlanFor,Onboarding,Home,MemberCard,ApptCard});
+Object.assign(window,{MembershipNotice,UnpaidPill,payNow,WatchDay,ReviewForm,KidsPicker,useKidsFree,SheetFixed,ScreenWide,MCtx,useM,Btn,Screen,Sheet,Card,Row,Field,IncludedTag,Thumb,lowestPlanFor,Onboarding,Home,MemberCard,ApptCard});

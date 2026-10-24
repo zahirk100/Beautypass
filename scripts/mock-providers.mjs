@@ -133,6 +133,10 @@ http.createServer(async (req, res) => {
       console.log('[mock] mollie', req.method, url.pathname, status);
       return json(status, data);
     }
+    if (parts[0] === 'brevo' && parts[2] === 'contacts' && parts[3] && req.method === 'GET') {
+      const c = (db.contacts || {})[decodeURIComponent(parts[3]).toLowerCase()];
+      return c ? json(200, { email: decodeURIComponent(parts[3]), listIds: c.listIds, emailBlacklisted: false }) : json(404, { code: 'document_not_found', message: 'Contact does not exist' });
+    }
     if (parts[0] === 'brevo' && url.pathname.endsWith('/smtp/email') && req.method === 'POST') {
       if (!req.headers['api-key']) return json(401, { code: 'unauthorized', message: 'Key not found' });
       db.mails.push({ at: now(), to: body.to, subject: body.subject, html: body.htmlContent, sender: body.sender });
@@ -142,6 +146,7 @@ http.createServer(async (req, res) => {
     if (parts[0] === 'mock') {
       if (parts[1] === 'reset' && req.method === 'POST') { reset(); return json(200, { ok: true }); }
       if (parts[1] === 'mails') return json(200, db.mails);
+      if (parts[1] === 'contact' && req.method === 'POST') { db.contacts = db.contacts || {}; db.contacts[body.email.toLowerCase()] = { listIds: body.listIds || [] }; return json(200, { ok: true }); }
       if (parts[1] === 'state') return json(200, db);
       if (parts[1] === 'charge' && req.method === 'POST') {
         const sub = db.subscriptions[parts[2]];

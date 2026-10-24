@@ -55,6 +55,9 @@ export default handler(async (req) => {
       await cancelSubscription(m);
       await one(db().from('membership_pauses').insert({ member_id: m.id, starts: today, ends: resume, months, paid_through: paidThrough }));
       await one(db().from('members').update({ status: 'gepauzeerd', paused_until: resume, mollie_subscription_id: null, next_payment_date: resume }).eq('id', m.id));
+      // Appointments within the membership that fall in the unpaid pause lapse (paid single treatments stay)
+      await one(db().from('appointments').update({ status: 'geannuleerd', cancel_reason: byTeam ? 'team' : 'lid', updated_at: new Date().toISOString() })
+        .eq('member_id', m.id).eq('status', 'gepland').eq('paid_amount', 0).gte('starts_at', paidThrough + 'T00:00:00+02:00').lt('starts_at', resume + 'T00:00:00+02:00'));
       await audit(user, 'pause', m, { months });
       return { until: resume };
     }
@@ -85,6 +88,34 @@ export default handler(async (req) => {
       await audit(user, 'cancel', m, { end });
       return { endsOn: end, endsOnText: fmtDate(end) };
     }
+    case 'uncancel': {
+      // Changed your mind: the membership simply continues, billing picks up on the date it would have ended
+      if (!m.cancel_at || m.status === 'opgezegd' || m.cancel_at <= today) throw new HttpError(400, 'Er staat geen opzegging open');
+      if (!m.mandate_id || !plan) throw new HttpError(400, 'Er is geen betaalmethode vastgelegd');
+      const update = { cancel_at: null };
+      if (m.status === 'actief') {
+        update.mollie_subscription_id = await newSubscription(m, plan, m.next_payment_date && m.next_payment_date > today ? m.next_payment_date : today);
+      }
+      await one(db().from('members').update(update).eq('id', m.id));
+      await audit(user, 'uncancel', m);
+      return {};
+    }
+    case 'settle': {
+      // "Betaling mislukt": pay the open month now (iDEAL or card); this also renews the mandate
+      if (m.status !== 'betaling mislukt' || !plan) throw new HttpError(400, 'Er staat geen betaling open');
+      if (!m.mollie_customer_id) throw new HttpError(400, 'Er is nog geen betaalaccount');
+      const open = (await one(db().from('payments').select('*').eq('member_id', m.id).eq('kind', 'maand').eq('status', 'open')))[0];
+      if (open) {
+        const p = await mollie('GET', '/payments/' + open.mollie_payment_id).catch(() => null);
+        if (p && p.status === 'open' && p._links && p._links.checkout) return { checkoutUrl: p._links.checkout.href };
+      }
+      const method = { iDEAL: 'ideal', Creditcard: 'creditcard' }[body.method] || 'ideal';
+      const pay = await mollie('POST', '/payments', { amount: money(plan.price), customerId: m.mollie_customer_id, sequenceType: 'first', method,
+        description: `BeautyPass ${plan.name}`, redirectUrl: APP_URL() + '/member/?betaald=1', webhookUrl: webhookUrl(), metadata: { member_id: m.id, kind: 'maand', settle: true } });
+      await one(db().from('payments').insert({ member_id: m.id, kind: 'maand', description: `Membership ${plan.name} (openstaand)`, mollie_payment_id: pay.id, amount: plan.price, status: 'open' }));
+      await audit(user, 'settle', m);
+      return { checkoutUrl: pay._links.checkout.href };
+    }
     case 'plan': {
       const to = (await one(db().from('plans').select('*').eq('id', body.plan).eq('active', true)))[0];
       if (!to) throw new HttpError(400, 'Kies een membership');
@@ -101,7 +132,7 @@ export default handler(async (req) => {
         await one(db().from('members').update({ plan_id: to.id, next_plan_id: null }).eq('id', m.id));
         if (diff >= 1 && m.mandate_id) {
           const pay = await mollie('POST', '/payments', { amount: money(diff), customerId: m.mollie_customer_id, mandateId: m.mandate_id, sequenceType: 'recurring',
-            description: `BeautyPass upgrade naar ${to.name}`, webhookUrl: webhookUrl(), metadata: { member_id: m.id, kind: 'upgrade', plan: to.id } });
+            description: `BeautyPass upgrade naar ${to.name}`, webhookUrl: webhookUrl(), metadata: { member_id: m.id, kind: 'upgrade', plan: to.id, from: plan.id } });
           await one(db().from('payments').insert({ member_id: m.id, kind: 'upgrade', description: `Upgrade naar ${to.name} (naar rato)`, mollie_payment_id: pay.id, amount: diff, status: 'open' }));
         }
         await audit(user, 'upgrade', m, { from: plan.id, to: to.id, diff });
