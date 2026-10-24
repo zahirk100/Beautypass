@@ -36,7 +36,7 @@ const mails = async () => (await fetch(L.MOCK + '/mock/mails')).json();
 
   console.log('2. notitie + extra tegoed in member-drawer');
   await a.getByText('Members', { exact: true }).first().click();
-  await a.getByText(name, { exact: true }).first().click();
+  await a.getByText(email, { exact: true }).first().click();
   await a.waitForTimeout(500);
   await a.screenshot({ path: 'tests/e2e/shots/bh_member.png' });
   const ta = a.locator('div[style*="position: fixed"] textarea').first();

@@ -172,6 +172,8 @@ function watchAppointments(reload) {
 async function boot(kind) {
   const { data: { session } } = await supabase.auth.getSession();
   set({ session });
+  // Payment mode (demo / test / live) for the test notices; not critical, so never blocks the app
+  fetch('/api/app-config').then((r) => r.json()).then((c) => set({ paymentsMode: c.payments || null })).catch(() => {});
   await loadCatalog();
   if (!session) { set({ loaded: true }); return kind === 'onboarding' ? 'onboarding' : 'login'; }
   await loadProfile();
@@ -314,6 +316,7 @@ const act = {
   setUserRole: async (userId, role) => { await q(supabase.rpc('owner_set_role', { p_user: userId, p_role: role })); await loadTeamData(); },
   inviteStaff: async (email, role) => { const r = await api('team-invite', { email, role }); await loadTeamData(); return r; },
   mollieCheck: () => api('mollie-check'),
+  demoCharge: async (memberId, outcome) => { await api('demo-charge', { member_id: memberId, outcome }); await loadTeamData(); },
   // The invoice needs the session token, so it is fetched and shown as a blob (the window opens first, or popup blockers step in)
   openInvoice: async (paymentId) => {
     const w = window.open('', '_blank');

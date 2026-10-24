@@ -9,14 +9,25 @@ const call = async (tok, path, body) => { const r = await fetch(APP + '/api/' + 
 const email = sql("select email from members where status='actief' and email like 'e2e.f.%' order by created_at desc limit 1");
 const M = await token(email, 'Geheim-1234'), O = await token('owner@beautypass-test.nl', 'Team-12345'), D = await token('desk@beautypass-test.nl', 'Team-12345');
 const mem = () => sql(`select status||'|'||coalesce(plan_id,'')||'|'||coalesce(next_plan_id,'-')||'|'||coalesce(mollie_subscription_id,'-')||'|'||coalesce(next_payment_date::text,'-')||'|'||coalesce(cancel_at::text,'-') from members where email='${email}'`);
-const state = async () => (await fetch(MOCK + '/mock/state')).json();
+// Payment state from the active provider: demo payments (table demo_mollie) or the local mock
+const DEMO = (await (await fetch(APP + '/api/app-config')).json()).payments === 'demo';
+const state = async () => {
+  if (!DEMO) return (await fetch(MOCK + '/mock/state')).json();
+  const all = JSON.parse(sql("select coalesce(json_agg(data),'[]') from demo_mollie"));
+  const by = (r) => Object.fromEntries(all.filter((x) => x.resource === r).map((x) => [x.id, x]));
+  return { subscriptions: by('subscription'), payments: by('payment'), refunds: by('refund') };
+};
+const charge = async (subId, status) => DEMO
+  ? call(O, 'demo-charge', { member_id: sql(`select id from members where mollie_subscription_id='${subId}'`), outcome: status })
+  : fetch(`${MOCK}/mock/charge/${subId}?status=${status}`, { method: 'POST' });
+console.log('payments:', DEMO ? 'demo' : 'mock');
 console.log('member', email, mem());
 
 console.log('auth');
 ok((await call(null, 'membership-change', { action: 'pause' })).status === 401, 'zonder token 401');
 ok((await call(M, 'membership-change', { action: 'retry', member_id: sql(`select id from members where email='${email}'`) })).status === 403, 'member kan geen team-actie op member_id');
 ok((await call(D, 'mollie-check')).status === 403, 'receptie mag Mollie-check niet');
-ok((await call(O, 'mollie-check')).mode === 'test', 'eigenaar: Mollie bereikbaar, test-modus');
+ok(['test', 'demo'].includes((await call(O, 'mollie-check')).mode), 'eigenaar: Mollie bereikbaar (test of demo)');
 ok((await call(D, 'team-invite', { email: 'x@beautypass-test.nl', role: 'desk' })).status === 403, 'receptie kan geen team uitnodigen');
 const pid = sql(`select p.id from payments p join members m on m.id=p.member_id where m.email='${email}' and p.status='betaald' limit 1`);
 ok((await fetch(APP + '/api/invoice', { method: 'POST', headers: { 'content-type': 'application/json', authorization: 'Bearer ' + D }, body: JSON.stringify({ id: pid }) })).status === 403, 'receptie kan geen factuur openen');
@@ -34,7 +45,7 @@ ok(st.subscriptions[subId].amount.value === sql("select price from plans where i
 console.log('downgrade (Signature → Essential), per volgende periode');
 r = await call(M, 'membership-change', { action: 'plan', plan: 'essential' });
 ok(r.ok && !r.immediate && mem().split('|')[2] === 'essential', 'next_plan essential, nu nog signature');
-await fetch(`${MOCK}/mock/charge/${subId}?status=paid`, { method: 'POST' }); await sleep(1500);
+await charge(subId, 'paid'); await sleep(1500);
 ok(mem().split('|')[1] === 'essential' && mem().split('|')[2] === '-', 'na maandincasso: essential actief');
 
 console.log('pauze 1 maand + vroeg hervatten');
@@ -56,8 +67,8 @@ if (mem().startsWith('gepauzeerd')) await call(M, 'membership-change', { action:
 console.log('nieuwe betaalmethode (verificatie €0,01)');
 r = await call(M, 'membership-change', { action: 'mandate', method: 'Creditcard' });
 ok(!!r.checkoutUrl, 'checkout voor verificatie');
-const tr = r.checkoutUrl.split('/').pop();
-await fetch(r.checkoutUrl, { method: 'POST', headers: { 'content-type': 'application/x-www-form-urlencoded' }, body: 'status=paid', redirect: 'manual' });
+const tr = new globalThis.URL(r.checkoutUrl).searchParams.get('id') || r.checkoutUrl.split('/').pop();
+await fetch(r.checkoutUrl.replace(/^https?:\/\/[^/]+/, DEMO ? APP : ''), { method: 'POST', headers: { 'content-type': 'application/x-www-form-urlencoded' }, body: 'status=paid&id=' + tr, redirect: 'manual' });
 await sleep(800);
 st = await state(); const sub2 = sql(`select mollie_subscription_id from members where email='${email}'`);
 ok(st.subscriptions[sub2].mandateId === st.payments[tr].mandateId, 'subscription op nieuw mandaat');

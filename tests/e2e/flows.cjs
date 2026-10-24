@@ -35,7 +35,7 @@ const mails = async () => (await fetch(L.MOCK + '/mock/mails')).json();
   const time = await free.nth(2).innerText(); await free.nth(2).click();
   await p.getByRole('button', { name: new RegExp(time) }).click();
   await p.getByRole('button', { name: /Betaal .* via Mollie/ }).click();
-  await p.waitForURL(/mollie\/checkout/);
+  await p.waitForURL(/checkout/);
   L.check(L.sql(`select confirmed::text||(hold_until is not null)::text from appointments a join members m on m.id=a.member_id where m.email='${email}' and a.status='gepland' and a.paid_amount>0`) === 'falsetrue', 'tijdslot vastgehouden, nog niet bevestigd');
   await p.click('#paid'); await p.waitForURL(/betaald=1/); await p.waitForTimeout(2500);
   L.check(L.sql(`select confirmed from appointments a join members m on m.id=a.member_id where m.email='${email}' and a.status='gepland' and a.paid_amount>0`) === 't', 'na betaling bevestigd');
@@ -48,8 +48,8 @@ const mails = async () => (await fetch(L.MOCK + '/mock/mails')).json();
   await p.getByRole('button', { name: 'Ja, annuleren' }).click();
   await p.waitForTimeout(2500);
   L.check(L.sql(`select p.status from payments p join members m on m.id=p.member_id where m.email='${email}' and kind='los'`) === 'terugbetaald', 'betaling terugbetaald');
-  const st = await (await fetch(L.MOCK + '/mock/state')).json();
-  L.check(Object.keys(st.refunds).length >= 1, 'refund bij Mollie aangemaakt');
+  const refunds = L.demo ? Number(L.sql("select count(*) from demo_mollie where data->>'resource'='refund'")) : Object.keys((await (await fetch(L.MOCK + '/mock/state')).json()).refunds).length;
+  L.check(refunds >= 1, 'refund bij Mollie aangemaakt');
 
   console.log('4. factuur openen');
   await p.getByText('Membership', { exact: true }).last().click();
@@ -63,18 +63,21 @@ const mails = async () => (await fetch(L.MOCK + '/mock/mails')).json();
 
   console.log('5. mislukte maandincasso → "betaling mislukt" in Beheer');
   const sub = L.sql(`select mollie_subscription_id from members where email='${email}'`);
-  await fetch(`${L.MOCK}/mock/charge/${sub}?status=failed`, { method: 'POST' });
+  const mid = L.sql(`select id from members where email='${email}'`);
+  const adm = await L.page(b, L.D);
+  await login(adm, '/beheer/', 'owner@beautypass-test.nl', 'Team-12345');
+  const charge = (status) => L.demo ? adm.evaluate(([id, st]) => BP.act.demoCharge(id, st), [mid, status]) : fetch(`${L.MOCK}/mock/charge/${sub}?status=${status}`, { method: 'POST' });
+  await charge('failed');
   await L.sleep(2500);
   L.check(L.sql(`select status from members where email='${email}'`) === 'betaling mislukt', 'member status betaling mislukt');
   L.check((await mails()).some((x) => x.to[0].email === email && /niet gelukt/.test(x.subject)), 'mail betaling mislukt');
-  const adm = await L.page(b, L.D);
-  await login(adm, '/beheer/', 'owner@beautypass-test.nl', 'Team-12345');
+  await adm.reload({ waitUntil: 'networkidle' });
   await adm.getByText('Members', { exact: true }).first().click();
   await adm.waitForTimeout(800);
   L.check(await adm.getByText('betaling mislukt').count() > 0, 'Beheer toont "betaling mislukt"');
   await adm.screenshot({ path: 'tests/e2e/shots/flow_beheer_failed.png' });
   // geslaagde nieuwe incasso herstelt
-  await fetch(`${L.MOCK}/mock/charge/${sub}?status=paid`, { method: 'POST' });
+  await charge('paid');
   await L.sleep(2500);
   L.check(L.sql(`select status from members where email='${email}'`) === 'actief', 'na geslaagde incasso weer actief');
 

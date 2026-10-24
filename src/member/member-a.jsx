@@ -69,7 +69,7 @@ if(step===4)return <><Screen onBack={()=>setStep(3)} title="Betalen" footer={<>{
 <div style={{borderTop:`1px solid ${BPC.line}`,paddingTop:12,display:'flex',justifyContent:'space-between',fontSize:15,fontWeight:700}}><span>Vandaag te betalen</span><span>{BP.eur(chosen.price)}</span></div></Card>
 <Eyebrow style={{margin:'24px 0 10px'}}>Betaalmethode</Eyebrow>
 <div style={{display:'grid',gap:8}}>{[['iDEAL','Eerste betaling, daarna automatische incasso'],['Creditcard','Visa, Mastercard, Amex']].map(([m,d],i)=><Card key={m} style={{display:'flex',alignItems:'center',gap:12,padding:14,borderColor:i===0?BPC.ink:BPC.line}}><div style={{width:20,height:20,borderRadius:10,border:i===0?`6px solid ${BPC.ink}`:`1.5px solid ${BPC.line2}`,boxSizing:'border-box'}}></div><div style={{flex:1}}><div style={{fontSize:14,fontWeight:600}}>{m}</div><div style={{fontSize:12,color:BPC.ink3}}>{d}</div></div></Card>)}</div>
-<div style={{display:'flex',alignItems:'center',gap:8,justifyContent:'center',marginTop:20,fontSize:12,color:BPC.ink3}}><Ico n="lock" s={14}/>Veilig betalen via Mollie</div></Screen>
+<div style={{display:'flex',alignItems:'center',gap:8,justifyContent:'center',marginTop:20,fontSize:12,color:BPC.ink3}}><Ico n="lock" s={14}/>{s.paymentsMode==='demo'?'Testmodus · er wordt niet echt betaald':'Veilig betalen via Mollie'}</div></Screen>
 </>;
 return <div style={{position:'absolute',inset:0,background:BPC.paper,display:'flex',flexDirection:'column',justifyContent:'center',padding:'0 28px',animation:'bpFade .4s',textAlign:'center'}}>
 <div style={{width:76,height:76,borderRadius:38,background:BPC.sageSoft,display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 26px'}}><Ico n="check" s={34} c={BPC.sage} w={2}/></div>

@@ -18,4 +18,5 @@ async function page(b, opts) {
   return p;
 }
 function check(cond, label) { console.log((cond ? '  ✓ ' : '  ✗ ') + label); if (!cond) process.exitCode = 1; }
-module.exports = { chromium, APP, MAIL, MOCK, sleep, otp, sql, D, M, page, check };
+const demo = require('child_process').execFileSync('curl', ['-s', APP + '/api/app-config']).toString().includes('"demo"');
+module.exports = { demo, chromium, APP, MAIL, MOCK, sleep, otp, sql, D, M, page, check };

@@ -18,8 +18,9 @@ async function onboard(b, { email, name, opts, outcome = 'paid', shot }) {
   await p.getByRole('button', { name: /Verder met/ }).click();
   await p.getByRole('button', { name: /^Kies / }).click();
   if (shot) await p.screenshot({ path: `tests/e2e/shots/${shot}_pay.png` });
+  if (L.demo) L.check(await p.getByText('Testmodus · er wordt niet echt betaald').count() === 1, 'betaalscherm meldt testmodus');
   await p.getByRole('button', { name: /Betaal & machtig/ }).click();
-  await p.waitForURL(/127\.0\.0\.1:4010\/mollie\/checkout/);
+  await p.waitForURL(/checkout/);
   await p.click('#' + outcome);
   await p.waitForURL(/betaald=1/);
   if (outcome === 'paid') await p.getByText(/you're in|welkom/i).first().waitFor({ timeout: 30000 });

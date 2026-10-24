@@ -1,6 +1,7 @@
 // Shared helpers for the server functions in /api (files starting with _ are not routes on Vercel).
 // Secrets only come from environment variables; nothing here is sent to the browser.
 import { createClient } from '@supabase/supabase-js';
+import { bindDemo, demoMollie, flushDemo } from './_mollie-demo.js';
 
 export const env = (k, fallback) => process.env[k] ?? fallback;
 export const APP_URL = () => env('APP_URL', 'https://www.beautypass.nl').replace(/\/$/, '');
@@ -34,6 +35,7 @@ export function handler(fn, { methods = ['POST'] } = {}) {
     if (!methods.includes(req.method)) { res.setHeader('Allow', methods.join(', ')); return res.status(405).json({ ok: false, error: 'Methode niet toegestaan' }); }
     try {
       const out = await fn(req, res);
+      if (demoPayments()) await flushDemo();
       if (!res.headersSent) res.status(200).json({ ok: true, ...(out || {}) });
     } catch (e) {
       const status = e instanceof HttpError ? e.status : 500;
@@ -65,7 +67,16 @@ export async function one(query) {
 
 // ───────────────────────────── Mollie ─────────────────────────────
 const MOLLIE = () => env('MOLLIE_API_URL', 'https://api.mollie.com/v2');
+// Demo payments (no Mollie account yet): explicitly switched on, and never next to a live key
+export const demoPayments = () => env('PAYMENTS_DEMO') === '1' && !(env('MOLLIE_API_KEY') || '').startsWith('live_');
+bindDemo(() => db());
 export async function mollie(method, path, body) {
+  if (demoPayments()) {
+    return demoMollie(method, path, body, APP_URL()).catch((e) => {
+      console.warn('demo_mollie_error', method, path, e.message);
+      throw new HttpError(e.mollieStatus === 404 ? 404 : 502, 'Mollie (demo): ' + e.message);
+    });
+  }
   const key = env('MOLLIE_API_KEY');
   if (!key) throw new HttpError(503, 'Betalen is nog niet gekoppeld (Mollie)');
   const res = await fetch(MOLLIE() + path, {
@@ -80,7 +91,7 @@ export async function mollie(method, path, body) {
   return data;
 }
 export const money = (n) => ({ currency: 'EUR', value: Number(n).toFixed(2) });
-export const mollieMode = () => ((env('MOLLIE_API_KEY') || '').startsWith('live_') ? 'live' : 'test');
+export const mollieMode = () => (demoPayments() ? 'demo' : (env('MOLLIE_API_KEY') || '').startsWith('live_') ? 'live' : env('MOLLIE_API_KEY') ? 'test' : 'off');
 export const webhookUrl = () => env('MOLLIE_WEBHOOK_URL', APP_URL() + '/api/mollie-webhook');
 
 // ───────────────────────────── Dates (Europe/Amsterdam) ─────────────────────────────
