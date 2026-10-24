@@ -29,7 +29,8 @@ const PERMS_ALL = ['dash', 'agenda', 'members', 'plans', 'team', 'waitlist', 'se
 const empty = () => ({
   v: 1, loaded: false, categories: [], treatments: [], plans: [], team: [], rooms: [], members: [], appointments: [],
   waitlist: [], invoices: [], payments: [], allowances: [],
-  settings: { hours: [], cancelHours: 24, noShowCounts: true, rollover: false, mollieMode: 'test', mollieProfile: '', rooms: [], roles: [], users: [] },
+  settings: { hours: [], cancelHours: 24, noShowCounts: true, rollover: false, mollieMode: 'test', mollieProfile: '', rooms: [], roles: [], users: [], kidsEnabled: false, kidsCapacity: 0, closedDates: [] },
+  absence: [],
   me: null, role: null, perms: [], session: null,
 });
 
@@ -46,7 +47,7 @@ const mapAppt = (a, rooms) => {
     memberId: a.member_id, treatmentId: a.treatment_id, staffId: a.staff_id, roomId: a.room_id,
     room: (rooms.find((r) => r.id === a.room_id) || {}).name || a.room_id,
     status: a.status, note: a.note || '', paid: Number(a.paid_amount) || 0, late: a.late_cancel,
-    confirmed: a.confirmed, holdUntil: a.hold_until, checkedInAt: a.checked_in_at || null,
+    confirmed: a.confirmed, holdUntil: a.hold_until, checkedInAt: a.checked_in_at || null, kids: a.kids || 0,
   };
 };
 const mapMember = (m, teamNotes = {}) => ({
@@ -96,7 +97,8 @@ async function loadCatalog() {
     categories, treatments, plans: planList, team, rooms,
     settings: { ...state.settings, hours: settings.hours, cancelHours: settings.cancel_hours, noShowCounts: settings.no_show_counts,
       rollover: settings.rollover, mollieMode: settings.mollie_mode, mollieProfile: settings.mollie_profile || '', rooms: rooms.filter((r) => r.active).map((r) => r.name),
-      slotTimes: settings.slot_times, bookingDays: settings.booking_days, pauseMonths: settings.pause_months_per_year },
+      slotTimes: settings.slot_times, bookingDays: settings.booking_days, pauseMonths: settings.pause_months_per_year,
+      kidsEnabled: settings.kids_enabled !== false && settings.kids_capacity > 0, kidsOn: settings.kids_enabled !== false, kidsCapacity: settings.kids_capacity ?? 0, closedDates: settings.closed_dates || [] },
   });
 }
 
@@ -105,13 +107,15 @@ async function loadMemberSelf() {
   const rows = await q(supabase.from('members').select('*').eq('user_id', uid));
   const me = rows[0];
   if (!me) { set({ me: null, members: [] }); return null; }
-  const [appts, pays, allow] = await Promise.all([
+  const [appts, pays, allow, usage] = await Promise.all([
     q(supabase.from('appointments').select('*').eq('member_id', me.id).order('starts_at')),
     q(supabase.from('payments').select('*').eq('member_id', me.id).order('created_at', { ascending: false })),
     q(supabase.from('allowance_adjustments').select('*').eq('member_id', me.id)),
+    q(supabase.rpc('month_usage')).catch(() => []),
   ]);
+  const lim = (usage.find((u) => u.member_id === me.id) || {}).month_limit;
   set({
-    me: me.id, members: [mapMember(me)], allowances: allow,
+    me: me.id, members: [{ ...mapMember(me), monthLimit: lim }], allowances: allow,
     appointments: appts.filter((a) => a.is_primary).map((a) => mapAppt(a, state.rooms)),
     payments: pays.map((p) => mapPayment(p)), invoices: pays.filter((p) => p.status === 'betaald').map((p) => mapPayment(p)),
   });
@@ -130,17 +134,21 @@ async function loadTeamData() {
     payments: can('finance') ? q(supabase.from('payments').select('*').order('created_at', { ascending: false }).limit(1000)) : Promise.resolve([]),
     users: can('settings') ? q(supabase.from('profiles').select('id,email,name,role').neq('role', 'member').order('created_at')) : Promise.resolve([]),
     roles: q(supabase.from('role_perms').select('*')),
+    usage: can('members') ? q(supabase.rpc('month_usage')).catch(() => []) : Promise.resolve([]),
+    absence: q(supabase.from('staff_absence').select('*').gte('ends', addDays(todayAms(), -1)).order('starts')),
   };
   const r = Object.fromEntries(await Promise.all(Object.entries(jobs).map(async ([k, p]) => [k, await p])));
   const notes = Object.fromEntries(r.notes.map((n) => [n.member_id, n.body]));
+  const limits = Object.fromEntries(r.usage.map((u) => [u.member_id, u.month_limit]));
   const members = can('members')
-    ? r.members.map((m) => mapMember(m, notes))
+    ? r.members.map((m) => ({ ...mapMember(m, notes), monthLimit: limits[m.id] }))
     : r.members.map((m) => ({ ...mapMember({ id: m.id, name: m.name, plan_id: m.plan_id, status: 'actief', since: null, prefs: { drink: m.drink }, notes: m.notes }), used: m.used, limit: m.month_limit }));
   const order = ['owner', 'manager', 'desk', 'specialist'];
   set({
     appointments: r.appts.map((a) => mapAppt(a, state.rooms)), members, allowances: r.allow,
     waitlist: r.waitlist.map((w) => ({ id: w.id, email: w.email, date: w.created_at.slice(0, 10), source: w.source, interest: w.interest || [], status: w.status, round: w.round })),
     payments: r.payments.map((p) => ({ ...mapPayment(p), memberId: p.member_id })),
+    absence: r.absence.map((x) => ({ id: x.id, staffId: x.staff_id, starts: x.starts, ends: x.ends, reason: x.reason })),
     settings: { ...state.settings,
       roles: order.map((id) => r.roles.find((x) => x.role === id)).filter(Boolean).map((x) => ({ id: x.role, name: x.name, perms: x.role === 'owner' ? PERMS_ALL : x.perms })),
       users: r.users.map((u) => ({ id: u.id, name: u.name || u.email.split('@')[0], email: u.email, role: u.role })) },
@@ -242,8 +250,8 @@ const act = {
   // ── member ──
   onboard: async ({ name, phone, routine, plan }) => { await q(supabase.rpc('member_onboard', { p_name: name, p_phone: phone, p_routine: routine, p_plan: plan })); },
   startMembership: async (plan, method) => api('membership-start', { plan, method }),   // → { checkoutUrl }
-  book: async ({ tid, date, time, staff, note, reschedule }) => {
-    const r = await q(supabase.rpc('book_appointment', { p_treatment: tid, p_date: date, p_time: time, p_staff: staff && staff !== 'any' ? staff : null, p_note: note || '', p_reschedule: reschedule || null }));
+  book: async ({ tid, date, time, staff, note, reschedule, kids }) => {
+    const r = await q(supabase.rpc('book_appointment', { p_treatment: tid, p_date: date, p_time: time, p_staff: staff && staff !== 'any' ? staff : null, p_note: note || '', p_reschedule: reschedule || null, p_kids: kids || 0 }));
     await loadMemberSelf();
     return r;
   },
@@ -259,9 +267,15 @@ const act = {
   },
   membership: async (action, extra = {}) => { const r = await api('membership-change', { action, ...extra }); await loadMemberSelf(); return r; },
   // ── team ──
+  // Kids corner: places taken per time on a day, and changing it on an appointment
+  kidsBusy: (date) => q(supabase.rpc('kids_busy', { p_date: date })),
+  setKids: async (id, kids) => { await q(supabase.rpc('set_appointment_kids', { p_appointment: id, p_kids: kids })); await (state.role && state.role !== 'member' ? loadTeamData() : loadMemberSelf()); },
+  // Absence (Team) and closing days (Instellingen)
+  addAbsence: async (staffId, starts, ends, reason) => { await q(supabase.from('staff_absence').insert({ staff_id: staffId, starts, ends, reason: reason || '' })); await loadTeamData(); },
+  removeAbsence: async (id) => { await q(supabase.from('staff_absence').delete().eq('id', id)); await loadTeamData(); },
   setApptStatus: async (id, status) => { await q(supabase.rpc('team_set_appointment_status', { p_appointment: id, p_status: status })); await loadTeamData(); },
-  teamBook: async ({ member, tr, date, time, staff, room }) => {
-    const r = await q(supabase.rpc('team_book_appointment', { p_member: member, p_treatment: tr, p_date: date, p_time: time, p_staff: staff || null, p_room: room || null }));
+  teamBook: async ({ member, tr, date, time, staff, room, kids }) => {
+    const r = await q(supabase.rpc('team_book_appointment', { p_member: member, p_treatment: tr, p_date: date, p_time: time, p_staff: staff || null, p_room: room || null, p_kids: kids || 0 }));
     await loadTeamData(); return r;
   },
   slotsFor: async (tid, date, skipGroup, member) => q(supabase.rpc('available_slots', { p_treatment: tid, p_date: date, p_skip_group: skipGroup || null, p_member: member || null })),
@@ -325,7 +339,8 @@ const act = {
   updateSettings: (patch) => {
     set({ settings: { ...state.settings, ...patch } });
     const s = state.settings;
-    later('settings', () => q(supabase.from('settings').update({ hours: s.hours, cancel_hours: s.cancelHours, no_show_counts: s.noShowCounts, rollover: s.rollover, mollie_mode: s.mollieMode }).eq('id', 1)), 300);
+    later('settings', () => q(supabase.from('settings').update({ hours: s.hours, cancel_hours: s.cancelHours, no_show_counts: s.noShowCounts, rollover: s.rollover, mollie_mode: s.mollieMode,
+      kids_enabled: s.kidsOn, kids_capacity: s.kidsCapacity, closed_dates: s.closedDates }).eq('id', 1)).then(() => loadCatalog()), 300);
   },
   setRolePerms: async (role, perms) => { set({ settings: { ...state.settings, roles: state.settings.roles.map((r) => (r.id === role ? { ...r, perms } : r)) } }); await q(supabase.from('role_perms').update({ perms }).eq('role', role)); },
   setUserRole: async (userId, role) => { await q(supabase.rpc('owner_set_role', { p_user: userId, p_role: role })); await loadTeamData(); },
@@ -372,7 +387,7 @@ const BP = {
     const nowAms = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Amsterdam', hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date());
     for (let i = 0; i <= n; i++) {
       const d = addDays(todayAms(), i), h = st.hours[(new Date(d + 'T12:00:00').getDay() + 6) % 7];
-      if (!h || !h[1]) continue;
+      if (!h || !h[1] || (st.closedDates || []).includes(d)) continue;
       if (i === 0) { const [hh, mm] = nowAms.split(':').map(Number), [ch, cm] = h[2].split(':').map(Number); if (ch * 60 + cm - (hh * 60 + mm) < 120) continue; }
       out.push(d);
     }
@@ -390,7 +405,8 @@ const BP = {
   staff: (id) => state.team.find((t) => t.id === id) || { id, name: 'Specialist', role: '', color: '#b7a48f', skills: [], days: [] },
   cat: (id) => state.categories.find((c) => c.id === id) || { id, name: '', img: '' },
   usedThisMonth, extraThisMonth,
-  limitThisMonth: (mid) => BP.plan(BP.mem(mid).plan).perMonth + extraThisMonth(mid),
+  // The database's number (includes extra treatments and carried-over ones); falls back to plan + extras
+  limitThisMonth: (mid) => { const m = BP.mem(mid); return m.monthLimit ?? m.limit ?? BP.plan(m.plan).perMonth + extraThisMonth(mid); },
   can: (p) => state.perms.includes(p),
 };
 window.BP = BP;

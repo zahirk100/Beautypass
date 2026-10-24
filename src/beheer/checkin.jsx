@@ -56,6 +56,7 @@ return <APanel style={{marginTop:14}}>
 return <div key={x.id} style={{display:'flex',alignItems:'center',gap:12,flexWrap:'wrap',padding:14,borderRadius:16,border:`1px solid ${x.checked_in_at&&!done?BPC.sage:BPC.line}`,background:x.checked_in_at&&!done?BPC.sageSoft:BPC.card}}>
 <div style={{fontFamily:BPC.serif,fontSize:22,fontWeight:600,minWidth:56}}>{tm(x.starts_at)}</div>
 <div style={{flex:'1 1 160px',minWidth:0}}><div style={{fontWeight:600,fontSize:14}}>{t.name}</div><div style={{fontSize:12.5,color:BPC.ink3}}>{st.name}{room?' · '+room:''}{Number(x.paid)>0?' · los '+BP.eur(x.paid):''}</div>
+{x.kids>0&&<div style={{fontSize:12.5,color:BPC.esp,marginTop:3,fontWeight:600,display:'flex',alignItems:'center',gap:5}}><Ico n="kid" s={14}/>Kinderhoek: {x.kids===1?'1 kind':x.kids+' kinderen'}</div>}
 {x.checked_in_at&&<div style={{fontSize:12,color:BPC.sage,marginTop:3,fontWeight:600}}>Aanwezig sinds {tm(x.checked_in_at)}</div>}</div>
 {done?<Pill tone="ok">afgerond</Pill>:!x.confirmed?<Pill tone="warn">wacht op betaling</Pill>:x.status!=='gepland'?<Pill tone={statusTone(x.status)}>{x.status}</Pill>
 :!x.checked_in_at?<ABtn disabled={busy===x.id} onClick={()=>act(x.id,()=>BP.act.arrive(x.id),m.name.split(' ')[0]+' is aanwezig')}>{busy===x.id?'Bezig…':'Aanwezig melden'}</ABtn>
@@ -74,7 +75,7 @@ return <><AHead title="Check-in" it="bij de balie" sub={`Vandaag ${today.length}
 {res&&<CheckinResult res={res} onAgain={()=>{setRes(null);setCode('');}} refresh={()=>look(code)}/>}
 <APanel title="Vandaag" style={{marginTop:14}}>{today.length?today.map(x=>{const t=BP.tr(x.treatmentId),m=BP.mem(x.memberId),st=BP.staff(x.staffId);const tone=x.status==='afgerond'?'ok':x.checkedInAt?'esp':null;
 return <div key={x.id} className="a-row" onClick={()=>a.open({k:'appt',id:x.id})} style={{display:'grid',gridTemplateColumns:'52px minmax(0,1fr) auto',gap:12,alignItems:'center',padding:'10px 8px',borderRadius:12,cursor:'pointer'}}>
-<div style={{fontFamily:BPC.serif,fontSize:19,fontWeight:600}}>{x.time}</div><div style={{minWidth:0}}><div style={{fontSize:13.5,fontWeight:600,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{m.name} · {t.name}</div><div style={{fontSize:12,color:BPC.ink3}}>{st.name} · {x.room}</div></div>
+<div style={{fontFamily:BPC.serif,fontSize:19,fontWeight:600}}>{x.time}</div><div style={{minWidth:0}}><div style={{fontSize:13.5,fontWeight:600,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{m.name} · {t.name}</div><div style={{fontSize:12,color:BPC.ink3}}>{st.name} · {x.room}{x.kids>0?' · kinderhoek '+x.kids:''}</div></div>
 {tone?<Pill tone={tone}>{x.status==='afgerond'?'afgerond':'aanwezig'}</Pill>:<Pill>{x.status==='gepland'?'verwacht':x.status}</Pill>}</div>;}):<div style={{fontSize:14,color:BPC.ink2}}>Vandaag staan er geen afspraken.</div>}</APanel></>;}
 
 Object.assign(window,{Checkin,Scanner});

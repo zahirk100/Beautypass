@@ -84,6 +84,20 @@ return <div style={{position:'absolute',inset:0,background:BPC.paper,display:'fl
 <Btn onClick={finish} icon="arrow">Plan je eerste behandeling</Btn></div>;}
 
 /* ---------- Home ---------- */
+// Kids corner with a booking: how many places are left at the chosen time (capacity set in Beheer)
+const amsMin=ts=>{const [h,m]=new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Amsterdam',hour:'2-digit',minute:'2-digit',hour12:false}).format(new Date(ts)).split(':').map(Number);return h*60+m;};
+function useKidsFree(date,time,tid,own=0){const s=useBP();const [busy,setBusy]=React.useState(null);
+React.useEffect(()=>{if(!s.settings.kidsEnabled||!date)return;let live=true;setBusy(null);BP.act.kidsBusy(date).then(r=>live&&setBusy(r||[])).catch(()=>live&&setBusy([]));return()=>{live=false;};},[date,s.appointments,s.settings.kidsEnabled]);
+if(!s.settings.kidsEnabled||!time||!tid||!busy)return null;const [h,m]=time.split(':').map(Number);const a=h*60+m,b=a+BP.tr(tid).dur;
+return Math.max(0,own+s.settings.kidsCapacity-busy.filter(x=>amsMin(x.starts_at)<b&&amsMin(x.ends_at)>a).reduce((n,x)=>n+x.kids,0));}
+function KidsPicker({date,time,tid,value,onChange,dark,own=0}){const s=useBP();const free=useKidsFree(date,time,tid,own);
+React.useEffect(()=>{if(!own&&free!=null&&value>free)onChange(free);},[free]);
+if(!s.settings.kidsEnabled)return null;
+return <div style={{marginTop:16,padding:14,borderRadius:16,background:dark?BPC.paper:BPC.card,border:`1px solid ${BPC.line}`}}>
+<div style={{display:'flex',alignItems:'center',gap:10,marginBottom:10}}><Ico n="kid" s={20} c={BPC.esp}/><div style={{flex:1}}><div style={{fontSize:14,fontWeight:600}}>Kinderhoek</div><div style={{fontSize:12,color:BPC.ink3}}>Speelhoek voor de kleintjes tijdens je behandeling</div></div></div>
+<div style={{display:'flex',gap:6,flexWrap:'wrap'}}>{[0,1,2,3].map(n=>{const off=n>0&&(free==null?!time:n>free);const on=value===n;return <div key={n} onClick={()=>!off&&onChange(n)} style={{padding:'8px 13px',borderRadius:99,fontSize:13,fontWeight:600,cursor:off?'default':'pointer',background:on?BPC.ink:BPC.paper2,color:on?'#fff':off?BPC.line2:BPC.ink,textDecoration:off&&n>0&&time?'line-through':'none'}}>{n===0?'Niet nodig':n===1?'1 kind':n+' kinderen'}</div>;})}</div>
+<div style={{fontSize:12,color:BPC.ink3,marginTop:8}}>{!time?'Kies eerst een tijd.':free===0?`De kinderhoek is om ${time} vol.`:free!=null?`Om ${time} nog ${free} ${free===1?'plek':'plekken'} vrij.`:''}</div></div>;}
+
 function MemberCard({s,me,plan,onClick}){const used=BP.usedThisMonth(me.id);const lim=BP.limitThisMonth(me.id);const left=Math.max(0,lim-used);const end=new Date();end.setMonth(end.getMonth()+1,1);
 return <div onClick={onClick} style={{background:BPC.esp,color:'#fff',borderRadius:24,padding:20,position:'relative',overflow:'hidden',cursor:onClick?'pointer':'default'}}>
 <div style={{position:'absolute',right:-40,top:-40,width:170,height:170,borderRadius:'50%',border:'1px solid rgba(255,255,255,.14)'}}></div><div style={{position:'absolute',right:-10,top:-10,width:110,height:110,borderRadius:'50%',border:'1px solid rgba(255,255,255,.1)'}}></div>
@@ -108,4 +122,4 @@ return <div style={{padding:'66px 20px 110px'}}>
 {routine.length>0&&<><div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline',margin:'28px 0 12px'}}><Serif size={24}>Snel boeken</Serif><span onClick={()=>m.push({k:'routine'})} style={{fontSize:13,color:BPC.ink2,cursor:'pointer'}}>Routine aanpassen</span></div>
 <div className="bp-scroll" style={{display:'flex',gap:10,overflowX:'auto',margin:'0 -20px',padding:'0 20px'}}>{routine.map(t=>{const c=BP.cat(t.cat);return <div key={t.id} onClick={()=>m.push({k:'book',tid:t.id})} style={{width:136,flexShrink:0,cursor:'pointer'}}><div style={{position:'relative'}}><img src={c.img} alt="" style={{width:136,height:160,objectFit:'cover',borderRadius:18,display:'block'}}/>{!plan.included.includes(t.id)&&<div style={{position:'absolute',top:8,left:8}}><Pill tone="warn">Niet inbegrepen</Pill></div>}</div><div style={{fontSize:13,fontWeight:600,marginTop:8}}>{t.name}</div><div style={{fontSize:12,color:BPC.ink3}}>{t.dur} min</div></div>;})}</div></>}
 <Card style={{marginTop:28,display:'flex',gap:14,alignItems:'center'}}><Thumb src="/assets/tour-arrival-v26.webp" size={56}/><div style={{flex:1}}><div style={{fontSize:14,fontWeight:600}}>The BeautyPass house</div><div style={{fontSize:12.5,color:BPC.ink2,marginTop:2}}>{hrs[1]?`Vandaag open ${hrs[1]} – ${hrs[2]}`:'Vandaag gesloten'} · Amsterdam</div></div></Card></div>;}
-Object.assign(window,{SheetFixed,ScreenWide,MCtx,useM,Btn,Screen,Sheet,Card,Row,Field,IncludedTag,Thumb,lowestPlanFor,Onboarding,Home,MemberCard,ApptCard});
+Object.assign(window,{KidsPicker,useKidsFree,SheetFixed,ScreenWide,MCtx,useM,Btn,Screen,Sheet,Card,Row,Field,IncludedTag,Thumb,lowestPlanFor,Onboarding,Home,MemberCard,ApptCard});
