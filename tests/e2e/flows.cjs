@@ -30,6 +30,8 @@ const mails = async () => (await fetch(L.MOCK + '/mock/mails')).json();
   console.log('2. losse behandeling (niet in Essential) met betaling');
   await p.getByText('Plannen', { exact: true }).last().click();
   await p.getByText('Pedicure', { exact: true }).locator('visible=true').first().click();
+  await p.waitForTimeout(800);
+  await p.locator('div[style*="width: 54px"]').nth(3).click();   // a few days ahead, so cancelling is on time
   await p.waitForTimeout(1200);
   const free = p.locator('div[style*="cursor: pointer"]', { hasText: /^\d\d:\d\d$/ });
   const time = await free.nth(2).innerText(); await free.nth(2).click();

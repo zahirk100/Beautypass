@@ -366,6 +366,18 @@ const fallbackPlan = { id: '', name: '—', price: 0, perMonth: 0, included: [],
 
 const BP = {
   get: () => state, subscribe: (f) => { subs.add(f); return () => subs.delete(f); },
+  // Days a member can book: today (while the salon is still open for at least another hour) up to bookingDays ahead
+  bookDays: () => {
+    const st = state.settings, n = st.bookingDays || 14, out = [];
+    const nowAms = new Intl.DateTimeFormat('en-GB', { timeZone: 'Europe/Amsterdam', hour: '2-digit', minute: '2-digit', hour12: false }).format(new Date());
+    for (let i = 0; i <= n; i++) {
+      const d = addDays(todayAms(), i), h = st.hours[(new Date(d + 'T12:00:00').getDay() + 6) % 7];
+      if (!h || !h[1]) continue;
+      if (i === 0) { const [hh, mm] = nowAms.split(':').map(Number), [ch, cm] = h[2].split(':').map(Number); if (ch * 60 + cm - (hh * 60 + mm) < 120) continue; }
+      out.push(d);
+    }
+    return out;
+  },
   boot, auth, act, supabase, authLink: AUTH_LINK, onError: (f) => { onError = f; }, showError: (e) => onError(friendly(e)),
   reload: { member: loadMemberSelf, team: loadTeamData, catalog: loadCatalog },
   get today() { return todayAms(); }, addDays, iso,
