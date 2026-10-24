@@ -150,10 +150,12 @@ async function loadTeamData() {
 async function loadProfile() {
   const uid = state.session && state.session.user.id;
   if (!uid) { set({ role: null, perms: [] }); return; }
-  const prof = await q(supabase.from('profiles').select('role,name,email').eq('id', uid).single());
+  const prof = await q(supabase.from('profiles').select('role,name,email').eq('id', uid).maybeSingle());
+  // A session for an account that no longer exists (deleted in Supabase, or another project): sign out cleanly
+  if (!prof) { await supabase.auth.signOut().catch(() => {}); set({ session: null, role: null, perms: [], profile: null }); return; }
   let perms = [];
   if (prof.role === 'owner') perms = PERMS_ALL;
-  else if (prof.role !== 'member') perms = (await q(supabase.from('role_perms').select('perms').eq('role', prof.role).single())).perms;
+  else if (prof.role !== 'member') perms = ((await q(supabase.from('role_perms').select('perms').eq('role', prof.role).maybeSingle())) || {}).perms || [];
   set({ role: prof.role, perms, profile: prof });
 }
 
@@ -177,6 +179,7 @@ async function boot(kind) {
   await loadCatalog();
   if (!session) { set({ loaded: true }); return kind === 'onboarding' ? 'onboarding' : 'login'; }
   await loadProfile();
+  if (!state.session) { set({ loaded: true }); return kind === 'onboarding' ? 'onboarding' : 'login'; }
   if (kind === 'team') {
     if (!state.role || state.role === 'member') { set({ loaded: true }); return 'no-access'; }
     await loadTeamData();

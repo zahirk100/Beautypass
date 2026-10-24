@@ -55,6 +55,7 @@ function NoAccess({what}){return <AuthShell eyebrow="Beheer · Amsterdam" title=
 <div style={{fontSize:14.5,color:BPC.ink2,lineHeight:1.55}}>Dit account heeft geen toegang tot {what||'de beheeromgeving'}. Vraag de eigenaar om je een rol te geven.</div>
 <LBtn kind="ghost" onClick={async()=>{await BP.auth.signOut();location.reload();}}>Uitloggen</LBtn><a href="/member/" style={{textAlign:'center',fontSize:14,color:BPC.ink2}}>Naar de member app</a></AuthShell>;}
 
-function BootError({message}){return <AuthShell eyebrow="BeautyPass" title="Even" it="geduld." image={false}><LMsg>{message}</LMsg><LBtn onClick={()=>location.reload()}>Opnieuw proberen</LBtn></AuthShell>;}
+function BootError({message}){return <AuthShell eyebrow="BeautyPass" title="Even" it="geduld." image={false}><LMsg>{message}</LMsg><LBtn onClick={()=>location.reload()}>Opnieuw proberen</LBtn>
+<LBtn kind="ghost" onClick={async()=>{await BP.auth.signOut().catch(()=>{});try{sessionStorage.clear();}catch(e){}location.reload();}}>Uitloggen en opnieuw beginnen</LBtn></AuthShell>;}
 
 Object.assign(window,{MemberLogin,TeamLogin,SetPassword,NoAccess,BootError,AuthShell});
