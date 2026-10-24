@@ -77,21 +77,35 @@ return <><Eyebrow>Verzetten</Eyebrow><Serif size={30} style={{margin:'8px 0 6px'
 <L l="Vrije tijden">{slots==null?<div style={{fontSize:13,color:BPC.ink3}}>Laden…</div>:opts.length?<div style={{display:'flex',flexWrap:'wrap',gap:6}}>{opts.map(r=><ABtn key={r.slot} small kind={time===r.slot?'primary':'ghost'} onClick={()=>setTime(r.slot)}>{r.slot}</ABtn>)}</div>:<div style={{fontSize:13,color:BPC.bord}}>Geen vrije tijd op deze dag{staff?' bij '+BP.staff(staff).name:''}.</div>}</L></div>
 <div style={{display:'flex',gap:8,marginTop:20}}><ABtn disabled={!time||busy} onClick={save}>{busy?'Bezig…':'Verzetten'}</ABtn><ABtn kind="ghost" onClick={()=>a.open({k:'appt',id})}>Terug</ABtn></div></>;}
 
+// Only times that are really free: within opening hours, not in the past, a specialist with the skill and a room
+// available (available_slots). The room column or hour clicked in the agenda is used when it fits.
 function NewAppt({date:d0,time:t0,room:r0,staff:s0,member:m0}){const s=useBP();const a=useA();const bookable=s.members.filter(x=>x.status!=='opgezegd'&&x.status!=='nieuw');const [busy,setBusy]=React.useState(false);
-const [f,setF]=React.useState({member:m0||(bookable[0]||{}).id,tr:(s.treatments.find(x=>x.active!==false)||{}).id,date:d0||BP.today,time:t0&&BP.T.includes(t0)?t0:BP.T[0],staff:s0||'',room:r0||''});
-const t=BP.tr(f.tr),m=BP.mem(f.member),p=BP.plan(m.plan);const away=id=>(s.absence||[]).some(x=>x.staffId===id&&f.date>=x.starts&&f.date<=x.ends);const staffOpts=s.team.filter(x=>x.skills.includes(t.cat)&&!away(x.id));const staff=f.staff&&staffOpts.find(x=>x.id===f.staff)?f.staff:(staffOpts[0]||{}).id;
-const room=f.room||(t.room==='six'?'Six hands suite':t.room==='duo'?'Duo-suite':'Solo 1');const clash=s.appointments.find(x=>x.date===f.date&&x.time===f.time&&x.status!=='geannuleerd'&&(x.room===room||x.staffId===staff));
-const roomId=(s.rooms.find(r=>r.name===room)||{}).id;
-const save=()=>{setBusy(true);a.run(BP.act.teamBook({member:f.member,tr:f.tr,date:f.date,time:f.time,staff,room:roomId,kids:f.kids||0}).then(r=>{a.close();return r;}),r=>r&&Number(r.paid_amount)>0?'Ingepland · '+BP.eur(r.paid_amount)+' wordt los afgerekend':'Afspraak ingepland').finally(()=>setBusy(false));};
-const L=ALabel;
+const [f,setF]=React.useState({member:m0||(bookable[0]||{}).id,tr:(s.treatments.find(x=>x.active!==false)||{}).id,date:d0||BP.today,time:t0||'',staff:s0||'',room:r0||''});
+const [slots,setSlots]=React.useState(null);
+React.useEffect(()=>{if(!f.tr||!f.date)return;let live=true;setSlots(null);BP.act.slotsFor(f.tr,f.date,null,f.member).then(r=>live&&setSlots(r||[])).catch(()=>live&&setSlots([]));return()=>{live=false;};},[f.tr,f.date,f.member]);
+const t=BP.tr(f.tr),m=BP.mem(f.member),p=BP.plan(m.plan);const away=id=>(s.absence||[]).some(x=>x.staffId===id&&f.date>=x.starts&&f.date<=x.ends);
+const staffOpts=s.team.filter(x=>x.skills.includes(t.cat)&&!away(x.id));const staff=f.staff&&staffOpts.find(x=>x.id===f.staff)?f.staff:'';
+const open=(slots||[]).filter(r=>!staff||r.staff_ids.includes(staff));
+// clicked an hour in the agenda: the first free time from then on
+const time=open.some(r=>r.slot===f.time)?f.time:((open.find(r=>r.slot>=(f.time||''))||open[0]||{}).slot||'');
+const freeStaff=time?((open.find(r=>r.slot===time)||{}).staff_ids||[]):[];
+const mins=x=>{const [h,mm]=x.split(':').map(Number);return h*60+mm;};
+const roomBusy=r=>time&&s.appointments.some(x=>x.date===f.date&&x.status!=='geannuleerd'&&x.roomId===r.id&&mins(x.time)<mins(time)+t.dur&&mins(time)<mins(x.time)+BP.tr(x.treatmentId).dur);
+const roomOpts=s.rooms.filter(r=>r.active!==false&&(!t.room||!r.type||r.type===t.room));
+const picked=roomOpts.find(r=>r.id===f.room||r.name===f.room);const room=picked&&!roomBusy(picked)?picked:roomOpts.find(r=>!roomBusy(r));
+const save=()=>{setBusy(true);a.run(BP.act.teamBook({member:f.member,tr:f.tr,date:f.date,time,staff:staff||null,room:room?room.id:null,kids:f.kids||0}).then(r=>{a.close();return r;}),r=>r&&Number(r.paid_amount)>0?'Ingepland · '+BP.eur(r.paid_amount)+' wordt los afgerekend':'Afspraak ingepland').finally(()=>setBusy(false));};
+const L=ALabel;const closed=(s.settings.closedDates||[]).includes(f.date);
+const msg=!staffOpts.length?['bad','Er is geen specialist met deze vaardigheid (of iedereen is afwezig).']:slots==null?['',' ']:!time?['bad',closed?'De salon is op deze dag gesloten.':`Geen vrije tijd op deze dag${staff?' bij '+BP.staff(staff).name:''}. Kies een andere dag${staff?' of specialist':''}.`]:!room?['bad','Er is op dit moment geen ruimte vrij.']:p.included.includes(f.tr)?['ok',`Inbegrepen. ${m.name.split(' ')[0]} heeft ${BP.usedThisMonth(m.id)}/${p.perMonth} gebruikt deze maand.`]:['warn',`Niet in ${p.name}. Reken ${BP.eur(t.price)} los af in de salon.`];
 return <><Serif size={34} style={{marginBottom:20}}>Nieuwe afspraak</Serif><div style={{display:'grid',gap:14}}>
 <L l="Member"><ASelect value={f.member} onChange={v=>setF({...f,member:v})} opts={bookable.map(x=>[x.id,x.name+' · '+BP.plan(x.plan).name])}/></L>
 <L l="Behandeling"><ASelect value={f.tr} onChange={v=>setF({...f,tr:v,staff:''})} opts={s.treatments.filter(x=>x.active!==false).map(x=>[x.id,x.name+(p.included.includes(x.id)?'':' (buiten membership)')])}/></L>
-<div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}}><L l="Datum"><AInput type="date" value={f.date} onChange={v=>setF({...f,date:v})}/></L><L l="Tijd"><ASelect value={f.time} onChange={v=>setF({...f,time:v})} opts={BP.T.map(x=>[x,x])}/></L></div>
-<div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}}><L l="Specialist"><ASelect value={staff} onChange={v=>setF({...f,staff:v})} opts={staffOpts.map(x=>[x.id,x.name])}/></L><L l="Ruimte"><ASelect value={room} onChange={v=>setF({...f,room:v})} opts={s.settings.rooms.map(x=>[x,x])}/></L></div>
+<div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}}><L l="Datum"><AInput type="date" value={f.date} onChange={v=>v&&setF({...f,date:v})}/></L><L l="Specialist"><ASelect value={staff} onChange={v=>setF({...f,staff:v})} opts={[['','Wie er vrij is'],...staffOpts.map(x=>[x.id,x.name])]}/></L></div>
+<L l="Vrije tijden">{slots==null?<div style={{fontSize:13,color:BPC.ink3}}>Laden…</div>:open.length?<div style={{display:'flex',flexWrap:'wrap',gap:6}}>{open.map(r=><ABtn key={r.slot} small kind={time===r.slot?'primary':'ghost'} onClick={()=>setF({...f,time:r.slot})}>{r.slot}</ABtn>)}</div>:<div style={{fontSize:13,color:BPC.ink3}}>—</div>}</L>
+<div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12}}><L l="Ruimte"><ASelect value={room?room.id:''} onChange={v=>setF({...f,room:v})} opts={roomOpts.filter(r=>!roomBusy(r)).map(x=>[x.id,x.name])}/></L>
 {s.settings.kidsEnabled&&<L l="Kinderhoek"><ASelect value={String(f.kids||0)} onChange={v=>setF({...f,kids:Number(v)})} opts={[['0','Niet nodig'],['1','1 kind'],['2','2 kinderen'],['3','3 kinderen']]}/></L>}</div>
-<div style={{marginTop:16,padding:14,borderRadius:14,fontSize:13,lineHeight:1.45,background:clash||!staff?BPC.bordSoft:p.included.includes(f.tr)?BPC.sageSoft:BPC.goldSoft,color:clash||!staff?BPC.bord:p.included.includes(f.tr)?BPC.sage:BPC.gold}}>{!staff?'Er is geen specialist met deze vaardigheid.':clash?`Conflict: ${clash.room===room?room:BP.staff(clash.staffId).name} is om ${f.time} al bezet.`:p.included.includes(f.tr)?`Inbegrepen. ${m.name.split(' ')[0]} heeft ${BP.usedThisMonth(m.id)}/${p.perMonth} gebruikt deze maand.`:`Niet in ${p.name}. Reken ${BP.eur(t.price)} los af in de salon.`}</div>
-<div style={{display:'flex',gap:8,marginTop:20}}><ABtn onClick={save} disabled={!!clash||busy||!staff||!f.member}>{busy?'Bezig…':'Inplannen'}</ABtn><ABtn kind="ghost" onClick={a.close}>Annuleren</ABtn></div></>;}
+{time&&!staff&&freeStaff.length>0&&<div style={{fontSize:12.5,color:BPC.ink3,marginTop:-4}}>Vrij om {time}: {freeStaff.map(id=>BP.staff(id).name.split(' ')[0]).join(', ')}</div>}</div>
+<div style={{marginTop:16,padding:14,borderRadius:14,fontSize:13,lineHeight:1.45,background:msg[0]==='bad'?BPC.bordSoft:msg[0]==='ok'?BPC.sageSoft:msg[0]==='warn'?BPC.goldSoft:'transparent',color:msg[0]==='bad'?BPC.bord:msg[0]==='ok'?BPC.sage:BPC.gold}}>{msg[1]}</div>
+<div style={{display:'flex',gap:8,marginTop:20}}><ABtn onClick={save} disabled={busy||!time||!room||!f.member||!staffOpts.length}>{busy?'Bezig…':'Inplannen'}</ABtn><ABtn kind="ghost" onClick={a.close}>Annuleren</ABtn></div></>;}
 
 function Members(){const s=useBP();const a=useA();const [q,setQ]=React.useState('');const [st,setSt]=React.useState('all');const [pl,setPl]=React.useState('all');
 const list=s.members.filter(m=>(st==='all'||m.status===st)&&(pl==='all'||m.plan===pl)&&(m.name+m.email).toLowerCase().includes(q.toLowerCase()));

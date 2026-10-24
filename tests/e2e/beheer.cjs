@@ -23,7 +23,13 @@ const mails = async () => (await fetch(L.MOCK + '/mock/mails')).json();
   await sel.nth(1).selectOption({ label: 'Blowout' });
   const tomorrow = L.sql("select ((now() at time zone 'Europe/Amsterdam')::date + 2)::text");
   await drawer.locator('input[type=date]').fill(tomorrow);
-  await sel.nth(2).selectOption('14:00');
+  await a.waitForTimeout(1200);
+  // only free times within opening hours are offered
+  const shown = await drawer.locator('button').allInnerTexts().then((x) => x.filter((y) => /^\d\d:\d\d$/.test(y)));
+  const free = await a.evaluate(([d]) => BP.act.slotsFor('blow', d).then((r) => r.map((x) => x.slot)), [tomorrow]);
+  const hrs = await a.evaluate((d) => { const s = BP.get().settings; return s.hours[(new Date(d + 'T12:00:00').getDay() + 6) % 7]; }, tomorrow);
+  L.check(shown.length > 0 && shown.every((x) => free.includes(x)) && shown.every((x) => x >= hrs[1] && x < hrs[2]), `alleen vrije tijden binnen openingstijden (${shown[0]}–${shown[shown.length - 1]}, open ${hrs[1]}–${hrs[2]})`);
+  await drawer.getByRole('button', { name: shown.includes('14:00') ? '14:00' : shown[0], exact: true }).click();
   await a.waitForTimeout(300);
   await a.screenshot({ path: 'tests/e2e/shots/bh_new.png' });
   await drawer.getByRole('button', { name: 'Inplannen' }).click();
