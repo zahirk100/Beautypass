@@ -4,7 +4,8 @@ import { createClient } from '@supabase/supabase-js';
 import { bindDemo, demoMollie, flushDemo } from './_mollie-demo.js';
 
 export const env = (k, fallback) => process.env[k] ?? fallback;
-export const APP_URL = () => env('APP_URL', 'https://www.beautypass.nl').replace(/\/$/, '');
+// Only the origin counts (a path pasted by mistake, like …/api/notify, is ignored)
+export const APP_URL = () => { const v = env('APP_URL', 'https://www.beautypass.nl'); try { return new URL(v).origin; } catch { return 'https://www.beautypass.nl'; } };
 
 let admin;
 export function db() {

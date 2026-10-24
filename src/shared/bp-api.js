@@ -238,7 +238,7 @@ const auth = {
 const act = {
   // ── member ──
   onboard: async ({ name, phone, routine, plan }) => { await q(supabase.rpc('member_onboard', { p_name: name, p_phone: phone, p_routine: routine, p_plan: plan })); },
-  startMembership: async (plan) => api('membership-start', { plan }),          // → { checkoutUrl }
+  startMembership: async (plan, method) => api('membership-start', { plan, method }),   // → { checkoutUrl }
   book: async ({ tid, date, time, staff, note, reschedule }) => {
     const r = await q(supabase.rpc('book_appointment', { p_treatment: tid, p_date: date, p_time: time, p_staff: staff && staff !== 'any' ? staff : null, p_note: note || '', p_reschedule: reschedule || null }));
     await loadMemberSelf();

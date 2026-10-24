@@ -24,13 +24,15 @@ return <AuthShell eyebrow="Bijna klaar" title={st==='wait'?'Betaling':'Nog even'
 function OnboardingPage(){const [st,setSt]=React.useState({k:'loading'});const [mobile,setMobile]=React.useState(()=>window.innerWidth<520);
 React.useEffect(()=>{const f=()=>setMobile(window.innerWidth<520);window.addEventListener('resize',f);return()=>window.removeEventListener('resize',f);},[]);
 const paid=new URLSearchParams(location.search).get('betaald');
-React.useEffect(()=>{BP.boot('onboarding').then(k=>{if(k==='member'){if(paid){setSt({k:'flow',step:5});return;}toMember();return;}setSt({k:paid?'return':'flow'});}).catch(e=>setSt({k:'error',msg:e.message}));},[]);
+// Signed in but not paid yet (back button, failed payment, or coming from /member): continue where it stopped
+const resume=()=>{const b=BP.get();if(!b.session)return undefined;const me=b.members.find(x=>x.id===b.me);return me&&me.plan&&me.routine.length?4:2;};
+React.useEffect(()=>{BP.boot('onboarding').then(k=>{if(k==='member'){if(paid){setSt({k:'flow',step:5});return;}toMember();return;}setSt(paid?{k:'return'}:{k:'flow',step:resume()});}).catch(e=>setSt({k:'error',msg:e.message}));},[]);
 if(st.k==='loading')return <Loading/>;
 if(st.k==='error')return <BootError message={st.msg}/>;
 if(st.k==='return')return <PaymentReturn onActive={()=>setSt({k:'flow',step:5})} onRetry={()=>{history.replaceState(null,'','/onboarding');setSt({k:'flow',step:4});}}/>;
-const login=()=>location.assign('/member/');
+const login=()=>location.assign('/member/');const logout=async()=>{await BP.auth.signOut();try{sessionStorage.removeItem('bp-onb');}catch(e){}location.replace('/onboarding');};
 if(mobile)return <div style={{position:'relative',height:'100dvh',overflow:'hidden',background:BPC.paper,fontFamily:BPC.sans,color:BPC.ink}}><Onboarding initStep={st.step} onLogin={login} onDone={toMember}/></div>;
 // Desktop starts at the account step: the campaign image on the left is the welcome
 let draft={};try{draft=JSON.parse(sessionStorage.getItem('bp-onb')||'{}');}catch(e){}
-return <MemberWeb view="onboarding" setView={()=>{}} onApp={()=>{}} okKey={0} onboard={{step:st.step!=null?st.step:Math.max(1,draft.step||1),login,done:toMember}}/>;}
+return <MemberWeb view="onboarding" setView={()=>{}} onApp={()=>{}} okKey={0} onboard={{step:st.step!=null?st.step:Math.max(1,draft.step||1),login,logout,done:toMember}}/>;}
 ReactDOM.createRoot(document.getElementById('root')).render(<OnboardingPage/>);

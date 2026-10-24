@@ -4,7 +4,8 @@ import { handler, currentUser, db, one, mollie, money, webhookUrl, APP_URL, Http
 
 export default handler(async (req) => {
   const user = await currentUser(req);
-  const { plan: planId } = await readJson(req);
+  const { plan: planId, method } = await readJson(req);
+  const mollieMethod = { iDEAL: 'ideal', Creditcard: 'creditcard' }[method];
   const m = (await one(db().from('members').select('*').eq('user_id', user.id)))[0];
   if (!m) throw new HttpError(400, 'Vul eerst je gegevens in');
   if (!['nieuw', 'opgezegd'].includes(m.status)) throw new HttpError(400, 'Je bent al member. Wijzig je membership in de app.');
@@ -22,12 +23,12 @@ export default handler(async (req) => {
   const open = (await one(db().from('payments').select('*').eq('member_id', m.id).eq('kind', 'eerste').eq('status', 'open')))[0];
   if (open) {
     const p = await mollie('GET', '/payments/' + open.mollie_payment_id).catch(() => null);
-    if (p && p.status === 'open' && p._links.checkout && p.amount.value === money(plan.price).value) return { checkoutUrl: p._links.checkout.href };
+    if (p && p.status === 'open' && p._links.checkout && p.amount.value === money(plan.price).value && (!mollieMethod || p.method === mollieMethod)) return { checkoutUrl: p._links.checkout.href };
     if (p && p.status === 'open') await mollie('DELETE', '/payments/' + open.mollie_payment_id).catch(() => {});
     if (p && ['open', 'canceled', 'expired', 'failed'].includes(p.status)) await one(db().from('payments').update({ status: 'mislukt' }).eq('id', open.id));
   }
   const pay = await mollie('POST', '/payments', {
-    amount: money(plan.price), customerId, sequenceType: 'first',
+    amount: money(plan.price), customerId, sequenceType: 'first', ...(mollieMethod ? { method: mollieMethod } : {}),
     description: `BeautyPass ${plan.name} · eerste maand`,
     redirectUrl: APP_URL() + '/onboarding?betaald=1', webhookUrl: webhookUrl(),
     metadata: { member_id: m.id, kind: 'eerste', plan: plan.id },
