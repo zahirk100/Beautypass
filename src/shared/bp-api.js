@@ -249,17 +249,13 @@ const act = {
   },
   payAppointment: async (groupId) => api('appointment-pay', { group_id: groupId }),   // → { checkoutUrl }
   cancel: async (id) => { const r = await q(supabase.rpc('cancel_appointment', { p_appointment: id })); await loadMemberSelf(); return r; },
+  // Name, phone, routine, preferences, note. The e-mail address belongs to the membership and is not changed here
   updateMe: (patch) => {
-    const me = state.members.find((m) => m.id === state.me);
-    const next = { ...me, ...patch };
-    set({ members: replaceIn(state.members, state.me, patch) });
-    later('me', async () => {
-      if (patch.email !== undefined && patch.email !== me.email) {
-        const { error } = await supabase.auth.updateUser({ email: patch.email });
-        if (error) throw error;
-      }
-      await q(supabase.from('members').update({ name: next.name, phone: next.phone || null, routine: next.routine, prefs: next.prefs, notes: next.notes }).eq('id', state.me));
-    });
+    const { email, ...rest } = patch;
+    if (!Object.keys(rest).length) return;
+    set({ members: replaceIn(state.members, state.me, rest) });
+    const next = state.members.find((m) => m.id === state.me);
+    later('me', () => q(supabase.from('members').update({ name: next.name, phone: next.phone || null, routine: next.routine, prefs: next.prefs, notes: next.notes }).eq('id', state.me)));
   },
   membership: async (action, extra = {}) => { const r = await api('membership-change', { action, ...extra }); await loadMemberSelf(); return r; },
   // ── team ──

@@ -39,7 +39,11 @@ function Eyebrow({children,style}){return <div style={{fontSize:10.5,letterSpaci
 function Pill({children,tone='neutral',style}){const t={neutral:[BPC.paper2,BPC.ink2],ok:[BPC.sageSoft,BPC.sage],warn:[BPC.goldSoft,BPC.gold],bad:[BPC.bordSoft,BPC.bord],esp:[BPC.esp,'#fff'],ink:[BPC.ink,'#fff']}[tone];return <span style={{display:'inline-flex',alignItems:'center',gap:5,background:t[0],color:t[1],fontSize:11,fontWeight:600,padding:'3px 9px',borderRadius:99,whiteSpace:'nowrap',...style}}>{children}</span>;}
 const statusTone=s=>({actief:'ok',gepland:'neutral',afgerond:'ok','betaling mislukt':'bad','no-show':'bad',gepauzeerd:'warn',opgezegd:'neutral',geannuleerd:'neutral',wachtend:'neutral',uitgenodigd:'warn',member:'ok',betaald:'ok'}[s]||'neutral');
 function Toggle({on,onChange}){return <div onClick={()=>onChange(!on)} style={{width:44,height:26,borderRadius:13,background:on?BPC.esp:BPC.line2,position:'relative',cursor:'pointer',transition:'background .2s',flexShrink:0}}><div style={{position:'absolute',top:3,left:on?21:3,width:20,height:20,borderRadius:10,background:'#fff',boxShadow:'0 1px 3px rgba(0,0,0,.2)',transition:'left .2s'}}></div></div>;}
-function Avatar({name,size=36,bg=BPC.espSoft,color=BPC.esp}){const i=name.split(' ').filter(w=>w[0]===w[0].toUpperCase()).map(w=>w[0]).slice(0,2).join('');return <div style={{width:size,height:size,borderRadius:size/2,background:bg,color,display:'flex',alignItems:'center',justifyContent:'center',fontFamily:BPC.serif,fontSize:size*0.42,fontWeight:600,flexShrink:0}}>{i}</div>;}
+// Initials without Dutch particles ("Anna de Vries" → AV), also for names typed in lower case
+const PARTICLES=['van','de','der','den','het','ten','ter','te','op','in',"'t",'la','le','du','von'];
+function initials(name){const w=String(name||'').trim().split(/\s+/).filter(Boolean);const main=w.filter(x=>!PARTICLES.includes(x.toLowerCase()));const use=(main.length?main:w);
+return (use.length>1?use[0][0]+use[use.length-1][0]:(use[0]||'').slice(0,1)).toUpperCase();}
+function Avatar({name,size=36,bg=BPC.espSoft,color=BPC.esp}){const i=initials(name);return <div style={{width:size,height:size,borderRadius:size/2,background:bg,color,display:'flex',alignItems:'center',justifyContent:'center',fontFamily:BPC.serif,fontSize:size*0.42,fontWeight:600,flexShrink:0}}>{i}</div>;}
 Object.assign(window,{BPC,WORDMARK,useBP,Ico,Serif,Eyebrow,Pill,statusTone,Toggle,Avatar});
 
 /* ---------- Real-data helpers ---------- */
