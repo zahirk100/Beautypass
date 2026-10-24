@@ -1,6 +1,6 @@
 // Onboarding step 4: create the Mollie customer and the first payment (iDEAL/card). The webhook
 // turns a paid first payment into a monthly subscription and activates the membership.
-import { handler, currentUser, db, one, mollie, money, webhookUrl, APP_URL, HttpError, readJson } from './_lib.js';
+import { handler, currentUser, db, one, mollie, money, webhookUrl, APP_URL, HttpError, readJson } from '../_lib.js';
 
 export default handler(async (req) => {
   const user = await currentUser(req);

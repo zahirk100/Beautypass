@@ -21,7 +21,7 @@ const pending = new Set();
 export async function flushDemo() {
   if (!pending.size) return;
   const ids = [...pending]; pending.clear();
-  const { applyPayment } = await import('./mollie-webhook.js');
+  const { applyPayment } = await import('./_routes/mollie-webhook.js');
   for (const id of ids) {
     const p = await store.get(id);
     if (!p || p.status !== 'pending') continue;

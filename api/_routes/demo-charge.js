@@ -1,6 +1,6 @@
 // Demo payments only: run a member's monthly direct debit now, successful or failed (Beheer → member).
-import { handler, currentUser, requirePerm, db, one, HttpError, readJson, demoPayments } from './_lib.js';
-import { chargeSubscription } from './_mollie-demo.js';
+import { handler, currentUser, requirePerm, db, one, HttpError, readJson, demoPayments } from '../_lib.js';
+import { chargeSubscription } from '../_mollie-demo.js';
 
 export default handler(async (req) => {
   if (!demoPayments()) throw new HttpError(404, 'Alleen in de testmodus');

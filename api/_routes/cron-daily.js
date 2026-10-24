@@ -1,7 +1,7 @@
 // Daily at 07:00 (vercel.json): reminders for tomorrow, memberships that end, pauses that end, downgrades.
 import { timingSafeEqual } from 'node:crypto';
-import { db, one, env, mollie, money, webhookUrl, todayAms, addMonths } from './_lib.js';
-import { mails, sendMail } from './_mail.js';
+import { db, one, env, mollie, money, webhookUrl, todayAms, addMonths } from '../_lib.js';
+import { mails, sendMail } from '../_mail.js';
 
 const same = (a, b) => { const x = Buffer.from(String(a)), y = Buffer.from(String(b)); return x.length === y.length && timingSafeEqual(x, y); };
 

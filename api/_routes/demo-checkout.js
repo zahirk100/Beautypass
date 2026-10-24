@@ -1,6 +1,6 @@
 // Demo payments only: the "Mollie checkout" where the tester chooses the outcome. Nothing is paid.
-import { demoPayments, readJson, eur } from './_lib.js';
-import { getDemo, settle } from './_mollie-demo.js';
+import { demoPayments, readJson, eur } from '../_lib.js';
+import { getDemo, settle } from '../_mollie-demo.js';
 import { applyPayment } from './mollie-webhook.js';
 
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);

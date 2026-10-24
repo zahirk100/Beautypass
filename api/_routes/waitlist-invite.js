@@ -1,6 +1,6 @@
 // Beheer → First access → Uitnodigen: next round, mail with a link to the onboarding
-import { handler, currentUser, requirePerm, db, one, HttpError, readJson } from './_lib.js';
-import { mails, sendMail } from './_mail.js';
+import { handler, currentUser, requirePerm, db, one, HttpError, readJson } from '../_lib.js';
+import { mails, sendMail } from '../_mail.js';
 
 export default handler(async (req) => {
   const user = await currentUser(req);

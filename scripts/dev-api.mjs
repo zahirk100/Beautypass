@@ -2,7 +2,6 @@
 // Only for local development; production uses Vercel's own functions.
 import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
-import { pathToFileURL } from 'node:url';
 
 function vercelRes(res) {
   res.status = (code) => { res.statusCode = code; return res; };
@@ -30,14 +29,17 @@ export default function devApi() {
         const url = new URL(req.url, 'http://local');
         // Vercel serves /onboarding as /onboarding/index.html; Vite needs the trailing slash
         if (/^\/(onboarding|member|beheer)$/.test(url.pathname)) { req.url = url.pathname + '/' + url.search; return next(); }
+        if (!url.pathname.startsWith('/api/')) return next();
         const m = url.pathname.match(/^\/api\/([a-z0-9-]+)\/?$/);
-        if (!m) return next();
-        const file = resolve(server.config.root, 'api', m[1] + '.js');
-        if (!existsSync(file)) return next();
+        const notFound = () => { res.statusCode = 404; res.setHeader('Content-Type', 'application/json'); res.end('{"ok":false,"error":"Niet gevonden"}'); };
+        if (!m) return notFound();
+        // Same single entry point as on Vercel
+        const file = resolve(server.config.root, 'api', '[route].js');
+        if (!existsSync(resolve(server.config.root, 'api', '_routes', m[1] + '.js'))) return notFound();
         try {
           req.query = Object.fromEntries(url.searchParams);
           req.body = await readBody(req);
-          const mod = await server.ssrLoadModule(pathToFileURL(file).pathname);
+          const mod = await server.ssrLoadModule(file);
           await mod.default(req, vercelRes(res));
         } catch (e) {
           console.error('[dev-api]', m[1], e);

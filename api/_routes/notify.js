@@ -1,7 +1,7 @@
 // The database reports new and cancelled appointments here (migration 002, pg_net); we send the mail.
 import { timingSafeEqual } from 'node:crypto';
-import { db, one, readJson, env, mollie } from './_lib.js';
-import { mails, sendMail } from './_mail.js';
+import { db, one, readJson, env, mollie } from '../_lib.js';
+import { mails, sendMail } from '../_mail.js';
 
 const same = (a, b) => { const x = Buffer.from(String(a)), y = Buffer.from(String(b)); return x.length === y.length && timingSafeEqual(x, y); };
 

@@ -80,11 +80,15 @@ export async function sendMail(to, mail) {
   const key = env('BREVO_API_KEY');
   if (!key) { console.warn('mail_skipped_no_key', mail.subject); return { skipped: true }; }
   const sender = { name: env('EMAIL_FROM_NAME', 'BeautyPass'), email: env('EMAIL_FROM', 'hallo@beautypass.nl') };
-  const res = await fetch(env('BREVO_API_URL', 'https://api.brevo.com/v3') + '/smtp/email', {
-    method: 'POST', headers: { 'api-key': key, 'content-type': 'application/json', accept: 'application/json' },
-    body: JSON.stringify({ sender, replyTo: sender, to: [{ email: to.email, name: to.name || undefined }], subject: mail.subject, htmlContent: mail.html }),
-    signal: AbortSignal.timeout(10000),
-  });
+  // A mail must never break the action that triggered it (payment, booking): failures are only logged
+  let res;
+  try {
+    res = await fetch(env('BREVO_API_URL', 'https://api.brevo.com/v3') + '/smtp/email', {
+      method: 'POST', headers: { 'api-key': key, 'content-type': 'application/json', accept: 'application/json' },
+      body: JSON.stringify({ sender, replyTo: sender, to: [{ email: to.email, name: to.name || undefined }], subject: mail.subject, htmlContent: mail.html }),
+      signal: AbortSignal.timeout(10000),
+    });
+  } catch (e) { console.warn('brevo_unreachable', mail.subject, e && e.message); return { ok: false }; }
   if (!res.ok) { console.warn('brevo_error', res.status, (await res.text()).slice(0, 200)); return { ok: false }; }
   return { ok: true };
 }

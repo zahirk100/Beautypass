@@ -1,5 +1,5 @@
 // A treatment outside the plan or over the monthly limit: one-off payment for the 30-minute hold
-import { handler, currentUser, db, one, mollie, money, webhookUrl, APP_URL, HttpError, readJson } from './_lib.js';
+import { handler, currentUser, db, one, mollie, money, webhookUrl, APP_URL, HttpError, readJson } from '../_lib.js';
 
 export default handler(async (req) => {
   const user = await currentUser(req);

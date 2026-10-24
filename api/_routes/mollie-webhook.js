@@ -1,7 +1,7 @@
 // Mollie calls this with only a payment id. We never trust the request: the payment is fetched from
 // Mollie and applied idempotently (a webhook can arrive more than once, or out of order).
-import { db, one, mollie, money, webhookUrl, readJson, markPaid, maskIban, todayAms, addMonths } from './_lib.js';
-import { mails, sendMail } from './_mail.js';
+import { db, one, mollie, money, webhookUrl, readJson, markPaid, maskIban, todayAms, addMonths } from '../_lib.js';
+import { mails, sendMail } from '../_mail.js';
 
 const methodName = { ideal: 'iDEAL', creditcard: 'Creditcard', directdebit: 'SEPA-incasso', bancontact: 'Bancontact' };
 

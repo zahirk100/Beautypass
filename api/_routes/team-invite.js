@@ -1,6 +1,6 @@
 // Beheer → Instellingen → Gebruikers → Uitnodigen (owner only). Supabase sends the invitation mail
 // (template "invite"); the link lands on /beheer where the new colleague chooses a password.
-import { handler, currentUser, db, one, HttpError, readJson, APP_URL } from './_lib.js';
+import { handler, currentUser, db, one, HttpError, readJson, APP_URL } from '../_lib.js';
 
 export default handler(async (req) => {
   const user = await currentUser(req);

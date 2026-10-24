@@ -1,6 +1,6 @@
 // Membership changes that touch Mollie. Called by the member for themselves, or by the team
 // (right "members") with member_id. Actions: pause, resume, cancel, plan, mandate, retry.
-import { handler, currentUser, requirePerm, db, one, mollie, money, webhookUrl, APP_URL, HttpError, readJson, todayAms, addMonths, fmtDate } from './_lib.js';
+import { handler, currentUser, requirePerm, db, one, mollie, money, webhookUrl, APP_URL, HttpError, readJson, todayAms, addMonths, fmtDate } from '../_lib.js';
 
 async function load(user, memberId) {
   let m;

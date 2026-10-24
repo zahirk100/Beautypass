@@ -1,5 +1,5 @@
 // Printable invoice (HTML) for a paid payment. Members get their own, the team with the "finance" right all.
-import { handler, currentUser, db, one, HttpError, readJson, eur, fmtDate } from './_lib.js';
+import { handler, currentUser, db, one, HttpError, readJson, eur, fmtDate } from '../_lib.js';
 
 const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 
