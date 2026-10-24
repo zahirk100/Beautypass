@@ -63,6 +63,12 @@ const mapPayment = (p) => ({
 });
 
 // ───────────────────────────── Loading ─────────────────────────────
+// Until migration 007 runs, the booking functions have no kids parameter: retry without it
+const rpcKids = async (fn, args) => {
+  const r = await supabase.rpc(fn, args);
+  if (r.error && /Could not find the function|p_kids/.test(r.error.message || '') && !args.p_kids) { const { p_kids, ...rest } = args; return supabase.rpc(fn, rest); }
+  return r;
+};
 async function q(promise) {
   const { data, error } = await promise;
   if (error) throw new Error(friendly(error));
@@ -135,7 +141,7 @@ async function loadTeamData() {
     users: can('settings') ? q(supabase.from('profiles').select('id,email,name,role').neq('role', 'member').order('created_at')) : Promise.resolve([]),
     roles: q(supabase.from('role_perms').select('*')),
     usage: can('members') ? q(supabase.rpc('month_usage')).catch(() => []) : Promise.resolve([]),
-    absence: q(supabase.from('staff_absence').select('*').gte('ends', addDays(todayAms(), -1)).order('starts')),
+    absence: q(supabase.from('staff_absence').select('*').gte('ends', addDays(todayAms(), -1)).order('starts')).catch(() => []),
   };
   const r = Object.fromEntries(await Promise.all(Object.entries(jobs).map(async ([k, p]) => [k, await p])));
   const notes = Object.fromEntries(r.notes.map((n) => [n.member_id, n.body]));
@@ -251,7 +257,7 @@ const act = {
   onboard: async ({ name, phone, routine, plan }) => { await q(supabase.rpc('member_onboard', { p_name: name, p_phone: phone, p_routine: routine, p_plan: plan })); },
   startMembership: async (plan, method) => api('membership-start', { plan, method }),   // → { checkoutUrl }
   book: async ({ tid, date, time, staff, note, reschedule, kids }) => {
-    const r = await q(supabase.rpc('book_appointment', { p_treatment: tid, p_date: date, p_time: time, p_staff: staff && staff !== 'any' ? staff : null, p_note: note || '', p_reschedule: reschedule || null, p_kids: kids || 0 }));
+    const r = await q(rpcKids('book_appointment', { p_treatment: tid, p_date: date, p_time: time, p_staff: staff && staff !== 'any' ? staff : null, p_note: note || '', p_reschedule: reschedule || null, p_kids: kids || 0 }));
     await loadMemberSelf();
     return r;
   },
@@ -275,7 +281,7 @@ const act = {
   removeAbsence: async (id) => { await q(supabase.from('staff_absence').delete().eq('id', id)); await loadTeamData(); },
   setApptStatus: async (id, status) => { await q(supabase.rpc('team_set_appointment_status', { p_appointment: id, p_status: status })); await loadTeamData(); },
   teamBook: async ({ member, tr, date, time, staff, room, kids }) => {
-    const r = await q(supabase.rpc('team_book_appointment', { p_member: member, p_treatment: tr, p_date: date, p_time: time, p_staff: staff || null, p_room: room || null, p_kids: kids || 0 }));
+    const r = await q(rpcKids('team_book_appointment', { p_member: member, p_treatment: tr, p_date: date, p_time: time, p_staff: staff || null, p_room: room || null, p_kids: kids || 0 }));
     await loadTeamData(); return r;
   },
   slotsFor: async (tid, date, skipGroup, member) => q(supabase.rpc('available_slots', { p_treatment: tid, p_date: date, p_skip_group: skipGroup || null, p_member: member || null })),
