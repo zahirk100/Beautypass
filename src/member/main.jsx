@@ -15,7 +15,8 @@ function TabBar({tab,setTab}){return <div style={{position:'absolute',left:0,rig
 function MemberApp({flash}){
 const view='app';const setView=()=>{};
 const [tab,setTabS]=React.useState(()=>localStorage.getItem('bp-member-tab')||'home');
-const [stack,setStack]=React.useState([]);const [toast,setToast]=React.useState(null);const [ok,setOk]=React.useState(0);
+// Opened from the "Hoe was je behandeling?" mail: straight to that appointment
+const [stack,setStack]=React.useState(()=>{const r=new URLSearchParams(location.search).get('review');if(!r)return [];try{localStorage.setItem('bp-member-tab','appts');localStorage.setItem('bp-web-page','appts');sessionStorage.setItem('bp-review',r);}catch(e){}history.replaceState(null,'',location.pathname);return window.innerWidth<760?[{k:'appt',id:r}]:[];});const [toast,setToast]=React.useState(null);const [ok,setOk]=React.useState(0);
 React.useEffect(()=>{localStorage.setItem('bp-member-tab',tab);},[tab]);
 const scrollRef=React.useRef(null);
 const api={push:x=>setStack(s=>[...s,x]),pop:()=>setStack(s=>s.slice(0,-1)),reset:()=>setStack([]),setTab:t=>{setStack([]);setTabS(t);if(scrollRef.current)scrollRef.current.scrollTop=0;},

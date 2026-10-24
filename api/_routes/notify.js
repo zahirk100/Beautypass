@@ -26,6 +26,21 @@ async function refund(a) {
   return done;
 }
 
+// A time came free: tell members waiting for that day, if their treatment now fits (each watch mails once)
+async function waitingList(a) {
+  const date = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Amsterdam' }).format(new Date(a.starts_at));
+  const watches = await one(db().from('slot_watches').select('*, members(name,email,status), treatments(name)').eq('date', date).is('notified_at', null));
+  for (const w of watches) {
+    if (!w.members || w.members.status !== 'actief') continue;
+    const slots = await one(db().rpc('available_slots', { p_treatment: w.treatment_id, p_date: date }));
+    if (!slots.length) continue;
+    const claimed = await one(db().from('slot_watches').update({ notified_at: new Date().toISOString() }).eq('id', w.id).is('notified_at', null).select());
+    if (!claimed.length) continue;
+    const dateText = new Date(date + 'T12:00:00').toLocaleDateString('nl-NL', { weekday: 'long', day: 'numeric', month: 'long' });
+    await sendMail({ email: w.members.email, name: w.members.name }, mails.slotFree(w.members, { treatment: w.treatments.name, dateText }));
+  }
+}
+
 export default async function notify(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
   if (!env('NOTIFY_SECRET') || !same(req.headers['x-notify-secret'] || '', env('NOTIFY_SECRET'))) return res.status(401).end();
@@ -41,6 +56,7 @@ export default async function notify(req, res) {
       info.refunded = await refund(a);
       await sendMail(to, mails.cancelled(a.members, info));
     }
+    if (event === 'cancelled' || event === 'freed') await waitingList(a);
     return res.status(200).json({ ok: true });
   } catch (e) {
     console.error('notify_error', e && e.message);

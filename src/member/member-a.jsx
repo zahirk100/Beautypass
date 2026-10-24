@@ -42,7 +42,8 @@ const rec=[...active].sort((a,b)=>a.price-b.price).find(p=>covers(p)===pick.leng
 const chosen=plan||rec;
 const finish=()=>{try{sessionStorage.removeItem('bp-onb');}catch(e){}onDone();};
 // Step 4: save the choices and go to Mollie for the first payment (iDEAL), which also sets up the monthly direct debit
-const startPay=async()=>{setPay(2);setErr('');try{await BP.act.onboard({name:f.name.trim(),phone:f.phone,routine:pick,plan:chosen.id});const r=await BP.act.startMembership(chosen.id,payM);window.location.href=r.checkoutUrl;}catch(e){setPay(0);setErr(e.message);}};
+const needTerms=!!(s.settings.termsUrl&&s.settings.privacyUrl);const [terms,setTerms]=React.useState(false);
+const startPay=async()=>{if(needTerms&&!terms){setErr('Ga eerst akkoord met de voorwaarden en het privacybeleid');return;}setPay(2);setErr('');try{await BP.act.onboard({name:f.name.trim(),phone:f.phone,routine:pick,plan:chosen.id});if(needTerms)await BP.act.acceptTerms();const r=await BP.act.startMembership(chosen.id,payM);window.location.href=r.checkoutUrl;}catch(e){setPay(0);setErr(e.message);}};
 const me=s.members.find(x=>x.id===s.me);
 if(step===0)return <div style={{position:'absolute',inset:0,background:BPC.ink,animation:'bpFade .4s'}}>
 <img src="/assets/cover-v3.webp" alt="" style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover'}}/>
@@ -75,6 +76,7 @@ if(step===4)return <><Screen onBack={()=>setStep(3)} title="Betalen" footer={<>{
 <div style={{borderTop:`1px solid ${BPC.line}`,paddingTop:12,display:'flex',justifyContent:'space-between',fontSize:15,fontWeight:700}}><span>Vandaag te betalen</span><span>{BP.eur(chosen.price)}</span></div></Card>
 <Eyebrow style={{margin:'24px 0 10px'}}>Betaalmethode</Eyebrow>
 <div style={{display:'grid',gap:8}}>{[['iDEAL','Eerste betaling, daarna automatische incasso'],['Creditcard','Visa, Mastercard, Amex']].map(([m,d])=>{const on=payM===m;return <Card key={m} onClick={()=>setPayM(m)} style={{display:'flex',alignItems:'center',gap:12,padding:14,cursor:'pointer',borderColor:on?BPC.ink:BPC.line}}><div style={{width:20,height:20,borderRadius:10,border:on?`6px solid ${BPC.ink}`:`1.5px solid ${BPC.line2}`,boxSizing:'border-box'}}></div><div style={{flex:1}}><div style={{fontSize:14,fontWeight:600}}>{m}</div><div style={{fontSize:12,color:BPC.ink3}}>{d}</div></div></Card>;})}</div>
+{needTerms&&<label style={{display:'flex',gap:10,alignItems:'flex-start',marginTop:20,fontSize:13,lineHeight:1.45,color:BPC.ink2,cursor:'pointer'}}><input type="checkbox" checked={terms} onChange={e=>{setTerms(e.target.checked);setErr('');}} style={{width:20,height:20,marginTop:1,accentColor:BPC.ink,flexShrink:0}}/><span>Ik ga akkoord met de <a href={s.settings.termsUrl} target="_blank" rel="noopener" style={{color:BPC.ink,fontWeight:600}}>algemene voorwaarden</a> en het <a href={s.settings.privacyUrl} target="_blank" rel="noopener" style={{color:BPC.ink,fontWeight:600}}>privacybeleid</a>, en met de maandelijkse automatische incasso.</span></label>}
 <div style={{display:'flex',alignItems:'center',gap:8,justifyContent:'center',marginTop:20,fontSize:12,color:BPC.ink3}}><Ico n="lock" s={14}/>{s.paymentsMode==='demo'?'Testmodus · er wordt niet echt betaald':'Veilig betalen via Mollie'}</div></Screen>
 </>;
 return <div style={{position:'absolute',inset:0,background:BPC.paper,display:'flex',flexDirection:'column',justifyContent:'center',padding:wide?'0 max(28px, calc(50% - 220px))':'0 28px',animation:'bpFade .4s',textAlign:'center'}}>
@@ -84,6 +86,20 @@ return <div style={{position:'absolute',inset:0,background:BPC.paper,display:'fl
 <Btn onClick={finish} icon="arrow">Plan je eerste behandeling</Btn></div>;}
 
 /* ---------- Home ---------- */
+// Nothing free on a day: ask for an e-mail as soon as a time comes free for this treatment
+function WatchDay({tid,date,web}){const s=useBP();const on=(s.watches||[]).some(w=>w.tid===tid&&w.date===date);const [busy,setBusy]=React.useState(false);
+const run=async fn=>{setBusy(true);try{await fn();}catch(e){BP.showError(e);}setBusy(false);};
+return <div style={{marginTop:web?12:0,marginBottom:web?0:22,padding:14,borderRadius:16,background:BPC.goldSoft,color:BPC.ink,fontSize:13.5,lineHeight:1.45}}>
+<b>Alles vol op {BP.fmtDate(date,{weekday:'long',day:'numeric',month:'long'})}.</b> {on?'Je krijgt een mail zodra er een tijd vrijkomt.':'Wil je een seintje als er een tijd vrijkomt?'}
+<div style={{marginTop:10}}>{on?<span onClick={()=>!busy&&run(()=>BP.act.unwatchSlot(tid,date))} style={{fontSize:13,fontWeight:600,textDecoration:'underline',cursor:'pointer'}}>Afmelden</span>
+:<span onClick={()=>!busy&&run(()=>BP.act.watchSlot(tid,date))} style={{display:'inline-block',padding:'8px 14px',borderRadius:99,background:BPC.ink,color:'#fff',fontSize:13,fontWeight:600,cursor:'pointer'}}>{busy?'Bezig…':'Laat het me weten'}</span>}</div></div>;}
+
+// Feedback after a completed treatment: 1–5 stars and an optional comment
+function ReviewForm({a,onDone}){const s=useBP();const prev=(s.reviews||[]).find(r=>r.appointmentId===a.id);const [stars,setStars]=React.useState(prev?prev.rating:0);const [txt,setTxt]=React.useState(prev?prev.comment:'');const [busy,setBusy]=React.useState(false);
+return <div><div style={{display:'flex',gap:6,justifyContent:'center',margin:'4px 0 14px'}}>{[1,2,3,4,5].map(n=><span key={n} role="button" aria-label={n+' sterren'} onClick={()=>setStars(n)} style={{fontSize:34,cursor:'pointer',color:n<=stars?BPC.gold:BPC.line2,lineHeight:1}}>★</span>)}</div>
+<textarea value={txt} onChange={e=>setTxt(e.target.value)} placeholder="Wil je nog iets kwijt? (optioneel)" style={{width:'100%',boxSizing:'border-box',height:80,borderRadius:14,border:`1px solid ${BPC.line2}`,padding:12,fontFamily:BPC.sans,fontSize:14,resize:'none',background:BPC.card,outline:'none'}}></textarea>
+<div style={{height:12}}></div><Btn disabled={!stars||busy} onClick={async()=>{setBusy(true);try{await BP.act.review(a.id,stars,txt);onDone&&onDone();}catch(e){BP.showError(e);}setBusy(false);}}>{busy?'Bezig…':prev?'Beoordeling bijwerken':'Versturen'}</Btn></div>;}
+
 // Kids corner with a booking: how many places are left at the chosen time (capacity set in Beheer)
 const amsMin=ts=>{const [h,m]=new Intl.DateTimeFormat('en-GB',{timeZone:'Europe/Amsterdam',hour:'2-digit',minute:'2-digit',hour12:false}).format(new Date(ts)).split(':').map(Number);return h*60+m;};
 function useKidsFree(date,time,tid,own=0){const s=useBP();const [busy,setBusy]=React.useState(null);
@@ -117,9 +133,10 @@ return <div style={{padding:'66px 20px 110px'}}>
 <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:22}}><img src={WORDMARK} alt="BeautyPass" style={{height:15}}/><div onClick={()=>m.setTab('profile')} style={{cursor:'pointer'}}><Avatar name={me.name} size={36}/></div></div>
 <Eyebrow>{h<12?'Goedemorgen':h<18?'Goedemiddag':'Goedenavond'}</Eyebrow><Serif size={40} style={{margin:'6px 0 22px'}} it="time for you.">{me.name.split(' ')[0]},</Serif>
 <MemberCard s={s} me={me} plan={plan} onClick={()=>m.setTab('membership')}/>
+{(()=>{const r=BP.toReview();return r?<div onClick={()=>m.push({k:'appt',id:r.id})} style={{display:'flex',alignItems:'center',gap:12,marginTop:18,padding:14,borderRadius:18,background:BPC.goldSoft,cursor:'pointer'}}><span style={{fontSize:22,color:BPC.gold}}>★</span><div style={{flex:1}}><div style={{fontSize:14,fontWeight:600}}>Hoe was je {BP.tr(r.treatmentId).name}?</div><div style={{fontSize:12.5,color:BPC.ink2}}>Geef je beoordeling in een paar seconden</div></div><Ico n="chev" s={16} c={BPC.ink3}/></div>:null;})()}
 <div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline',margin:'28px 0 12px'}}><Serif size={24}>Je volgende moment</Serif>{next&&<span onClick={()=>m.setTab('appts')} style={{fontSize:13,color:BPC.ink2,cursor:'pointer'}}>Alles</span>}</div>
 {next?<ApptCard a={next} onClick={()=>m.push({k:'appt',id:next.id})}/>:<Card style={{textAlign:'center',padding:24}}><div style={{fontSize:14,color:BPC.ink2,marginBottom:14}}>Je hebt nog niets gepland.</div><Btn onClick={()=>m.setTab('book')}>Plan een behandeling</Btn></Card>}
 {routine.length>0&&<><div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline',margin:'28px 0 12px'}}><Serif size={24}>Snel boeken</Serif><span onClick={()=>m.push({k:'routine'})} style={{fontSize:13,color:BPC.ink2,cursor:'pointer'}}>Routine aanpassen</span></div>
 <div className="bp-scroll" style={{display:'flex',gap:10,overflowX:'auto',margin:'0 -20px',padding:'0 20px'}}>{routine.map(t=>{const c=BP.cat(t.cat);return <div key={t.id} onClick={()=>m.push({k:'book',tid:t.id})} style={{width:136,flexShrink:0,cursor:'pointer'}}><div style={{position:'relative'}}><img src={c.img} alt="" style={{width:136,height:160,objectFit:'cover',borderRadius:18,display:'block'}}/>{!plan.included.includes(t.id)&&<div style={{position:'absolute',top:8,left:8}}><Pill tone="warn">Niet inbegrepen</Pill></div>}</div><div style={{fontSize:13,fontWeight:600,marginTop:8}}>{t.name}</div><div style={{fontSize:12,color:BPC.ink3}}>{t.dur} min</div></div>;})}</div></>}
 <Card style={{marginTop:28,display:'flex',gap:14,alignItems:'center'}}><Thumb src="/assets/tour-arrival-v26.webp" size={56}/><div style={{flex:1}}><div style={{fontSize:14,fontWeight:600}}>The BeautyPass house</div><div style={{fontSize:12.5,color:BPC.ink2,marginTop:2}}>{hrs[1]?`Vandaag open ${hrs[1]} – ${hrs[2]}`:'Vandaag gesloten'} · Amsterdam</div></div></Card></div>;}
-Object.assign(window,{KidsPicker,useKidsFree,SheetFixed,ScreenWide,MCtx,useM,Btn,Screen,Sheet,Card,Row,Field,IncludedTag,Thumb,lowestPlanFor,Onboarding,Home,MemberCard,ApptCard});
+Object.assign(window,{WatchDay,ReviewForm,KidsPicker,useKidsFree,SheetFixed,ScreenWide,MCtx,useM,Btn,Screen,Sheet,Card,Row,Field,IncludedTag,Thumb,lowestPlanFor,Onboarding,Home,MemberCard,ApptCard});

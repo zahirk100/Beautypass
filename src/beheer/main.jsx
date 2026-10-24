@@ -42,7 +42,7 @@ return <div key={k} className={'m-tab'+(on?' on':'')} onClick={()=>{setMenu(fals
 <div className="foot"><div style={{display:'flex',alignItems:'center',gap:10,padding:'10px 8px',borderTop:`1px solid ${BPC.line}`}}><Avatar name={(s.profile&&s.profile.name)||who||'B'} size={32}/><div style={{flex:1,minWidth:0}}><div style={{fontSize:13,fontWeight:600,overflow:'hidden',textOverflow:'ellipsis'}}>{who}</div><div style={{fontSize:11.5,color:BPC.ink3}}>{roleName}</div></div></div>
 <div onClick={logout} style={{fontSize:11.5,color:BPC.ink3,cursor:'pointer',padding:'0 8px'}}>Uitloggen</div></div></nav>
 <main className="main" key={page} onClick={()=>menu&&setMenu(false)} style={{animation:'aIn .25s'}}>{P}</main></div>
-<Drawer open={!!drawer} onClose={api.close}>{drawer&&(drawer.k==='appt'?<ApptDrawer id={drawer.id}/>:drawer.k==='member'?<MemberDrawer id={drawer.id}/>:drawer.k==='tr'?<TrDrawer id={drawer.id}/>:drawer.k==='staff'?<StaffDrawer id={drawer.id}/>:drawer.k==='new'?<NewAppt {...drawer}/>:null)}</Drawer>
+<Drawer open={!!drawer} onClose={api.close}>{drawer&&(drawer.k==='appt'?<ApptDrawer id={drawer.id}/>:drawer.k==='member'?<MemberDrawer id={drawer.id}/>:drawer.k==='tr'?<TrDrawer id={drawer.id}/>:drawer.k==='staff'?<StaffDrawer id={drawer.id}/>:drawer.k==='move'?<MoveAppt id={drawer.id}/>:drawer.k==='new'?<NewAppt {...drawer}/>:null)}</Drawer>
 {toast&&<div key={toast.k} style={{position:'fixed',bottom:28,left:'50%',zIndex:200,background:BPC.ink,color:'#fff',fontSize:13.5,fontWeight:600,padding:'12px 20px',borderRadius:99,animation:'bpToast 2.8s forwards',boxShadow:'0 10px 30px rgba(0,0,0,.2)'}}>{toast.m}</div>}
 </ACtx.Provider>;}
 function Gate(){const [st,setSt]=React.useState({k:'loading'});

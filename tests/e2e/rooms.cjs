@@ -28,7 +28,7 @@ async function login(p, path, email, pw) {
   L.check(L.sql(`select phone from members where email='${email}'`) === '0611122233', 'telefoon gewijzigd op mobiel');
   const mb = await L.page(b, { viewport: { width: 390, height: 844 } }); await login(mb, '/beheer/', 'owner@beautypass-test.nl', 'Team-12345');
   await mb.getByText('Meer', { exact: true }).click(); await mb.getByText('Instellingen', { exact: true }).locator('visible=true').first().click(); await mb.waitForTimeout(600);
-  L.check(await mb.getByText('Openingstijden').count() === 1, 'mobiel: Meer → Instellingen werkt');
+  L.check(await mb.getByText('Openingstijden', { exact: true }).count() === 1, 'mobiel: Meer → Instellingen werkt');
   for (const x of [a, desk, m, mb]) if (x.errs.length) console.log('  errs', x.errs.slice(0, 2));
   await b.close();
 })().catch((e) => { console.error(e); process.exit(1); });

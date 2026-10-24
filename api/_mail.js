@@ -64,6 +64,19 @@ export const mails = {
         + button(APP_URL() + '/member/', 'Betaalmethode bijwerken')
         + `<p style="margin:16px 0 0;font-size:13px;color:#958c80;">We proberen het ook zelf nog een keer. Vragen? Antwoord op deze mail.</p>` }),
   }),
+  slotFree: (m, w) => ({
+    subject: `Er is plek: ${w.treatment} op ${w.dateText}`,
+    html: layout({ preheader: `Er is een tijd vrijgekomen op ${w.dateText}.`, eyebrow: 'Plek vrij', title: 'Goed', it: 'nieuws.',
+      body: p(`${first(m.name)}, op ${b(esc(w.dateText))} is er weer plek voor ${b(esc(w.treatment))}. Wie het eerst boekt, heeft hem.`)
+        + button(APP_URL() + '/member/', 'Nu boeken')
+        + `<p style="margin:16px 0 0;font-size:13px;color:#958c80;">Je kreeg deze mail omdat je vroeg om een seintje voor deze dag.</p>` }),
+  }),
+  reviewAsk: (m, a) => ({
+    subject: `Hoe was je ${a.treatment}?`,
+    html: layout({ preheader: 'Laat in een paar seconden weten hoe het was.', eyebrow: 'Jouw mening', title: 'Hoe was', it: 'het?',
+      body: p(`${first(m.name)}, bedankt voor je bezoek. Hoe vond je je ${b(esc(a.treatment))} bij ${esc(a.staff)}? Met je beoordeling maken we BeautyPass elke keer beter.`)
+        + button(APP_URL() + '/member/?review=' + encodeURIComponent(a.id), 'Geef je beoordeling') }),
+  }),
   invite: (email) => ({
     subject: 'Je First access tot BeautyPass staat klaar',
     html: layout({ preheader: 'Je uitnodiging voor BeautyPass Amsterdam.', eyebrow: 'Amsterdam · First access', title: "You're", it: 'invited.',

@@ -9,7 +9,7 @@ export default async function cron(req, res) {
   const auth = (req.headers.authorization || '').replace(/^Bearer\s+/i, '');
   if (!env('CRON_SECRET') || !same(auth, env('CRON_SECRET'))) return res.status(401).end();
   const today = todayAms(), tomorrow = todayAms(1);
-  const done = { reminders: 0, ended: 0, resumed: 0, downgraded: 0 };
+  const done = { reminders: 0, reviews: 0, ended: 0, resumed: 0, downgraded: 0 };
   try {
     await db().rpc('release_expired_holds');
     // Reminders for tomorrow's appointments (members who want them)
@@ -24,6 +24,20 @@ export default async function cron(req, res) {
       await one(db().from('appointments').update({ reminder_sent_at: new Date().toISOString() }).eq('id', a.id));
       done.reminders++;
     }
+    // "Hoe was je behandeling?" for yesterday's completed treatments (once, members who want mails)
+    try {
+      const yday = todayAms(-1);
+      const finished = await one(db().from('appointments').select('*, treatments(name), staff(name), members(name,email,prefs)')
+        .eq('status', 'afgerond').eq('is_primary', true).is('review_asked_at', null).gte('starts_at', yday + 'T00:00:00Z').lt('starts_at', today + 'T23:59:59Z'));
+      for (const a of finished) {
+        if (new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Amsterdam' }).format(new Date(a.starts_at)) !== yday) continue;
+        const has = await one(db().from('reviews').select('appointment_id').eq('appointment_id', a.id));
+        await one(db().from('appointments').update({ review_asked_at: new Date().toISOString() }).eq('id', a.id));
+        if (has.length || (a.members.prefs && a.members.prefs.reminders === false)) continue;
+        await sendMail({ email: a.members.email, name: a.members.name }, mails.reviewAsk(a.members, { ...a, treatment: a.treatments.name, staff: a.staff.name }));
+        done.reviews++;
+      }
+    } catch (e) { console.error('cron_reviews_failed', e && e.message); }
     // Cancelled memberships whose paid period is over
     const ending = await one(db().from('members').select('id').lte('cancel_at', today).neq('status', 'opgezegd'));
     for (const m of ending) { await one(db().from('members').update({ status: 'opgezegd' }).eq('id', m.id)); done.ended++; }

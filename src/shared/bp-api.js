@@ -30,7 +30,7 @@ const empty = () => ({
   v: 1, loaded: false, categories: [], treatments: [], plans: [], team: [], rooms: [], members: [], appointments: [],
   waitlist: [], invoices: [], payments: [], allowances: [],
   settings: { hours: [], cancelHours: 24, noShowCounts: true, rollover: false, mollieMode: 'test', mollieProfile: '', rooms: [], roles: [], users: [], kidsEnabled: false, kidsCapacity: 0, closedDates: [] },
-  absence: [],
+  absence: [], reviews: [], watches: [],
   me: null, role: null, perms: [], session: null,
 });
 
@@ -52,10 +52,11 @@ const mapAppt = (a, rooms) => {
 };
 const mapMember = (m, teamNotes = {}) => ({
   id: m.id, userId: m.user_id, name: m.name, email: m.email || '', phone: m.phone || '', plan: m.plan_id, nextPlan: m.next_plan_id,
-  status: m.status, since: m.since, pausedUntil: m.paused_until, cancelAt: m.cancel_at, nextPayment: m.next_payment_date, checkinCode: m.checkin_code || '',
+  status: m.status, since: m.since, pausedUntil: m.paused_until, cancelAt: m.cancel_at, nextPayment: m.next_payment_date, checkinCode: m.checkin_code || '', termsAcceptedAt: m.terms_accepted_at || null,
   mollie: m.mollie_subscription_id || m.mollie_customer_id || '—', mandate: m.mandate_method || '—', mandateLabel: m.mandate_label || '',
   routine: m.routine || [], prefs: m.prefs || {}, notes: m.notes || '', teamNote: teamNotes[m.id] || '',
 });
+const mapReview = (r) => ({ appointmentId: r.appointment_id, memberId: r.member_id, staffId: r.staff_id, rating: r.rating, comment: r.comment || '', date: r.created_at.slice(0, 10) });
 const amsDate = (ts) => new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Amsterdam' }).format(new Date(ts));
 const mapPayment = (p) => ({
   id: p.invoice_no || p.id, paymentId: p.id, date: amsDate(p.paid_at || p.created_at), amount: Number(p.amount),
@@ -104,7 +105,8 @@ async function loadCatalog() {
     settings: { ...state.settings, hours: settings.hours, cancelHours: settings.cancel_hours, noShowCounts: settings.no_show_counts,
       rollover: settings.rollover, mollieMode: settings.mollie_mode, mollieProfile: settings.mollie_profile || '', rooms: rooms.filter((r) => r.active).map((r) => r.name),
       slotTimes: settings.slot_times, bookingDays: settings.booking_days, pauseMonths: settings.pause_months_per_year,
-      kidsEnabled: settings.kids_enabled !== false && settings.kids_capacity > 0, kidsOn: settings.kids_enabled !== false, kidsCapacity: settings.kids_capacity ?? 0, closedDates: settings.closed_dates || [] },
+      kidsEnabled: settings.kids_enabled !== false && settings.kids_capacity > 0, kidsOn: settings.kids_enabled !== false, kidsCapacity: settings.kids_capacity ?? 0, closedDates: settings.closed_dates || [],
+      termsUrl: settings.terms_url || '', privacyUrl: settings.privacy_url || '' },
   });
 }
 
@@ -113,15 +115,17 @@ async function loadMemberSelf() {
   const rows = await q(supabase.from('members').select('*').eq('user_id', uid));
   const me = rows[0];
   if (!me) { set({ me: null, members: [] }); return null; }
-  const [appts, pays, allow, usage] = await Promise.all([
+  const [appts, pays, allow, usage, revs, watches] = await Promise.all([
     q(supabase.from('appointments').select('*').eq('member_id', me.id).order('starts_at')),
     q(supabase.from('payments').select('*').eq('member_id', me.id).order('created_at', { ascending: false })),
     q(supabase.from('allowance_adjustments').select('*').eq('member_id', me.id)),
     q(supabase.rpc('month_usage')).catch(() => []),
+    q(supabase.from('reviews').select('*').eq('member_id', me.id)).catch(() => []),
+    q(supabase.from('slot_watches').select('*').eq('member_id', me.id).is('notified_at', null)).catch(() => []),
   ]);
   const lim = (usage.find((u) => u.member_id === me.id) || {}).month_limit;
   set({
-    me: me.id, members: [{ ...mapMember(me), monthLimit: lim }], allowances: allow,
+    me: me.id, members: [{ ...mapMember(me), monthLimit: lim }], allowances: allow, reviews: revs.map(mapReview), watches: watches.map((w) => ({ id: w.id, tid: w.treatment_id, date: w.date })),
     appointments: appts.filter((a) => a.is_primary).map((a) => mapAppt(a, state.rooms)),
     payments: pays.map((p) => mapPayment(p)), invoices: pays.filter((p) => p.status === 'betaald').map((p) => mapPayment(p)),
   });
@@ -141,6 +145,7 @@ async function loadTeamData() {
     users: can('settings') ? q(supabase.from('profiles').select('id,email,name,role').neq('role', 'member').order('created_at')) : Promise.resolve([]),
     roles: q(supabase.from('role_perms').select('*')),
     usage: can('members') ? q(supabase.rpc('month_usage')).catch(() => []) : Promise.resolve([]),
+    reviews: can('members') || can('team') ? q(supabase.from('reviews').select('*').order('created_at', { ascending: false }).limit(500)).catch(() => []) : Promise.resolve([]),
     absence: q(supabase.from('staff_absence').select('*').gte('ends', addDays(todayAms(), -1)).order('starts')).catch(() => []),
   };
   const r = Object.fromEntries(await Promise.all(Object.entries(jobs).map(async ([k, p]) => [k, await p])));
@@ -154,6 +159,7 @@ async function loadTeamData() {
     appointments: r.appts.map((a) => mapAppt(a, state.rooms)), members, allowances: r.allow,
     waitlist: r.waitlist.map((w) => ({ id: w.id, email: w.email, date: w.created_at.slice(0, 10), source: w.source, interest: w.interest || [], status: w.status, round: w.round })),
     payments: r.payments.map((p) => ({ ...mapPayment(p), memberId: p.member_id })),
+    reviews: r.reviews.map(mapReview),
     absence: r.absence.map((x) => ({ id: x.id, staffId: x.staff_id, starts: x.starts, ends: x.ends, reason: x.reason })),
     settings: { ...state.settings,
       roles: order.map((id) => r.roles.find((x) => x.role === id)).filter(Boolean).map((x) => ({ id: x.role, name: x.name, perms: x.role === 'owner' ? PERMS_ALL : x.perms })),
@@ -279,6 +285,15 @@ const act = {
   // Absence (Team) and closing days (Instellingen)
   addAbsence: async (staffId, starts, ends, reason) => { await q(supabase.from('staff_absence').insert({ staff_id: staffId, starts, ends, reason: reason || '' })); await loadTeamData(); },
   removeAbsence: async (id) => { await q(supabase.from('staff_absence').delete().eq('id', id)); await loadTeamData(); },
+  acceptTerms: async () => { await q(supabase.rpc('member_accept_terms')); await loadMemberSelf(); },
+  review: async (id, rating, comment) => { await q(supabase.rpc('member_review', { p_appointment: id, p_rating: rating, p_comment: comment || '' })); await loadMemberSelf(); },
+  watchSlot: async (tid, date) => { await q(supabase.rpc('watch_slot', { p_treatment: tid, p_date: date })); await loadMemberSelf(); },
+  unwatchSlot: async (tid, date) => { await q(supabase.rpc('unwatch_slot', { p_treatment: tid, p_date: date })); await loadMemberSelf(); },
+  teamUpdateMember: async (id, name, phone) => { await q(supabase.rpc('team_update_member', { p_member: id, p_name: name, p_phone: phone })); await loadTeamData(); },
+  teamReschedule: async ({ id, date, time, staff, room }) => {
+    const r = await q(supabase.rpc('team_reschedule_appointment', { p_appointment: id, p_date: date, p_time: time, p_staff: staff || null, p_room: room || null }));
+    await loadTeamData(); return r;
+  },
   setApptStatus: async (id, status) => { await q(supabase.rpc('team_set_appointment_status', { p_appointment: id, p_status: status })); await loadTeamData(); },
   teamBook: async ({ member, tr, date, time, staff, room, kids }) => {
     const r = await q(rpcKids('team_book_appointment', { p_member: member, p_treatment: tr, p_date: date, p_time: time, p_staff: staff || null, p_room: room || null, p_kids: kids || 0 }));
@@ -342,12 +357,18 @@ const act = {
   removeStaff: async (id) => { await q(supabase.from('staff').update({ active: false, user_id: null }).eq('id', id)); await loadCatalog(); },
   addStaff: async () => { await q(supabase.from('staff').insert({ name: 'Nieuwe specialist', role_title: 'Specialist' })); await loadCatalog(); },
   inviteWaitlist: async (ids) => { const r = await api('waitlist-invite', { ids }); await loadTeamData(); return r; },
+  // Only the changed settings are saved (also keeps working while a newer migration has not been run yet)
   updateSettings: (patch) => {
     set({ settings: { ...state.settings, ...patch } });
-    const s = state.settings;
-    later('settings', () => q(supabase.from('settings').update({ hours: s.hours, cancel_hours: s.cancelHours, no_show_counts: s.noShowCounts, rollover: s.rollover, mollie_mode: s.mollieMode,
-      kids_enabled: s.kidsOn, kids_capacity: s.kidsCapacity, closed_dates: s.closedDates }).eq('id', 1)).then(() => loadCatalog()), 300);
+    Object.keys(patch).forEach((k) => settingsDirty.add(k));
+    later('settings', () => {
+      const s = state.settings, cols = {};
+      for (const k of settingsDirty) if (SETTINGS_COLUMNS[k]) cols[SETTINGS_COLUMNS[k]] = s[k] === '' ? null : s[k];
+      settingsDirty.clear();
+      return Object.keys(cols).length ? q(supabase.from('settings').update(cols).eq('id', 1)).then(() => loadCatalog()) : Promise.resolve();
+    }, 300);
   },
+
   setRolePerms: async (role, perms) => { set({ settings: { ...state.settings, roles: state.settings.roles.map((r) => (r.id === role ? { ...r, perms } : r)) } }); await q(supabase.from('role_perms').update({ perms }).eq('role', role)); },
   setUserRole: async (userId, role) => { await q(supabase.rpc('owner_set_role', { p_user: userId, p_role: role })); await loadTeamData(); },
   inviteStaff: async (email, role) => { const r = await api('team-invite', { email, role }); await loadTeamData(); return r; },
@@ -385,8 +406,18 @@ const extraThisMonth = (mid) => {
 };
 const fallbackPlan = { id: '', name: '—', price: 0, perMonth: 0, included: [], active: false, desc: '' };
 
+const SETTINGS_COLUMNS = { hours: 'hours', cancelHours: 'cancel_hours', noShowCounts: 'no_show_counts', rollover: 'rollover', mollieMode: 'mollie_mode',
+  kidsOn: 'kids_enabled', kidsCapacity: 'kids_capacity', closedDates: 'closed_dates', slotTimes: 'slot_times', termsUrl: 'terms_url', privacyUrl: 'privacy_url' };
+const settingsDirty = new Set();
+
 const BP = {
   get: () => state, subscribe: (f) => { subs.add(f); return () => subs.delete(f); },
+  // The most recent completed treatment (last 14 days) the member has not rated yet
+  toReview: () => {
+    const done = new Set((state.reviews || []).map((r) => r.appointmentId)), from = addDays(todayAms(), -14);
+    return state.appointments.filter((a) => a.memberId === state.me && a.status === 'afgerond' && a.date >= from && !done.has(a.id))
+      .sort((a, b) => (b.date + b.time).localeCompare(a.date + a.time))[0] || null;
+  },
   // Why today is missing from the booking days (null when today can be booked or the salon is closed today anyway)
   todayClosedNote: () => {
     const st = state.settings, t = todayAms(), h = st.hours[(new Date(t + 'T12:00:00').getDay() + 6) % 7];
