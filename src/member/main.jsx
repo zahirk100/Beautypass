@@ -23,29 +23,24 @@ React.useEffect(()=>{if(!toast)return;const t=setTimeout(()=>setToast(null),2600
 const top=stack[stack.length-1];
 const renderTop=x=>x.k==='appt'?<ApptDetail id={x.id}/>:x.k==='book'?<Book tid={x.tid} reschedule={x.reschedule}/>:x.k==='routine'?<RoutineEdit/>:x.k==='plans'?<Plans/>:x.k==='payments'?<Payments/>:null;
 const root={home:<Home/>,appts:<Appointments/>,membership:<Membership/>,profile:<Profile/>}[tab];
-const [scale,setScale]=React.useState(1);const [mobile,setMobile]=React.useState(()=>window.innerWidth<520);
-const [mode,setMode]=React.useState(()=>localStorage.getItem('bp-member-mode')||'web');
-React.useEffect(()=>{localStorage.setItem('bp-member-mode',mode);document.body.classList.toggle('web',mode==='web'&&!mobile);},[mode,mobile]);
+// Phone: the app layout full screen; tablet and computer: the website layout
+const MOBILE=760;const [mobile,setMobile]=React.useState(()=>window.innerWidth<MOBILE);
+React.useEffect(()=>{document.body.classList.toggle('web',!mobile);},[mobile]);
 // Errors from background saves go to whichever toast is on screen (the website view has its own)
-const webView=mode==='web'&&!mobile;
+const webView=!mobile;
 React.useEffect(()=>{if(!webView)BP.onError(msg=>api.toast(msg));},[webView]);React.useEffect(()=>{if(flash&&!webView)api.toast(flash);},[]);
-React.useEffect(()=>{const f=()=>{setMobile(window.innerWidth<520);setScale(Math.min(1,(window.innerHeight-40)/874,(window.innerWidth-40)/402));};f();window.addEventListener('resize',f);return()=>window.removeEventListener('resize',f);},[]);
-const inner=<div style={{position:'relative',height:mobile?'100dvh':874,overflow:'hidden',background:BPC.paper,fontFamily:BPC.sans,color:BPC.ink}}>
+React.useEffect(()=>{const f=()=>setMobile(window.innerWidth<MOBILE);f();window.addEventListener('resize',f);return()=>window.removeEventListener('resize',f);},[]);
+const inner=<div style={{position:'relative',height:'100dvh',overflow:'hidden',background:BPC.paper,fontFamily:BPC.sans,color:BPC.ink}}>
 {<>
 <div ref={scrollRef} className="bp-scroll" style={{position:'absolute',inset:0,overflowY:'auto'}}>{tab==='book'?null:root}</div>
 {tab==='book'&&!top&&<Book root key="rootbook"/>}
 {top&&<div key={stack.length} style={{position:'absolute',inset:0,zIndex:20}}>{renderTop(top)}</div>}
 {!top&&tab!=='book'&&<TabBar tab={tab} setTab={api.setTab}/>}
 </>}
-{toast&&<div key={toast.k} style={{position:'absolute',top:60,left:'50%',zIndex:70,background:BPC.ink,color:'#fff',fontSize:13,fontWeight:600,padding:'11px 18px',borderRadius:99,whiteSpace:'nowrap',animation:'bpToast 2.6s forwards',boxShadow:'0 8px 24px rgba(0,0,0,.2)'}}>{toast.msg}</div>}
+{toast&&<div key={toast.k} style={{position:'absolute',top:60,left:'50%',zIndex:90,background:BPC.ink,color:'#fff',fontSize:13,fontWeight:600,padding:'11px 18px',borderRadius:99,whiteSpace:'nowrap',animation:'bpToast 2.6s forwards',boxShadow:'0 8px 24px rgba(0,0,0,.2)'}}>{toast.msg}</div>}
 </div>;
-if(mobile)return <MCtx.Provider value={api}>{inner}</MCtx.Provider>;
-if(mode==='web')return <MCtx.Provider value={api}><MemberWeb view={view} setView={setView} okKey={ok} onboard={null} flash={flash} logout={api.logout} onApp={()=>setMode('app')}/></MCtx.Provider>;
-return <MCtx.Provider value={api}><div className="stage">
-<div className="side"><img src={WORDMARK} alt="BeautyPass" style={{height:16,alignSelf:'flex-start'}}/><h1>Member <em>app</em></h1><p>Zo ziet BeautyPass eruit op je telefoon.</p>
-<div className="sw"><button className="on" onClick={()=>setStack([])}>App</button><button onClick={()=>setMode('web')}>Website-weergave →</button></div></div>
-<div style={{width:402*scale,height:874*scale,flexShrink:0}}><div style={{transform:`scale(${scale})`,transformOrigin:'top left'}}>
-<IOSDevice width={402} height={874}>{inner}</IOSDevice></div></div></div></MCtx.Provider>;}
+if(mobile)return <MCtx.Provider value={api}><SheetFixed.Provider value={true}>{inner}</SheetFixed.Provider></MCtx.Provider>;
+return <MCtx.Provider value={api}><MemberWeb view={view} setView={setView} okKey={ok} onboard={null} flash={flash} logout={api.logout}/></MCtx.Provider>;}
 // Who is this? Not logged in → login; no active membership yet → onboarding; otherwise the app
 function Gate(){const [st,setSt]=React.useState({k:'loading'});
 const [flash]=React.useState(()=>{if(!new URLSearchParams(location.search).get('betaald'))return null;

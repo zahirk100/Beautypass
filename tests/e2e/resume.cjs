@@ -7,7 +7,7 @@ const L = require('./lib.cjs');
     const p = await L.page(b, opts);
     await p.goto(L.APP + '/onboarding', { waitUntil: 'networkidle' });
     await p.screenshot({ path: `tests/e2e/shots/res_${tag}_1.png` });
-    if (tag === 'm') await p.getByText('Word member', { exact: true }).first().click();
+    if (tag === 'm') await p.getByText('Word member', { exact: true }).locator('visible=true').first().click();
     L.check(await p.getByLabel('Volledige naam').count() === 1, tag + ': formulier zichtbaar');
     await p.getByLabel('Volledige naam').fill('Resume Test'); await p.getByLabel('E-mailadres').fill(email); await p.getByLabel('Wachtwoord').fill('Geheim-1234');
     const t0 = Date.now() - 2000;

@@ -21,8 +21,8 @@ return <AuthShell eyebrow="Bijna klaar" title={st==='wait'?'Betaling':'Nog even'
 <button onClick={onRetry} style={{height:52,borderRadius:26,border:'none',background:BPC.ink,color:'#fff',fontFamily:BPC.sans,fontSize:15,fontWeight:600,cursor:'pointer'}}>Opnieuw betalen</button></>}
 </AuthShell>;}
 
-function OnboardingPage(){const [st,setSt]=React.useState({k:'loading'});const [mobile,setMobile]=React.useState(()=>window.innerWidth<520);
-React.useEffect(()=>{const f=()=>setMobile(window.innerWidth<520);window.addEventListener('resize',f);return()=>window.removeEventListener('resize',f);},[]);
+function OnboardingPage(){const [st,setSt]=React.useState({k:'loading'});const [mobile,setMobile]=React.useState(()=>window.innerWidth<760);
+React.useEffect(()=>{const f=()=>setMobile(window.innerWidth<760);window.addEventListener('resize',f);return()=>window.removeEventListener('resize',f);},[]);
 const paid=new URLSearchParams(location.search).get('betaald');
 // Signed in but not paid yet (back button, failed payment, or coming from /member): continue where it stopped
 const resume=()=>{const b=BP.get();if(!b.session)return undefined;const me=b.members.find(x=>x.id===b.me);return me&&me.plan&&me.routine.length?4:2;};

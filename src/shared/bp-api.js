@@ -307,6 +307,22 @@ const act = {
       if (del.length) await q(supabase.from('staff_skills').delete().eq('staff_id', id).in('category_id', del));
     }, 300);
   },
+  // Rooms (Instellingen → Ruimtes). Never deleted: appointments keep pointing at them; switching off hides them
+  updateRoom: (id, patch) => {
+    const rooms = state.rooms.map((r) => (r.id === id ? { ...r, ...patch } : r));
+    set({ rooms, settings: { ...state.settings, rooms: rooms.filter((r) => r.active).map((r) => r.name) } });
+    const r = rooms.find((x) => x.id === id);
+    later('room' + id, async () => {
+      if (!r.name.trim()) throw new Error('Geef de ruimte een naam');
+      try { await q(supabase.from('rooms').update({ name: r.name.trim(), type: r.type, active: r.active }).eq('id', id)); }
+      finally { await loadCatalog(); }
+    }, 500);
+  },
+  addRoom: async () => {
+    const n = state.rooms.length + 1;
+    await q(supabase.from('rooms').insert({ id: 'ruimte-' + Date.now().toString(36), name: 'Nieuwe ruimte ' + n, type: 'solo', sort: n }));
+    await loadCatalog();
+  },
   removeStaff: async (id) => { await q(supabase.from('staff').update({ active: false, user_id: null }).eq('id', id)); await loadCatalog(); },
   addStaff: async () => { await q(supabase.from('staff').insert({ name: 'Nieuwe specialist', role_title: 'Specialist' })); await loadCatalog(); },
   inviteWaitlist: async (ids) => { const r = await api('waitlist-invite', { ids }); await loadTeamData(); return r; },

@@ -12,13 +12,13 @@ async function login(p, path, email, pw) {
   // Beheer open on the agenda (owner, desktop)
   const adm = await L.page(b, L.D);
   await login(adm, '/beheer/', 'owner@beautypass-test.nl', 'Team-12345');
-  await adm.getByText('Agenda', { exact: true }).first().click();
+  await adm.getByText('Agenda', { exact: true }).locator('visible=true').first().click();
   await adm.waitForTimeout(800);
 
   const p = await L.page(b, L.M);
   await login(p, '/member/', email, 'Geheim-1234');
   await p.getByText('Plannen', { exact: true }).last().click();
-  await p.getByText('Gellak manicure', { exact: true }).first().click();
+  await p.getByText('Gellak manicure', { exact: true }).locator('visible=true').first().click();
   // pick the first free time on the first day offered
   await p.waitForTimeout(1200);
   const free = p.locator('div[style*="cursor: pointer"]', { hasText: /^\d\d:\d\d$/ });

@@ -3,7 +3,7 @@ const L = require('./lib.cjs');
 async function onboard(b, { email, name, opts, outcome = 'paid', shot }) {
   const p = await L.page(b, opts);
   await p.goto(L.APP + '/onboarding', { waitUntil: 'networkidle' });
-  if (await p.getByText('Word member', { exact: true }).count()) await p.getByText('Word member', { exact: true }).first().click();
+  if (await p.getByText('Word member', { exact: true }).count()) await p.getByText('Word member', { exact: true }).locator('visible=true').first().click();
   await p.getByLabel('Volledige naam').fill(name);
   await p.getByLabel('E-mailadres').fill(email);
   await p.getByLabel('Telefoon').fill('0612345678');
