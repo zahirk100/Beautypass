@@ -22,7 +22,7 @@
   <link rel="stylesheet" href="styles-07.css">
   <link rel="stylesheet" href="styles-08.css">
   <link rel="preload" as="image" href="assets/cover-v3.webp" fetchpriority="high">
-<link rel="stylesheet" href="styles-09.css"><link rel="stylesheet" href="styles-10.css"><link rel="stylesheet" href="styles-11.css"><link rel="stylesheet" href="styles-12.css"><link rel="stylesheet" href="styles-13.css"><link rel="stylesheet" href="styles-14.css"><link rel="stylesheet" href="styles-15.css"><link rel="stylesheet" href="opening-copy.css?v=maison-statement-20261025"><link rel="stylesheet" href="hero-closeup.css?v=20261023-8"><link rel="stylesheet" href="beauty-edit.css?v=20261025-1"><link rel="stylesheet" href="typography.css?v=roles-20261025"></head>
+<link rel="stylesheet" href="styles-09.css"><link rel="stylesheet" href="styles-10.css"><link rel="stylesheet" href="styles-11.css"><link rel="stylesheet" href="styles-12.css"><link rel="stylesheet" href="styles-13.css"><link rel="stylesheet" href="styles-14.css"><link rel="stylesheet" href="styles-15.css"><link rel="stylesheet" href="opening-copy.css?v=maison-statement-20261025"><link rel="stylesheet" href="hero-closeup.css?v=20261023-8"><link rel="stylesheet" href="beauty-edit.css?v=lookbook-20261025-2"><link rel="stylesheet" href="typography.css?v=roles-20261025"></head>
 <body>
   <a class="skip-link" href="#main">Naar de inhoud</a>
   <header class="site-header is-fixed">
@@ -67,14 +67,16 @@
     <section class="beauty-edit" id="beauty" aria-labelledby="beauty-title" lang="en">
       <div class="edit-heading">
         <h2 class="edit-signature bp-type-label" id="beauty-title">The Beauty Edit</h2>
+        <p class="edit-swipe-hint bp-type-ui" hidden>Swipe to explore</p>
         <nav class="edit-index-nav bp-type-ui" aria-label="Explore the treatment categories">
-          <a href="#edit-nails">Manicure &amp; pedicure</a>
-          <a href="#edit-brows">Brows &amp; lashes</a>
-          <a href="#edit-hair">Blowouts</a>
-          <a href="#edit-skin">Skincare &amp; facials</a>
-          <a href="#edit-smooth">Laser &amp; wax</a>
+          <a href="#edit-nails" aria-label="Manicure &amp; pedicure"><span class="edit-index-full">Manicure &amp; pedicure</span><span class="edit-index-short" aria-hidden="true">Nails</span></a>
+          <a href="#edit-brows" aria-label="Brows &amp; lashes"><span class="edit-index-full">Brows &amp; lashes</span><span class="edit-index-short" aria-hidden="true">Brows &amp; lashes</span></a>
+          <a href="#edit-hair" aria-label="Blowouts"><span class="edit-index-full">Blowouts</span><span class="edit-index-short" aria-hidden="true">Hair</span></a>
+          <a href="#edit-skin" aria-label="Skincare &amp; facials"><span class="edit-index-full">Skincare &amp; facials</span><span class="edit-index-short" aria-hidden="true">Skin</span></a>
+          <a href="#edit-smooth" aria-label="Laser &amp; wax"><span class="edit-index-full">Laser &amp; wax</span><span class="edit-index-short" aria-hidden="true">Laser &amp; wax</span></a>
         </nav>
       </div>
+      <div class="edit-gallery" id="edit-gallery">
       <div class="edit-spread edit-spread-opening">
         <article class="edit-scene edit-scene-nails" id="edit-nails" aria-labelledby="edit-nails-title">
           <picture class="edit-visual">
@@ -82,17 +84,15 @@
             <img src="assets/nails-mobile-v21.webp" srcset="assets/nails-mobile-v21-640.webp 640w, assets/nails-mobile-v21.webp 1024w" sizes="(max-width: 900px) 100vw, (orientation: portrait) 100vw, 50vw" alt="Nude almond-shaped nails with tortoiseshell tips and espresso accents, presented against a warm brown coat." width="1024" height="1536" loading="lazy" decoding="async">
           </picture>
           <div class="edit-copy">
-            <p class="edit-category bp-type-label">Manicure &amp; pedicure</p>
+            <button class="edit-category bp-type-label" type="button" disabled data-edit-open="edit-details-nails" aria-haspopup="dialog" aria-controls="edit-details-nails" aria-label="Explore manicure &amp; pedicure treatments">Manicure &amp; pedicure</button>
             <h3 class="bp-type-display" id="edit-nails-title">Perfectly<br><em>polished.</em></h3>
-            <button class="edit-explore bp-type-ui" type="button" hidden data-edit-open="edit-details-nails" aria-haspopup="dialog" aria-controls="edit-details-nails" aria-label="Explore manicure &amp; pedicure treatments">Explore treatments</button>
           </div>
         </article>
         <article class="edit-scene edit-scene-brows" id="edit-brows" aria-labelledby="edit-brows-title">
           <img class="edit-visual" src="assets/brows-v23.webp" srcset="assets/brows-v23-640.webp 640w, assets/brows-v23.webp 1024w" sizes="(max-width: 900px) 100vw, (orientation: portrait) 100vw, 50vw" alt="A softly defined brow and lifted lashes, framed by dark hair and warm light." width="1024" height="1536" loading="lazy" decoding="async">
           <div class="edit-copy">
-            <p class="edit-category bp-type-label">Brows &amp; lashes</p>
+            <button class="edit-category bp-type-label" type="button" disabled data-edit-open="edit-details-brows" aria-haspopup="dialog" aria-controls="edit-details-brows" aria-label="Explore brows &amp; lashes treatments">Brows &amp; lashes</button>
             <h3 class="bp-type-display" id="edit-brows-title">Eyes <em>on you.</em></h3>
-            <button class="edit-explore bp-type-ui" type="button" hidden data-edit-open="edit-details-brows" aria-haspopup="dialog" aria-controls="edit-details-brows" aria-label="Explore brows &amp; lashes treatments">Explore treatments</button>
           </div>
         </article>
       </div>
@@ -103,9 +103,8 @@
           <img src="assets/blowouts-v18.webp" srcset="assets/blowouts-v18-960.webp 960w, assets/blowouts-v18.webp 1536w" sizes="100vw" alt="A woman with blonde hair in rollers, a chocolate-brown salon cape and a glass of coffee." width="1536" height="1024" loading="lazy" decoding="async">
         </picture>
         <div class="edit-copy">
-          <p class="edit-category bp-type-label">Blowouts</p>
+          <button class="edit-category bp-type-label" type="button" disabled data-edit-open="edit-details-hair" aria-haspopup="dialog" aria-controls="edit-details-hair" aria-label="Explore blowouts treatments">Blowouts</button>
             <h3 class="bp-type-display" id="edit-hair-title">Good hair days.</h3>
-            <button class="edit-explore bp-type-ui" type="button" hidden data-edit-open="edit-details-hair" aria-haspopup="dialog" aria-controls="edit-details-hair" aria-label="Explore blowouts treatments">Explore treatments</button>
         </div>
       </article>
 
@@ -113,19 +112,24 @@
         <article class="edit-scene edit-scene-skin" id="edit-skin" aria-labelledby="edit-skin-title">
           <img class="edit-visual" src="assets/skincare-v21.webp" srcset="assets/skincare-v21-640.webp 640w, assets/skincare-v21.webp 1024w" sizes="(max-width: 900px) 100vw, (orientation: portrait) 100vw, 50vw" alt="A woman receiving a gentle facial massage, with hands around her jaw and an ivory headband." width="1024" height="1536" loading="lazy" decoding="async">
           <div class="edit-copy">
-            <p class="edit-category bp-type-label">Skincare &amp; facials</p>
+            <button class="edit-category bp-type-label" type="button" disabled data-edit-open="edit-details-skin" aria-haspopup="dialog" aria-controls="edit-details-skin" aria-label="Explore skincare &amp; facials treatments">Skincare &amp; facials</button>
             <h3 class="bp-type-display" id="edit-skin-title">Your skin,<br><em>in good hands.</em></h3>
-            <button class="edit-explore bp-type-ui" type="button" hidden data-edit-open="edit-details-skin" aria-haspopup="dialog" aria-controls="edit-details-skin" aria-label="Explore skincare &amp; facials treatments">Explore treatments</button>
           </div>
         </article>
         <article class="edit-scene edit-scene-smooth" id="edit-smooth" aria-labelledby="edit-smooth-title">
-          <img class="edit-visual" src="assets/smooth-v23.webp" srcset="assets/smooth-v23-640.webp 640w, assets/smooth-v23.webp 1024w" sizes="(max-width: 900px) 100vw, (orientation: portrait) 100vw, 50vw" alt="A woman wearing protective eyewear during a laser hair-removal treatment, resting on ivory linen." width="1024" height="1536" loading="lazy" decoding="async">
+          <img class="edit-visual" src="assets/smooth-legs-v1.webp" srcset="assets/smooth-legs-v1-640.webp 640w, assets/smooth-legs-v1.webp 1024w" sizes="(max-width: 900px) 100vw, (orientation: portrait) 100vw, 50vw" alt="Smooth legs and relaxed, crossed ankles on ivory hotel linen, lit by warm daylight." width="1024" height="1536" loading="lazy" decoding="async">
           <div class="edit-copy">
-            <p class="edit-category bp-type-label">Laser &amp; wax</p>
+            <button class="edit-category bp-type-label" type="button" disabled data-edit-open="edit-details-smooth" aria-haspopup="dialog" aria-controls="edit-details-smooth" aria-label="Explore laser &amp; wax treatments">Laser &amp; wax</button>
             <h3 class="bp-type-display" id="edit-smooth-title">Beautifully<br><em>smooth.</em></h3>
-            <button class="edit-explore bp-type-ui" type="button" hidden data-edit-open="edit-details-smooth" aria-haspopup="dialog" aria-controls="edit-details-smooth" aria-label="Explore laser &amp; wax treatments">Explore treatments</button>
           </div>
         </article>
+      </div>
+
+      </div>
+      <div class="edit-lookbook-controls bp-type-ui" hidden>
+        <div class="edit-pagination" aria-hidden="true"><span class="edit-count">01 / 05</span><span class="edit-progress"><span></span></span></div>
+        <button class="edit-explore" type="button" data-edit-open="edit-details-nails" aria-haspopup="dialog" aria-controls="edit-details-nails" aria-label="Explore manicure &amp; pedicure treatments">Explore treatments</button>
+        <span class="edit-status" role="status" aria-live="polite" aria-atomic="true"></span>
       </div>
 
       <dialog class="edit-dialog" id="edit-details-nails" aria-labelledby="edit-details-nails-title" aria-describedby="edit-details-nails-intro">
@@ -361,5 +365,5 @@
   
 
 
-<script src="beautypass-sections.js"></script><script src="beauty-edit.js?v=20261025-1"></script></body></html>
+<script src="beautypass-sections.js"></script><script src="beauty-edit.js?v=lookbook-20261025-2"></script></body></html>
 

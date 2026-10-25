@@ -40,16 +40,33 @@
   text-decoration-thickness: 1px;
 }
 .edit-index-nav a:hover {text-decoration: underline;}
+.edit-index-short,
+.edit-swipe-hint,
+.edit-lookbook-controls {display: none;}
 .beauty-edit .edit-scene {scroll-margin-top: -16px;}
 .beauty-edit .edit-copy {
   padding: 150px var(--edit-inset) var(--edit-bottom);
 }
 .beauty-edit .edit-category {
-  margin: 0 0 15px;
+  display: block;
+  width: fit-content;
+  min-height: 44px;
+  margin: 0 0 5px;
+  padding: 10px 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: inherit;
   font-size: .8125rem;
   line-height: 1.5;
   letter-spacing: .1em;
+  text-align: left;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 5px;
+  cursor: pointer;
 }
+.beauty-edit .edit-category:disabled {text-decoration: none; cursor: default;}
 .beauty-edit .edit-copy h3 {
   font-size: var(--edit-display);
   line-height: 1.06;
@@ -106,11 +123,12 @@
 }
 .beauty-edit .edit-scene-hair .edit-copy::before {display: none;}
 .beauty-edit .edit-scene-skin,
-.beauty-edit .edit-scene-smooth {color: #30271f;}
+.beauty-edit .edit-scene-smooth {color: var(--paper);}
 .beauty-edit .edit-scene-skin .edit-copy::before,
 .beauty-edit .edit-scene-smooth .edit-copy::before {
-  background: linear-gradient(180deg, transparent, rgb(248 244 237 / 92%) 90px, rgb(248 244 237 / 85%));
+  background: linear-gradient(180deg, transparent, rgb(35 26 20 / 66%) 90px, rgb(35 26 20 / 73%));
 }
+.beauty-edit .edit-scene-smooth {--edit-position: 62% 50%;}
 
 /* Treatment details are a secondary reading layer, opened on request. */
 html.bp-edit-dialog-open {overflow: hidden;}
@@ -193,15 +211,15 @@ html.bp-edit-dialog-open {overflow: hidden;}
     --edit-inset: 26px;
     --edit-bottom: 28px;
   }
-  .edit-heading {padding: 22px 24px 20px; gap: 10px;}
+  .edit-heading {padding: 26px 24px 12px; gap: 8px 12px; align-items: start;}
   .edit-heading .edit-signature {font-size: .6875rem;}
-  .edit-index-nav {gap: 0 20px;}
+  .edit-index-nav {justify-content: flex-start; gap: 0 18px;}
   .edit-index-nav a {font-size: .71875rem;}
   .beauty-edit .edit-scene {
     min-height: max(480px, calc(86svh - var(--edit-header-height)));
   }
   .beauty-edit .edit-scene-nails {min-height: max(480px, var(--edit-height));}
-  .beauty-edit .edit-category {font-size: .75rem; margin-bottom: 12px;}
+  .beauty-edit .edit-category {font-size: .75rem; margin-bottom: 2px;}
   .beauty-edit .edit-scene-hair {
     --edit-display: clamp(3rem, 13.2vw, 3.375rem);
     --edit-position: 83% 25%;
@@ -215,6 +233,69 @@ html.bp-edit-dialog-open {overflow: hidden;}
     display: block;
     background: linear-gradient(180deg, transparent, rgb(25 17 13 / 60%) 90px, rgb(25 17 13 / 65%));
   }
+
+  /* A nearly full-width image keeps the campaign scale. The next-page edge
+     and moving rule reveal the native, non-looping horizontal lookbook. */
+  .beauty-edit[data-edit-lookbook] {--edit-lookbook-height: max(520px, calc(100svh - 112px));}
+  [data-edit-lookbook] .edit-heading {display: grid; grid-template-columns: 1fr auto;}
+  [data-edit-lookbook] .edit-swipe-hint {
+    display: block;
+    margin: 0;
+    color: var(--service-ink);
+    font-size: .625rem;
+    line-height: 1.65;
+  }
+  [data-edit-lookbook] .edit-index-nav {
+    grid-column: 1 / -1;
+    justify-content: space-between;
+    column-gap: 12px;
+  }
+  [data-edit-lookbook] .edit-index-full {display: none;}
+  [data-edit-lookbook] .edit-index-short {display: inline;}
+  [data-edit-lookbook] .edit-index-nav a {min-width: 32px; color: var(--service-ink);}
+  [data-edit-lookbook] .edit-index-nav a[aria-current="true"] {
+    color: var(--ink);
+    text-decoration: underline;
+  }
+  [data-edit-lookbook] .edit-gallery {
+    position: relative;
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    background: var(--paper);
+  }
+  [data-edit-lookbook] .edit-gallery::-webkit-scrollbar {display: none;}
+  [data-edit-lookbook] .edit-gallery:focus-visible {outline: 1px solid var(--ink); outline-offset: -2px;}
+  [data-edit-lookbook] .edit-spread {display: contents;}
+  [data-edit-lookbook] .edit-gallery::after {content: ""; flex: 0 0 16px;}
+  .beauty-edit[data-edit-lookbook] .edit-scene {
+    flex: 0 0 calc(100% - 24px);
+    width: calc(100% - 24px);
+    min-height: var(--edit-lookbook-height);
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+  }
+  [data-edit-lookbook] .edit-category {text-decoration: none;}
+  [data-edit-lookbook] .edit-lookbook-controls:not([hidden]) {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0 24px;
+    min-height: 76px;
+    padding: 12px 24px;
+    background: var(--paper);
+    color: var(--ink);
+  }
+  .edit-pagination {display: flex; flex: 1 1 120px; align-items: center; gap: 14px; max-width: 48%;}
+  .edit-count {font-size: .625rem; letter-spacing: .07em; white-space: nowrap; font-variant-numeric: tabular-nums;}
+  .edit-progress {display: block; position: relative; flex: 1; height: 1px; background: #d4cfc8;}
+  .edit-progress > span {display: block; width: 20%; height: 1px; background: var(--ink); transform: translateX(calc(var(--edit-active, 0) * 100%)); transition: transform 240ms ease;}
+  .edit-lookbook-controls .edit-explore {margin: 0; font-size: .71875rem;}
+  .edit-status {position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap;}
 }
 @media (max-width: 760px) {
   .beauty-edit .edit-scene {scroll-margin-top: -14px;}
@@ -235,4 +316,5 @@ html.bp-edit-dialog-open {overflow: hidden;}
 }
 @media (prefers-reduced-motion: reduce) {
   html:has(.beauty-edit) {scroll-behavior: auto;}
+  .edit-progress > span {transition: none;}
 }

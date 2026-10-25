@@ -54,11 +54,17 @@ categorielabel, beschrijvende uitleg en een kort merkbijschrift.
   op mobiel; korte koppen mogen op één regel staan. Het brede haarbeeld krijgt
   dezelfde kopschaal als de andere categorieën. De behandeldetails horen bij
   de rustige DM Sans-laag, met duidelijke focus en een sluitknop.
-- In The Beauty Edit volgt de tekstkleur de foto: licht op de donkere
-  fashionbeelden, donker op het lichte linnen van skincare en ontharing.
-  Gebruik plaatselijke contrastlagen; leg geen uniforme zwarte waas over
-  alle beelden. Mobiel blijft het eerste beeld schermvullend; de vervolgbeelden
-  volgen 86svh minus de header, met voldoende minimale hoogte voor de tekst.
+- In The Beauty Edit blijven alle campagnekoppen en categorielabels wit.
+  Gebruik alleen een plaatselijk uitlopende schaduw achter de caption; verander
+  de lichte foto's niet in een donkere sectie. De desktopindeling blijft 2–1–2.
+- Mobiel gebruikt een native horizontaal lookbook met grote beelden, een zichtbare
+  rand van het volgende beeld en een dunne voortgangslijn. Alle vijf categorieën
+  blijven direct bereikbaar. Geen pijlen, autoplay of verplichte swipebeweging.
+  De beeldhoogte is 100svh minus 112 px, minimaal 520 px; de inhoud kan groeien
+  bij tekstvergroting. De beelden blijven ruim, het totale verticale traject korter.
+- De desktopcategorie zelf opent behandeldetails; de extra herhaalde tekstregel
+  vervalt. Mobiel staat één gedeelde ‘Explore treatments’ onder het actieve beeld.
+  Zonder JavaScript blijft het bestaande verticale beeldverhaal beschikbaar.
 - Breek bij betekenisvolle zinsdelen. Gebruik geen `white-space: nowrap`
   om de afgesproken regelverdeling bij tekstvergroting af te dwingen.
 - Voeg geen nieuwe fontfamilie toe om één onderdeel een ander gevoel te geven.
