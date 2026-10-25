@@ -1,0 +1,238 @@
+/* Beauty Edit: one collection, five ways into a personal routine.
+   Typography uses the shared roles in typography.css. */
+.beauty-edit {
+  --edit-height: calc(100svh - var(--edit-header-height));
+  --edit-display: clamp(3.5rem, 4.7vw, 4.5rem);
+  --edit-bottom: clamp(32px, 4vh, 52px);
+}
+.edit-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px 40px;
+  padding: 20px var(--gutter);
+  background: var(--paper);
+  color: var(--ink);
+  border-top: 1px solid var(--line);
+}
+.edit-heading .edit-signature {
+  position: static;
+  margin: 0;
+  flex: 0 0 auto;
+  font-size: .75rem;
+  line-height: 1.5;
+  letter-spacing: .14em;
+}
+.edit-index-nav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0 24px;
+}
+.edit-index-nav a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  font-size: .75rem;
+  line-height: 1.5;
+  text-decoration: none;
+  text-underline-offset: 5px;
+  text-decoration-thickness: 1px;
+}
+.edit-index-nav a:hover {text-decoration: underline;}
+.beauty-edit .edit-scene {scroll-margin-top: -16px;}
+.beauty-edit .edit-copy {
+  padding: 150px var(--edit-inset) var(--edit-bottom);
+}
+.beauty-edit .edit-category {
+  margin: 0 0 15px;
+  font-size: .8125rem;
+  line-height: 1.5;
+  letter-spacing: .1em;
+}
+.beauty-edit .edit-copy h3 {
+  font-size: var(--edit-display);
+  line-height: 1.06;
+  letter-spacing: -.018em;
+  text-wrap: pretty;
+  overflow-wrap: anywhere;
+}
+.edit-explore {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  margin-top: 13px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  color: inherit;
+  background: none;
+  font-size: .75rem;
+  font-weight: 400;
+  line-height: 1.5;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 5px;
+  cursor: pointer;
+}
+.edit-explore[hidden] {display: none;}
+.beauty-edit a:focus-visible,
+.beauty-edit button:focus-visible {
+  outline: 1px solid currentColor;
+  outline-offset: 5px;
+}
+
+/* Protect captions locally, keeping faces, skin and linen in their own light. */
+.beauty-edit .edit-scene-nails {--edit-position: 42% 15%;}
+.beauty-edit .edit-scene::after {background: none;}
+.beauty-edit .edit-copy::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: 85px 0 0;
+  pointer-events: none;
+  background: linear-gradient(180deg, transparent, rgb(26 17 12 / 55%) 90px, rgb(26 17 12 / 65%));
+}
+.beauty-edit .edit-scene-brows .edit-copy::before {
+  background: linear-gradient(180deg, transparent, rgb(24 17 13 / 58%) 90px, rgb(24 17 13 / 68%));
+}
+.beauty-edit .edit-scene-hair {
+  --edit-display: clamp(3.5rem, 4.7vw, 4.5rem);
+  min-height: max(540px, calc(86svh - var(--edit-header-height)));
+}
+.beauty-edit .edit-scene-hair .edit-copy {
+  width: 49%;
+  padding-block: 48px;
+}
+.beauty-edit .edit-scene-hair .edit-copy::before {display: none;}
+.beauty-edit .edit-scene-skin,
+.beauty-edit .edit-scene-smooth {color: #30271f;}
+.beauty-edit .edit-scene-skin .edit-copy::before,
+.beauty-edit .edit-scene-smooth .edit-copy::before {
+  background: linear-gradient(180deg, transparent, rgb(248 244 237 / 92%) 90px, rgb(248 244 237 / 85%));
+}
+
+/* Treatment details are a secondary reading layer, opened on request. */
+html.bp-edit-dialog-open {overflow: hidden;}
+.edit-dialog {
+  position: fixed;
+  width: min(520px, calc(100% - 40px));
+  max-width: none;
+  max-height: calc(100svh - 48px);
+  margin: auto;
+  padding: 48px;
+  border: 0;
+  border-radius: 0;
+  color: var(--ink);
+  background: var(--paper);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.edit-dialog::backdrop {background: rgb(24 18 14 / 42%);}
+.edit-dialog-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  color: inherit;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+}
+.edit-dialog-close svg {width: 18px; height: 18px;}
+.edit-dialog .edit-dialog-kicker {
+  margin: 0 0 27px;
+  font-size: .6875rem;
+  line-height: 1.5;
+  letter-spacing: .13em;
+  text-transform: uppercase;
+}
+.edit-dialog h3 {
+  margin: 0 0 18px;
+  font-size: 1.75rem;
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: -.025em;
+}
+.edit-dialog .edit-dialog-intro {
+  margin: 0;
+  font-size: .9375rem;
+  line-height: 1.75;
+  color: var(--copy-ink);
+}
+.edit-treatment-list {list-style: none; margin: 28px 0; padding: 0;}
+.edit-treatment-list li {
+  padding: 12px 0;
+  border-top: 1px solid var(--line);
+  font-size: .875rem;
+  line-height: 1.6;
+}
+.edit-treatment-list li:last-child {border-bottom: 1px solid var(--line);}
+.edit-dialog .edit-preview-note {
+  margin: 26px 0 0;
+  font-size: .75rem;
+  line-height: 1.75;
+  color: var(--service-ink);
+}
+.edit-preview-note a {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+@media (max-width: 1100px) {
+  .edit-heading {flex-direction: column; gap: 10px;}
+  .edit-index-nav {justify-content: center;}
+}
+@media (max-width: 900px), (orientation: portrait) {
+  .beauty-edit {
+    --edit-display: clamp(3rem, 13.2vw, 3.375rem);
+    --edit-inset: 26px;
+    --edit-bottom: 28px;
+  }
+  .edit-heading {padding: 22px 24px 20px; gap: 10px;}
+  .edit-heading .edit-signature {font-size: .6875rem;}
+  .edit-index-nav {gap: 0 20px;}
+  .edit-index-nav a {font-size: .71875rem;}
+  .beauty-edit .edit-scene {
+    min-height: max(480px, calc(86svh - var(--edit-header-height)));
+  }
+  .beauty-edit .edit-scene-nails {min-height: max(480px, var(--edit-height));}
+  .beauty-edit .edit-category {font-size: .75rem; margin-bottom: 12px;}
+  .beauty-edit .edit-scene-hair {
+    --edit-display: clamp(3rem, 13.2vw, 3.375rem);
+    --edit-position: 83% 25%;
+    align-items: flex-end;
+  }
+  .beauty-edit .edit-scene-hair .edit-copy {
+    width: 100%;
+    padding: 150px var(--edit-inset) var(--edit-bottom);
+  }
+  .beauty-edit .edit-scene-hair .edit-copy::before {
+    display: block;
+    background: linear-gradient(180deg, transparent, rgb(25 17 13 / 60%) 90px, rgb(25 17 13 / 65%));
+  }
+}
+@media (max-width: 760px) {
+  .beauty-edit .edit-scene {scroll-margin-top: -14px;}
+  .edit-dialog {
+    inset: auto 0 0;
+    width: 100%;
+    max-height: calc(100svh - 48px);
+    margin: 0;
+    padding: 38px 28px max(32px, env(safe-area-inset-bottom));
+  }
+  .edit-dialog .edit-dialog-kicker {margin-bottom: 24px;}
+  .edit-dialog h3 {padding-right: 20px; font-size: 1.625rem;}
+}
+@media (max-width: 360px) {
+  .beauty-edit {--edit-inset: 22px;}
+  .edit-heading {padding-inline: 20px;}
+  .edit-index-nav {gap: 0 16px;}
+}
+@media (prefers-reduced-motion: reduce) {
+  html:has(.beauty-edit) {scroll-behavior: auto;}
+}

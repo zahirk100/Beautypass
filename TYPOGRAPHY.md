@@ -48,6 +48,17 @@ categorielabel, beschrijvende uitleg en een kort merkbijschrift.
 - De foto- en uitnodigingstitels zijn bewuste editorialere merkuitingen.
   Hun schaal volgt de beeldcompositie; koppen voor informatie imiteren die
   schaal niet.
+- The Beauty Edit gebruikt een zelfstandig DM Sans-label met een compact
+  categorieoverzicht. Categorielabels staan boven de campagnekop: 13 px op
+  desktop, 12 px op mobiel. Campagnekoppen zijn 56–72 px op desktop en 48–54 px
+  op mobiel; korte koppen mogen op één regel staan. Het brede haarbeeld krijgt
+  dezelfde kopschaal als de andere categorieën. De behandeldetails horen bij
+  de rustige DM Sans-laag, met duidelijke focus en een sluitknop.
+- In The Beauty Edit volgt de tekstkleur de foto: licht op de donkere
+  fashionbeelden, donker op het lichte linnen van skincare en ontharing.
+  Gebruik plaatselijke contrastlagen; leg geen uniforme zwarte waas over
+  alle beelden. Mobiel blijft het eerste beeld schermvullend; de vervolgbeelden
+  volgen 86svh minus de header, met voldoende minimale hoogte voor de tekst.
 - Breek bij betekenisvolle zinsdelen. Gebruik geen `white-space: nowrap`
   om de afgesproken regelverdeling bij tekstvergroting af te dwingen.
 - Voeg geen nieuwe fontfamilie toe om één onderdeel een ander gevoel te geven.
