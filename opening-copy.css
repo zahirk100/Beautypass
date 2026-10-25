@@ -30,16 +30,26 @@
 }
 .hero-access:hover {text-underline-offset: 8px;}
 .hero-access:focus-visible {outline: 2px solid currentColor; outline-offset: 4px;}
-/* Each line carries one thought. Nonbreaking spaces protect the short
-   phrases if text enlargement or a very narrow viewport requires reflow. */
+/* Maison introduces the place quietly; the existing display faces carry
+   the title. Keep full thoughts together without locking text against zoom. */
+.brand-manifesto .manifesto-kicker {
+  margin: 0 auto 22px;
+  font-family: var(--sans);
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 1.6;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  text-wrap: balance;
+  color: var(--service-ink);
+}
+.brand-manifesto .manifesto-kicker > span {padding-inline: .15em;}
+.brand-manifesto .manifesto-title-line {display: block; text-wrap: balance;}
 .brand-manifesto .manifesto-copy {
   max-width: 510px;
   text-wrap: initial;
 }
 .brand-manifesto .manifesto-line {display: block; text-wrap: balance;}
-/* Keep complete phrases together when a sentence needs a second line.
-   At larger text sizes each phrase can still reflow within the container. */
-.brand-manifesto .manifesto-phrase {display: inline-block; max-width: 100%;}
 @media (max-width: 760px) {
   /* Keep the original photograph. A wider mobile framing gives the eye,
      manicure and lips room above the campaign message. */
@@ -92,5 +102,6 @@
   .hero .hero-copy-line {display: block;}
   .hero-access {min-width: 112px; margin-left: 0;}
   .wordmark {width: clamp(134px, 40.2vw, 158px);}
+  .brand-manifesto .manifesto-kicker {font-size: 9.5px; margin-bottom: 20px;}
   .brand-manifesto .manifesto-copy {max-width: 370px;}
 }
