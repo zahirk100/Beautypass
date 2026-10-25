@@ -30,10 +30,10 @@
 }
 .hero-access:hover {text-underline-offset: 8px;}
 .hero-access:focus-visible {outline: 2px solid currentColor; outline-offset: 4px;}
-/* Maison introduces the place quietly; the existing display faces carry
-   the title. Keep full thoughts together without locking text against zoom. */
+/* One statement introduces the concept. Maison remains the quiet location
+   label; the three clauses share one typographic level. */
 .brand-manifesto .manifesto-kicker {
-  margin: 0 auto 22px;
+  margin: 0 auto 30px;
   font-family: var(--sans);
   font-size: 10px;
   font-weight: 400;
@@ -44,27 +44,26 @@
   color: var(--service-ink);
 }
 .brand-manifesto .manifesto-kicker > span {padding-inline: .15em;}
-.brand-manifesto .manifesto-title-line {display: block; text-wrap: balance;}
-/* A short reading interlude between the two photographic sections.
-   Keep its height content-led, including when visitors enlarge the text. */
+/* Content-led height preserves the pause between photographs and can grow
+   when visitors enlarge the text. */
 .brand-manifesto {
-  padding-block: clamp(64px, 5vw, 80px) clamp(68px, 5.3vw, 84px);
+  padding-block: 80px;
 }
-.brand-manifesto .manifesto-copy {
-  max-width: 40rem;
-  margin: 28px auto 0;
-  font-family: BPFineSerif, "Times New Roman", serif;
-  font-size: clamp(18px, 1.4vw, 20px);
+.brand-manifesto .manifesto-statement {
+  max-width: 48rem;
+  margin: 0 auto;
+  font-family: var(--serif);
+  font-size: clamp(3rem, 3.8vw, 3.25rem);
   font-weight: 400;
   font-style: normal;
-  line-height: 1.5;
-  letter-spacing: .005em;
-  text-wrap: initial;
+  font-synthesis: none;
+  line-height: 1.18;
+  letter-spacing: -.01em;
+  color: var(--ink);
 }
-/* Desktop reads as one sentence followed by its short conclusion.
-   Each phrase may still reflow rather than clipping at enlarged sizes. */
-.brand-manifesto .manifesto-line {display: inline-block; max-width: 100%; text-wrap: balance;}
-.brand-manifesto .manifesto-closing {display: block; margin-top: .25em;}
+/* Keep the semantic three-line rhythm on phones and desktop. Allow each
+   clause to wrap at enlarged text sizes instead of forcing nowrap. */
+.brand-manifesto .manifesto-line {display: block; text-wrap: balance;}
 @media (max-width: 760px) {
   /* Keep the original photograph. A wider mobile framing gives the eye,
      manicure and lips room above the campaign message. */
@@ -117,13 +116,10 @@
   .hero .hero-copy-line {display: block;}
   .hero-access {min-width: 112px; margin-left: 0;}
   .wordmark {width: clamp(134px, 40.2vw, 158px);}
-  .brand-manifesto {padding-block: 48px 52px;}
-  .brand-manifesto .manifesto-kicker {font-size: 9.5px; margin-bottom: 20px;}
-  .brand-manifesto .manifesto-copy {
-    max-width: 370px;
-    margin-top: 22px;
-    font-size: clamp(16px, 4.45vw, 18px);
-    line-height: 1.55;
+  .brand-manifesto {padding-block: 60px 64px;}
+  .brand-manifesto .manifesto-kicker {font-size: 9.5px; margin-bottom: 24px;}
+  .brand-manifesto .manifesto-statement {
+    max-width: 24rem;
+    font-size: clamp(1.625rem, 8.1vw, 2rem);
   }
-  .brand-manifesto .manifesto-line {display: block;}
 }
