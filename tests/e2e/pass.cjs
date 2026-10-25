@@ -8,7 +8,7 @@ const { execFileSync } = require('child_process');
   for (const [tag, o] of [['m', L.M], ['d', L.D]]) {
     const p = await L.page(b, o);
     await p.goto(L.APP + '/member/', { waitUntil: 'networkidle' });
-    await p.getByLabel('E-mailadres').fill(email); await p.getByLabel('Wachtwoord').fill('Geheim-1234');
+    await L.pwMode(p); await p.getByLabel('E-mailadres').fill(email); await p.getByLabel('Wachtwoord').fill('Geheim-1234');
     await p.getByRole('button', { name: 'Inloggen', exact: true }).click(); await p.waitForTimeout(1500);
     await p.getByText('Mijn pas').first().click(); await p.waitForTimeout(500);
     await p.screenshot({ path: `tests/e2e/shots/pass_${tag}.png` });

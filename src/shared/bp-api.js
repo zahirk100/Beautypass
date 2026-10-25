@@ -268,6 +268,9 @@ const act = {
   // ── member ──
   onboard: async ({ name, phone, routine, plan }) => { await q(supabase.rpc('member_onboard', { p_name: name, p_phone: phone, p_routine: routine, p_plan: plan })); },
   startMembership: async (plan, method) => api('membership-start', { plan, method }),   // → { checkoutUrl }
+  // Not signed in yet: the account is made together with the first payment (onboarding checkout)
+  checkout: (data) => api('membership-checkout', data),   // → { checkoutUrl, ref }
+  checkoutStatus: (ref) => api('checkout-status', { ref }),   // → { status: open | paid | failed }
   book: async ({ tid, date, time, staff, note, reschedule, kids }) => {
     const r = await q(rpcKids('book_appointment', { p_treatment: tid, p_date: date, p_time: time, p_staff: staff && staff !== 'any' ? staff : null, p_note: note || '', p_reschedule: reschedule || null, p_kids: kids || 0 }));
     await loadMemberSelf();
@@ -295,6 +298,7 @@ const act = {
   review: async (id, rating, comment) => { await q(supabase.rpc('member_review', { p_appointment: id, p_rating: rating, p_comment: comment || '' })); await loadMemberSelf(); },
   watchSlot: async (tid, date) => { await q(supabase.rpc('watch_slot', { p_treatment: tid, p_date: date })); await loadMemberSelf(); },
   unwatchSlot: async (tid, date) => { await q(supabase.rpc('unwatch_slot', { p_treatment: tid, p_date: date })); await loadMemberSelf(); },
+  memberEmail: async (id, email) => { await api('member-email', { member_id: id, email }); await loadTeamData(); },
   teamUpdateMember: async (id, name, phone) => { await q(supabase.rpc('team_update_member', { p_member: id, p_name: name, p_phone: phone })); await loadTeamData(); },
   teamReschedule: async ({ id, date, time, staff, room }) => {
     const r = await q(supabase.rpc('team_reschedule_appointment', { p_appointment: id, p_date: date, p_time: time, p_staff: staff || null, p_room: room || null }));

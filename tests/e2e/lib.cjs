@@ -19,4 +19,6 @@ async function page(b, opts) {
 }
 function check(cond, label) { console.log((cond ? '  ✓ ' : '  ✗ ') + label); if (!cond) process.exitCode = 1; }
 const demo = require('child_process').execFileSync('curl', ['-s', APP + '/api/app-config']).toString().includes('"demo"');
-module.exports = { demo, chromium, APP, MAIL, MOCK, sleep, otp, sql, D, M, page, check };
+// Member login opens on "code per e-mail"; the tests sign in with a password
+async function pwMode(p) { const b = p.getByText('Inloggen met wachtwoord', { exact: true }); if (await b.count()) await b.click(); }
+module.exports = { pwMode, demo, chromium, APP, MAIL, MOCK, sleep, otp, sql, D, M, page, check };

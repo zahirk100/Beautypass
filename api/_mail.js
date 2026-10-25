@@ -36,7 +36,7 @@ export const mails = {
       body: p(`Je ${b(esc(plan.name))}-membership is actief. Je hebt elke maand ${b(plan.per_month + ' behandelingen')} tegoed, en die kun je nu al plannen.`)
         + rows([['Membership', esc(plan.name)], ['Per maand', eur(plan.price)], ['Behandelingen', plan.per_month + ' per maand']])
         + button(APP_URL() + '/member/', 'Plan je eerste behandeling')
-        + `<p style="margin:16px 0 0;font-size:13px;color:#958c80;">Je betaalt maandelijks automatisch via Mollie en je kunt maandelijks opzeggen.</p>` }),
+        + `<p style="margin:16px 0 0;font-size:13px;color:#958c80;">Inloggen doe je met je e-mailadres ${esc(m.email)}: je krijgt dan een code per mail. Je betaalt maandelijks automatisch via Mollie en je kunt maandelijks opzeggen.</p>` }),
   }),
   booked: (m, a) => ({
     subject: `Bevestigd: ${a.treatment}, ${fmtWhen(a.starts_at)}`,
@@ -87,7 +87,7 @@ export const mails = {
     subject: 'Je First access tot BeautyPass staat klaar',
     html: layout({ preheader: 'Je uitnodiging voor BeautyPass Amsterdam.', eyebrow: 'Amsterdam · First access', title: "You're", it: 'invited.',
       body: p('Je stond op onze First access-lijst, en nu is het zover: je kunt als een van de eersten member worden van BeautyPass. Bekijk de memberships, kies je routine en plan je eerste behandeling.')
-        + button(APP_URL() + '/onboarding', 'Word member')
+        + button(APP_URL() + '/onboarding?email=' + encodeURIComponent(email), 'Word member')
         + `<p style="margin:16px 0 0;font-size:13px;color:#958c80;">Een uitnodiging reserveert nog geen membership; we openen in rondes.</p>` }),
   }),
 };

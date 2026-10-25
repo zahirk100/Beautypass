@@ -8,7 +8,7 @@ export default handler(async (req) => {
   const { email, role } = await readJson(req);
   if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email || '')) throw new HttpError(400, 'Vul een geldig e-mailadres in');
   if (!['manager', 'desk', 'specialist'].includes(role)) throw new HttpError(400, 'Kies een rol');
-  const existing = (await one(db().from('profiles').select('id,role').ilike('email', email.trim())))[0];
+  const existing = (await one(db().from('profiles').select('id,role').eq('email', email.trim().toLowerCase())))[0];
   let id = existing && existing.id;
   if (!id) {
     const { data, error } = await db().auth.admin.inviteUserByEmail(email.trim(), { redirectTo: APP_URL() + '/beheer/' });

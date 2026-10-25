@@ -2,7 +2,7 @@
 const L = require('./lib.cjs');
 async function login(p, email) {
   await p.goto(L.APP + '/member/', { waitUntil: 'networkidle' });
-  await p.getByLabel('E-mailadres').fill(email); await p.getByLabel('Wachtwoord').fill('Geheim-1234');
+  await L.pwMode(p); await p.getByLabel('E-mailadres').fill(email); await p.getByLabel('Wachtwoord').fill('Geheim-1234');
   await p.getByRole('button', { name: 'Inloggen', exact: true }).click(); await p.waitForTimeout(1500);
 }
 (async () => {

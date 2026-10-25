@@ -1,4 +1,4 @@
-// Onboarding: account → routine → membership → first payment (Mollie). Phone: the app flow full screen;
+// Onboarding: routine → package → checkout (Mollie); the account is made at checkout. Phone: the app flow full screen;
 // desktop: the split layout from the prototype's website view.
 import '../shared/globals.js';
 import '../shared/bp-api.js';
@@ -26,11 +26,14 @@ function OnboardingPage(){const [st,setSt]=React.useState({k:'loading'});const [
 React.useEffect(()=>{const f=()=>setMobile(window.innerWidth<760);window.addEventListener('resize',f);return()=>window.removeEventListener('resize',f);},[]);
 const paid=new URLSearchParams(location.search).get('betaald');
 // Signed in but not paid yet (back button, failed payment, or coming from /member): continue where it stopped
-const resume=()=>{const b=BP.get();if(!b.session)return undefined;const me=b.members.find(x=>x.id===b.me);return me&&me.plan&&me.routine.length?4:2;};
-React.useEffect(()=>{BP.boot('onboarding').then(k=>{if(k==='member'){if(paid){setSt({k:'flow',step:5});return;}toMember();return;}setSt(paid?{k:'return'}:{k:'flow',step:resume()});}).catch(e=>setSt({k:'error',msg:e.message}));},[]);
+const resume=()=>{const b=BP.get();if(!b.session)return undefined;const me=b.members.find(x=>x.id===b.me);return me&&me.plan&&me.routine.length?3:1;};
+const ref=new URLSearchParams(location.search).get('ref');
+React.useEffect(()=>{BP.boot('onboarding').then(k=>{if(k==='member'){if(paid){setSt({k:'flow',step:5});return;}toMember();return;}setSt(paid?{k:BP.get().session?'return':'checkout'}:{k:'flow',step:resume()});}).catch(e=>setSt({k:'error',msg:e.message}));},[]);
 if(st.k==='loading')return <Loading/>;
 if(st.k==='error')return <BootError message={st.msg}/>;
-if(st.k==='return')return <PaymentReturn onActive={()=>setSt({k:'flow',step:5})} onRetry={()=>{history.replaceState(null,'','/onboarding');setSt({k:'flow',step:4});}}/>;
+if(st.k==='return')return <PaymentReturn onActive={()=>setSt({k:'flow',step:5})} onRetry={()=>{history.replaceState(null,'','/onboarding');setSt({k:'flow',step:3});}}/>;
+if(st.k==='checkout'){let d={};try{d=JSON.parse(sessionStorage.getItem('bp-onb')||'{}');}catch(e){}
+return <CheckoutReturn refId={ref} email={d.email} onRetry={()=>{history.replaceState(null,'','/onboarding');setSt({k:'flow',step:3});}} onSignedIn={()=>{history.replaceState(null,'','/onboarding?betaald=1');setSt({k:'loading'});BP.boot('onboarding').then(k=>setSt(k==='member'?{k:'flow',step:5}:{k:'return'})).catch(e=>setSt({k:'error',msg:e.message}));}}/>;}
 const login=()=>location.assign('/member/');const logout=async()=>{await BP.auth.signOut();try{sessionStorage.removeItem('bp-onb');}catch(e){}location.replace('/onboarding');};
 if(mobile)return <div style={{position:'relative',height:'100dvh',overflow:'hidden',background:BPC.paper,fontFamily:BPC.sans,color:BPC.ink}}><Onboarding initStep={st.step} onLogin={login} onDone={toMember}/></div>;
 // Desktop starts at the account step: the campaign image on the left is the welcome

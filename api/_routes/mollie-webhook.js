@@ -60,7 +60,7 @@ export async function applyPayment(id) {
       });
       await one(db().from('members').update({ status: 'actief', since: m.status === 'nieuw' ? todayAms() : m.since, cancel_at: null, paused_until: null, mollie_subscription_id: sub.id, next_payment_date: start,
         ...(await applyMandate(m, p.customerId, p.mandateId)) }).eq('id', m.id));
-      await one(db().from('waitlist').update({ status: 'member' }).ilike('email', m.email));
+      await one(db().from('waitlist').update({ status: 'member' }).eq('email', String(m.email).toLowerCase()));
       await sendMail({ email: m.email, name: m.name }, mails.welcome(m, plan));
     } else if (row.kind === 'maand') {
       const next = p.subscriptionId ? (await mollie('GET', `/customers/${p.customerId}/subscriptions/${p.subscriptionId}`).catch(() => ({}))).nextPaymentDate : null;

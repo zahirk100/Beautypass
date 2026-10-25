@@ -15,7 +15,8 @@ return <div style={{minHeight:'100vh',display:'grid',gridTemplateColumns:'minmax
 <div style={{display:'flex',alignItems:'center',justifyContent:'center',padding:24}}>{form}</div></div>;}
 
 // Members: password, or a 6-digit code by e-mail (also the way back in when the password is forgotten)
-function MemberLogin({onDone}){const [mode,setMode]=React.useState('pw');const [email,setEmail]=React.useState('');const [pw,setPw]=React.useState('');const [code,setCode]=React.useState('');const [sent,setSent]=React.useState(false);const [busy,setBusy]=React.useState(false);const [err,setErr]=React.useState('');
+// Members sign in with a code from their mail by default (accounts made at checkout have no password)
+function MemberLogin({onDone}){const [mode,setMode]=React.useState('code');const [email,setEmail]=React.useState('');const [pw,setPw]=React.useState('');const [code,setCode]=React.useState('');const [sent,setSent]=React.useState(false);const [busy,setBusy]=React.useState(false);const [err,setErr]=React.useState('');
 const run=async fn=>{setBusy(true);setErr('');try{await fn();}catch(e){setErr(e.message);}setBusy(false);};
 const okEmail=/^\S+@\S+\.\S+$/.test(email);
 return <AuthShell eyebrow="Amsterdam · Members" title="Welkom" it="terug.">
@@ -31,6 +32,25 @@ return <AuthShell eyebrow="Amsterdam · Members" title="Welkom" it="terug.">
 :<LBtn disabled={busy||!okEmail} onClick={()=>run(async()=>{await BP.auth.sendCode(email);setSent(true);})}>{busy?'Bezig…':'Stuur code'}</LBtn>}
 <LBtn kind="ghost" onClick={()=>{setMode('pw');setErr('');}}>Inloggen met wachtwoord</LBtn></>}
 <div style={{textAlign:'center',fontSize:14,color:BPC.ink2,marginTop:6}}>Nog geen member? <a href="/onboarding" style={{fontWeight:700,color:BPC.ink,textDecoration:'none'}}>Word member</a></div>
+</AuthShell>;}
+
+// Back from Mollie after a checkout without an account: check the payment, then sign in with a code
+function CheckoutReturn({refId,email:e0,onSignedIn,onRetry}){const [st,setSt]=React.useState('wait');const [email,setEmail]=React.useState(e0||'');const [code,setCode]=React.useState('');const [sent,setSent]=React.useState(false);const [busy,setBusy]=React.useState(false);const [err,setErr]=React.useState('');
+const send=async(to)=>{setBusy(true);setErr('');try{await BP.auth.sendCode(to);setSent(true);}catch(e){setErr(e.message);}setBusy(false);};
+React.useEffect(()=>{let n=0,live=true;const tick=async()=>{n++;let r=null;try{r=await BP.act.checkoutStatus(refId);}catch(e){if(live)setSt('unknown');return;}if(!live)return;
+if(r.status==='paid'){setSt('paid');if(e0)send(e0);return;}if(r.status==='failed')return setSt('failed');if(n>=30)return setSt('slow');setTimeout(tick,2000);};tick();return()=>{live=false;};},[]);
+const verify=async()=>{setBusy(true);setErr('');try{await BP.auth.verifyCode(email,code,'email');onSignedIn();}catch(e){setErr(e.message);setBusy(false);}};
+const okEmail=/^\S+@\S+\.\S+$/.test(email);
+if(st==='wait')return <AuthShell eyebrow="Bijna klaar" title="Betaling" it="verwerken…" image={false}><div style={{display:'flex',alignItems:'center',gap:12,color:BPC.ink2,fontSize:14}}><div style={{width:22,height:22,borderRadius:11,border:`2.5px solid ${BPC.line}`,borderTopColor:BPC.esp,animation:'bpSpin .8s linear infinite'}}></div>We wachten op de bevestiging van Mollie.</div></AuthShell>;
+if(st==='failed')return <AuthShell eyebrow="Betaling" title="Niet" it="gelukt." image={false}><div style={{fontSize:14,color:BPC.ink2,lineHeight:1.55}}>Je betaling is niet gelukt of geannuleerd. Er is niets afgeschreven. Je keuzes staan nog klaar.</div><LBtn onClick={onRetry}>Opnieuw proberen</LBtn></AuthShell>;
+if(st==='slow'||st==='unknown')return <AuthShell eyebrow="Bijna klaar" title="Nog even" it="geduld." image={false}><div style={{fontSize:14,color:BPC.ink2,lineHeight:1.55}}>We hebben nog geen bevestiging van je betaling. Is hij gelukt? Dan krijg je binnen een paar minuten een welkomstmail en kun je inloggen met je e-mailadres.</div><LBtn onClick={()=>location.reload()}>Opnieuw controleren</LBtn><LBtn kind="ghost" onClick={onRetry}>Opnieuw betalen</LBtn></AuthShell>;
+return <AuthShell eyebrow="Betaling gelukt" title="Welkom bij" it="BeautyPass." image={false}>
+<div style={{fontSize:14,color:BPC.ink2,lineHeight:1.55}}>Je membership is actief. {sent?<>We stuurden een code van 6 cijfers naar <b style={{color:BPC.ink}}>{email}</b>. Vul hem in om je account te openen.</>:'Vul je e-mailadres in, dan sturen we je een code om in te loggen.'}</div>
+{!sent&&<LField label="E-mailadres" type="email" auto="email" value={email} onChange={setEmail}/>}
+{sent&&<LField label="Code uit je mail" value={code} placeholder="123456" auto="one-time-code" onChange={v=>setCode(v.replace(/\D/g,'').slice(0,6))}/>}
+<LMsg>{err}</LMsg>
+{sent?<LBtn disabled={busy||code.length!==6} onClick={verify}>{busy?'Bezig…':'Account openen'}</LBtn>:<LBtn disabled={busy||!okEmail} onClick={()=>send(email)}>{busy?'Bezig…':'Stuur code'}</LBtn>}
+{sent&&<div style={{textAlign:'center',fontSize:13,color:BPC.ink2}}>Geen code gekregen? Kijk in je spam of <span onClick={()=>!busy&&send(email)} style={{fontWeight:700,color:BPC.ink,cursor:'pointer'}}>stuur opnieuw</span>. Klopt het e-mailadres niet? Neem contact op met de salon.</div>}
 </AuthShell>;}
 
 // Team: e-mail + password; reset by e-mail link
@@ -58,4 +78,4 @@ function NoAccess({what}){return <AuthShell eyebrow="Beheer · Amsterdam" title=
 function BootError({message}){return <AuthShell eyebrow="BeautyPass" title="Even" it="geduld." image={false}><LMsg>{message}</LMsg><LBtn onClick={()=>location.reload()}>Opnieuw proberen</LBtn>
 <LBtn kind="ghost" onClick={async()=>{await BP.auth.signOut().catch(()=>{});try{sessionStorage.clear();}catch(e){}location.reload();}}>Uitloggen en opnieuw beginnen</LBtn></AuthShell>;}
 
-Object.assign(window,{MemberLogin,TeamLogin,SetPassword,NoAccess,BootError,AuthShell});
+Object.assign(window,{CheckoutReturn,MemberLogin,TeamLogin,SetPassword,NoAccess,BootError,AuthShell});

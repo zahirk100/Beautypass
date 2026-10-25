@@ -59,6 +59,20 @@ export default async function cron(req, res) {
     // Downgrades start with the new period (normally already done by the webhook of that month's payment)
     const down = await one(db().from('members').select('id,next_plan_id,next_payment_date').not('next_plan_id', 'is', null).lte('next_payment_date', today));
     for (const m of down) { await one(db().from('members').update({ plan_id: m.next_plan_id, next_plan_id: null }).eq('id', m.id)); done.downgraded++; }
+    // Checkouts that were never paid and never used (no login): removed after 3 days, so no stray accounts remain
+    try {
+      const stale = await one(db().from('members').select('id,user_id').eq('status', 'nieuw').lt('created_at', new Date(Date.now() - 3 * 864e5).toISOString()));
+      for (const m of stale) {
+        if ((await one(db().from('payments').select('id').eq('member_id', m.id).eq('status', 'betaald'))).length) continue;
+        if (m.user_id) {
+          const { data } = await db().auth.admin.getUserById(m.user_id);
+          if (data && data.user && data.user.last_sign_in_at) continue;
+        }
+        await one(db().from('members').delete().eq('id', m.id));
+        if (m.user_id) await db().auth.admin.deleteUser(m.user_id);
+        done.cleaned = (done.cleaned || 0) + 1;
+      }
+    } catch (e) { console.error('cron_cleanup_failed', e && e.message); }
     return res.status(200).json({ ok: true, ...done });
   } catch (e) {
     console.error('cron_error', e && e.message);

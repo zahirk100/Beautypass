@@ -3,7 +3,7 @@
 const L = require('./lib.cjs');
 async function login(p, path, email, pw) {
   await p.goto(L.APP + path, { waitUntil: 'networkidle' });
-  await p.getByLabel('E-mailadres').fill(email); await p.getByLabel('Wachtwoord').fill(pw);
+  await L.pwMode(p); await p.getByLabel('E-mailadres').fill(email); await p.getByLabel('Wachtwoord').fill(pw);
   await p.getByRole('button', { name: 'Inloggen', exact: true }).click(); await p.waitForTimeout(1500);
 }
 const mails = async () => (await fetch(L.MOCK + '/mock/mails')).json();
@@ -66,20 +66,14 @@ const nav = (p, label) => p.getByText(label, { exact: true }).locator('visible=t
   L.check(L.sql('select terms_url is not null and privacy_url is not null from settings') === 't', 'links opgeslagen');
   const n = await L.page(b, L.M);
   const email = `e2e.t.${Date.now()}@beautypass-test.nl`;
-  await n.goto(L.APP + '/onboarding', { waitUntil: 'networkidle' });
-  await n.getByText('Word member', { exact: true }).first().click();
-  await n.getByLabel('Volledige naam').fill('Terms Test'); await n.getByLabel('E-mailadres').fill(email); await n.getByLabel('Wachtwoord').fill('Geheim-1234');
-  const tt = Date.now() - 2000; await n.getByRole('button', { name: 'Volgende' }).click();
-  await n.getByLabel('Code').fill(await L.otp(email, tt)); await n.getByRole('button', { name: 'Bevestigen' }).click();
-  await n.getByText('Stel je').waitFor(); await n.getByText('Blowout', { exact: true }).click();
-  await n.getByRole('button', { name: /Verder met/ }).click(); await n.getByRole('button', { name: /^Kies / }).click();
-  await n.getByRole('button', { name: /Betaal & machtig/ }).click(); await n.waitForTimeout(600);
+  const O = require('./onboard.cjs');
+  await O.toCheckout(n, { email, name: 'Terms Test' });
+  await n.getByRole('button', { name: /^Betaal / }).click(); await n.waitForTimeout(600);
   L.check(await n.getByText('Ga eerst akkoord met de voorwaarden en het privacybeleid').count() === 1, 'zonder vinkje: melding, geen betaling');
   await n.screenshot({ path: 'tests/e2e/shots/terms.png' });
   await n.locator('input[type=checkbox]').check();
-  await n.getByRole('button', { name: /Betaal & machtig/ }).click(); await n.waitForURL(/checkout/);
+  await O.payAndSignIn(n, email);
   L.check(L.sql(`select terms_accepted_at is not null from members where email='${email}'`) === 't', 'akkoord vastgelegd bij de member');
-  await n.click('#paid'); await n.waitForURL(/betaald=1/);
   L.sql('update settings set terms_url=null, privacy_url=null');
 
   console.log('6. wachtlijst: mail als er plek vrijkomt');

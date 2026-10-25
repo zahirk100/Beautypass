@@ -5,7 +5,7 @@ const { execFileSync } = require('child_process');
 const OUT = 'tests/e2e/shots/';
 async function login(p, path, email, pw) {
   await p.goto(L.APP + path, { waitUntil: 'networkidle' });
-  await p.getByLabel('E-mailadres').fill(email); await p.getByLabel('Wachtwoord').fill(pw);
+  await L.pwMode(p); await p.getByLabel('E-mailadres').fill(email); await p.getByLabel('Wachtwoord').fill(pw);
   await p.getByRole('button', { name: 'Inloggen', exact: true }).click(); await p.waitForTimeout(1500);
 }
 const nav = (p, label) => p.getByText(label, { exact: true }).locator('visible=true').first().click();
