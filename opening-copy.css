@@ -45,11 +45,26 @@
 }
 .brand-manifesto .manifesto-kicker > span {padding-inline: .15em;}
 .brand-manifesto .manifesto-title-line {display: block; text-wrap: balance;}
+/* A short reading interlude between the two photographic sections.
+   Keep its height content-led, including when visitors enlarge the text. */
+.brand-manifesto {
+  padding-block: clamp(64px, 5vw, 80px) clamp(68px, 5.3vw, 84px);
+}
 .brand-manifesto .manifesto-copy {
-  max-width: 510px;
+  max-width: 40rem;
+  margin: 28px auto 0;
+  font-family: BPFineSerif, "Times New Roman", serif;
+  font-size: clamp(18px, 1.4vw, 20px);
+  font-weight: 400;
+  font-style: normal;
+  line-height: 1.5;
+  letter-spacing: .005em;
   text-wrap: initial;
 }
-.brand-manifesto .manifesto-line {display: block; text-wrap: balance;}
+/* Desktop reads as one sentence followed by its short conclusion.
+   Each phrase may still reflow rather than clipping at enlarged sizes. */
+.brand-manifesto .manifesto-line {display: inline-block; max-width: 100%; text-wrap: balance;}
+.brand-manifesto .manifesto-closing {display: block; margin-top: .25em;}
 @media (max-width: 760px) {
   /* Keep the original photograph. A wider mobile framing gives the eye,
      manicure and lips room above the campaign message. */
@@ -102,6 +117,13 @@
   .hero .hero-copy-line {display: block;}
   .hero-access {min-width: 112px; margin-left: 0;}
   .wordmark {width: clamp(134px, 40.2vw, 158px);}
+  .brand-manifesto {padding-block: 48px 52px;}
   .brand-manifesto .manifesto-kicker {font-size: 9.5px; margin-bottom: 20px;}
-  .brand-manifesto .manifesto-copy {max-width: 370px;}
+  .brand-manifesto .manifesto-copy {
+    max-width: 370px;
+    margin-top: 22px;
+    font-size: clamp(16px, 4.45vw, 18px);
+    line-height: 1.55;
+  }
+  .brand-manifesto .manifesto-line {display: block;}
 }
