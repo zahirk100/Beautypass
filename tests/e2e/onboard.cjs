@@ -55,6 +55,7 @@ if (require.main === module) (async () => {
     L.check(L.sql(`select count(*) from members where email='${email}'`) === '0', 'nog geen account vóór het betalen');
     await payAndSignIn(p, email);
     await p.screenshot({ path: `tests/e2e/shots/onb_${tag}_done.png` });
+    await p.evaluate(() => BP.auth.setPassword('Geheim-1234'));   // the other tests sign in with a password
     L.check(L.sql(`select status||' '||array_to_string(routine,',') from members where email='${email}'`) === 'actief gel,blow', 'member is actief met de routine');
     L.check(L.sql(`select count(*) from payments p join members m on m.id=p.member_id where m.email='${email}' and p.status='betaald' and p.invoice_no like 'BP-%'`) === '1', 'eerste betaling betaald met factuurnummer');
     L.check(L.sql(`select mollie_subscription_id is not null and mandate_id is not null from members where email='${email}'`) === 't', 'subscription + mandaat vastgelegd');
@@ -87,6 +88,7 @@ if (require.main === module) (async () => {
   L.check(await f.getByLabel('E-mailadres').inputValue() === e2, 'gegevens staan nog klaar');
   await payAndSignIn(f, e2);
   L.check(L.sql(`select status from members where email='${e2}'`) === 'actief', 'tweede poging: actief');
+  await f.evaluate(() => BP.auth.setPassword('Geheim-1234'));
   L.check(L.sql(`select count(*) from members where email='${e2}'`) === '1', 'geen dubbele member');
 
   console.log('team corrigeert een e-mailadres (nog nooit ingelogd)');
