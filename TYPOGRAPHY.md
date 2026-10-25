@@ -63,7 +63,9 @@ categorielabel, beschrijvende uitleg en een kort merkbijschrift.
   De beeldhoogte is 100svh minus 112 px, minimaal 520 px; de inhoud kan groeien
   bij tekstvergroting. De beelden blijven ruim, het totale verticale traject korter.
 - De desktopcategorie zelf opent behandeldetails; de extra herhaalde tekstregel
-  vervalt. Mobiel staat één gedeelde ‘Explore treatments’ onder het actieve beeld.
+  vervalt. Mobiel staat één gedeelde ‘Explore treatments’ in een smalle balk boven het
+  beeld. Die balk blijft onder de vaste header zichtbaar zolang het lookbook
+  in beeld is; teller en voortgang blijven erin geïntegreerd.
   Zonder JavaScript blijft het bestaande verticale beeldverhaal beschikbaar.
 - Breek bij betekenisvolle zinsdelen. Gebruik geen `white-space: nowrap`
   om de afgesproken regelverdeling bij tekstvergroting af te dwingen.
