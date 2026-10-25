@@ -1,0 +1,128 @@
+/* BeautyPass type roles. This is the final typography layer: choose a role
+   for new content instead of introducing a section-specific font family.
+   See TYPOGRAPHY.md for the corresponding design decisions. */
+:root {
+  --font-editorial: BPInstrument, Georgia, serif;
+  --font-service: "DM Sans", Arial, sans-serif;
+  --font-fine: BPFineSerif, "Times New Roman", serif;
+  --serif: var(--font-editorial);
+  --sans: var(--font-service);
+  --type-weight-regular: 400;
+  --type-weight-label: 450;
+  --type-weight-medium: 500;
+  --type-section-size: clamp(1.75rem, 2.6vw, 2.25rem);
+}
+
+.bp-sections {
+  --bp-serif: var(--font-editorial);
+  --bp-sans: var(--font-service);
+  --bp-fine: var(--font-fine);
+}
+
+/* New headings start in the information layer; editorial headings opt in. */
+h2, h3, h4, h5, h6 {
+  font-family: var(--font-service);
+  font-weight: var(--type-weight-medium);
+  font-style: normal;
+}
+
+/* The reading and service layer is the default throughout the page. */
+body,
+.bp-type-copy,
+.bp-type-ui,
+.site-header a,
+.site-footer a,
+button,
+input,
+select,
+textarea,
+summary,
+.bp-sections button,
+.bp-sections input,
+.bp-print-area .bp-email-label input {
+  font-family: var(--font-service);
+  font-style: normal;
+  font-synthesis: none;
+}
+
+/* Emotional campaign headings may use the true italic face as an accent.
+   Their existing composition and size remain owned by the image section. */
+.bp-type-display,
+.brand-manifesto .bp-type-statement {
+  font-family: var(--font-editorial);
+  font-weight: var(--type-weight-regular);
+  font-style: normal;
+  font-synthesis: none;
+}
+.bp-type-display em {
+  font-family: inherit;
+  font-weight: inherit;
+  font-style: italic;
+}
+
+/* Practical section headings have one modern, upright treatment. */
+.bp-know .bp-type-section,
+h2.bp-type-section {
+  font-family: var(--font-service);
+  font-size: var(--type-section-size);
+  font-weight: var(--type-weight-medium);
+  font-style: normal;
+  font-synthesis: none;
+  line-height: 1.2;
+  letter-spacing: -.015em;
+  text-transform: none;
+}
+.bp-type-section em {font: inherit;}
+
+/* Labels identify places and categories; sizes follow their local layout. */
+.bp-type-label {
+  font-family: var(--font-service);
+  font-weight: var(--type-weight-label);
+  font-style: normal;
+  font-synthesis: none;
+}
+.bp-topic-label,
+.bp-question,
+.footer-label {
+  font-family: var(--font-service);
+  font-weight: var(--type-weight-medium);
+  font-style: normal;
+}
+
+/* The fine Roman face is reserved for short brand captions, not form help. */
+.hero .bp-type-fine,
+.bp-cuff-copy .bp-type-fine {
+  font-family: var(--font-fine);
+  font-weight: var(--type-weight-regular);
+  font-style: normal;
+}
+.bp-print-area .bp-type-note,
+.bp-form-status {
+  font-family: var(--font-service);
+  font-weight: var(--type-weight-regular);
+  font-style: normal;
+}
+
+/* Launch information belongs to the service layer, alongside contact links. */
+.site-footer .footer-launch {
+  font-family: var(--font-service);
+  font-size: .875rem;
+  font-weight: var(--type-weight-regular);
+  font-style: normal;
+  line-height: 1.6;
+  letter-spacing: 0;
+}
+
+@media (max-width: 760px) {
+  :root {--type-section-size: 1.75rem;}
+  /* Retain equal tabs at normal sizes; let enlarged labels use another row
+     instead of colliding with the adjacent tab. */
+  .bp-sections[data-bp-enhanced] .bp-mobile-tabs {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .bp-mobile-tabs button {
+    flex: 1 1 0;
+    min-width: max-content;
+  }
+}
