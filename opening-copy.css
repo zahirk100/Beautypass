@@ -30,16 +30,40 @@
 }
 .hero-access:hover {text-underline-offset: 8px;}
 .hero-access:focus-visible {outline: 2px solid currentColor; outline-offset: 4px;}
-/* Each line carries one thought. Nonbreaking spaces protect the short
-   phrases if text enlargement or a very narrow viewport requires reflow. */
-.brand-manifesto .manifesto-copy {
-  max-width: 510px;
-  text-wrap: initial;
+/* One statement introduces the concept. Maison remains the quiet location
+   label; the three clauses share one typographic level. */
+.brand-manifesto .manifesto-kicker {
+  margin: 0 auto 30px;
+  font-family: var(--sans);
+  font-size: 10px;
+  font-weight: 400;
+  line-height: 1.6;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  text-wrap: balance;
+  color: var(--service-ink);
 }
+.brand-manifesto .manifesto-kicker > span {padding-inline: .15em;}
+/* Content-led height preserves the pause between photographs and can grow
+   when visitors enlarge the text. */
+.brand-manifesto {
+  padding-block: 80px;
+}
+.brand-manifesto .manifesto-statement {
+  max-width: 48rem;
+  margin: 0 auto;
+  font-family: var(--serif);
+  font-size: clamp(3rem, 3.8vw, 3.25rem);
+  font-weight: 400;
+  font-style: normal;
+  font-synthesis: none;
+  line-height: 1.18;
+  letter-spacing: -.01em;
+  color: var(--ink);
+}
+/* Keep the semantic three-line rhythm on phones and desktop. Allow each
+   clause to wrap at enlarged text sizes instead of forcing nowrap. */
 .brand-manifesto .manifesto-line {display: block; text-wrap: balance;}
-/* Keep complete phrases together when a sentence needs a second line.
-   At larger text sizes each phrase can still reflow within the container. */
-.brand-manifesto .manifesto-phrase {display: inline-block; max-width: 100%;}
 @media (max-width: 760px) {
   /* Keep the original photograph. A wider mobile framing gives the eye,
      manicure and lips room above the campaign message. */
@@ -92,5 +116,10 @@
   .hero .hero-copy-line {display: block;}
   .hero-access {min-width: 112px; margin-left: 0;}
   .wordmark {width: clamp(134px, 40.2vw, 158px);}
-  .brand-manifesto .manifesto-copy {max-width: 370px;}
+  .brand-manifesto {padding-block: 60px 64px;}
+  .brand-manifesto .manifesto-kicker {font-size: 9.5px; margin-bottom: 24px;}
+  .brand-manifesto .manifesto-statement {
+    max-width: 24rem;
+    font-size: clamp(1.625rem, 8.1vw, 2rem);
+  }
 }
