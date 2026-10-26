@@ -21,6 +21,7 @@ Then, with Playwright available:
 | `beheer.cjs` | team booking, team notes, team cancel, specialist view, staff drawer |
 | `audit.cjs` | no leaks (staff logins, others' usage), paying a failed month yourself, undoing a cancellation, unpaid reservations (retry, lapse, refund when paid too late), unpaid upgrade reverted, pause cancels appointments in the unpaid period |
 | `visit.cjs` | routine in one visit: Home button, routine ticked from the profile, treatments at the same time (six hands) in one suite, one mail, reschedule, cancel one part or the whole visit, Beheer sees the visit |
+| `package.cjs` | members book only what is in their membership, up to the monthly number; the Beheer switch "Losse behandelingen" turns paying separately back on |
 | `sweep.cjs` | screenshots of every screen (member web + app, Beheer desktop + mobile) |
 
 Screenshots go to `tests/e2e/shots/` (ignored by git).

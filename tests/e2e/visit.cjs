@@ -9,6 +9,7 @@ async function login(p, path, email, pw) {
 const mails = async () => (await fetch(L.MOCK + '/mock/mails')).json();
 (async () => {
   const b = await L.chromium.launch();
+  L.sql('update settings set allow_extras=true');   // this test covers paying for treatments outside the membership
   const email = L.sql("select m.email from members m join auth.users u on u.id=m.user_id where m.status='actief' and m.cancel_at is null and u.encrypted_password <> '' order by m.created_at desc limit 1");
   const id = L.sql(`select id from members where email='${email}'`);
   const D = L.sql("select ((now() at time zone 'Europe/Amsterdam')::date + 5)::text");
@@ -72,5 +73,6 @@ const mails = async () => (await fetch(L.MOCK + '/mock/mails')).json();
   const seq = L.sql(`select plan->>'parallel' || ' ' || (plan->>'minutes') from visit_slots(array['gel','browlam','blow'], '${D}') where slot='13:00'`.replace('visit_slots', 'public.visit_slots'));
   L.check(seq === '' || seq.startsWith('false'), 'na elkaar: ' + seq);
   L.sql('update settings set parallel_enabled=true');
+  L.sql('update settings set allow_extras=false');
   await b.close();
 })().catch((e) => { console.error(e); process.exit(1); });

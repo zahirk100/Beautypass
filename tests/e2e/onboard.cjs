@@ -5,13 +5,16 @@ const L = require('./lib.cjs');
 // Routine + package + checkout form up to the Mollie page
 async function toCheckout(p, { email, name, terms }) {
   await p.goto(L.APP + '/onboarding', { waitUntil: 'networkidle' });
-  const start = p.getByText('Stel je routine samen', { exact: true }).locator('visible=true');
+  const start = p.getByText('Bekijk de memberships', { exact: true }).locator('visible=true');
   if (await start.count()) await start.first().click();
-  await p.getByText('Gellak manicure', { exact: true }).click();
-  await p.getByText('Blowout', { exact: true }).click();
-  await p.getByRole('button', { name: 'Bekijk je pakket' }).click();
-  await p.getByText('Past het best bij jou').waitFor();
-  await p.getByRole('button', { name: /^Verder met / }).click();
+  // 1. the plan: the middle one is preselected ("Meest gekozen")
+  await p.getByText('Meest gekozen').waitFor();
+  await p.getByText('Essential', { exact: true }).click();   // the other suites expect an Essential member
+  await p.getByRole('button', { name: /^Kies Essential/ }).click();
+  // 2. favourites by category: they become the routine
+  await p.getByText('Manicure & pedicure', { exact: true }).click(); await p.getByText('Gellak manicure', { exact: true }).click();
+  await p.getByText('Blowouts', { exact: true }).click(); await p.getByText('Blowout', { exact: true }).click();
+  await p.getByRole('button', { name: 'Verder', exact: true }).click();
   await p.getByLabel('Volledige naam').fill(name);
   await p.getByLabel('E-mailadres').fill(email);
   await p.getByLabel('Telefoon (optioneel)').fill('0612345678');

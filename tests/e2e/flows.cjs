@@ -8,6 +8,7 @@ async function login(p, path, email, pw) {
 const mails = async () => (await fetch(L.MOCK + '/mock/mails')).json();
 (async () => {
   const b = await L.chromium.launch();
+  L.sql('update settings set allow_extras=true');   // this test covers paying for treatments outside the membership
   const email = `e2e.f.${Date.now()}@beautypass-test.nl`;
   const p = await require('./onboard.cjs').onboard(b, { email, name: 'Flow Tester', opts: L.M });
   await p.getByRole('button', { name: /Plan je eerste behandeling/ }).click();
@@ -102,5 +103,6 @@ const mails = async () => (await fetch(L.MOCK + '/mock/mails')).json();
   const leak = await spec.evaluate(async () => (await BP.supabase.from('members').select('email')).data?.length ?? 0);
   L.check(leak === 0, 'specialist kan geen member-e-mails lezen');
   for (const x of [p, adm, desk, mem, spec]) if (x.errs.length) console.log('  errs:', x.errs.slice(0, 3));
+  L.sql('update settings set allow_extras=false');
   await b.close();
 })().catch((e) => { console.error(e); process.exit(1); });

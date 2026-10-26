@@ -108,7 +108,7 @@ async function loadCatalog() {
     settings: { ...state.settings, hours: settings.hours, cancelHours: settings.cancel_hours, noShowCounts: settings.no_show_counts,
       rollover: settings.rollover, mollieMode: settings.mollie_mode, mollieProfile: settings.mollie_profile || '', rooms: rooms.filter((r) => r.active).map((r) => r.name),
       slotTimes: settings.slot_times, bookingDays: settings.booking_days, pauseMonths: settings.pause_months_per_year,
-      kidsEnabled: settings.kids_enabled !== false && settings.kids_capacity > 0, kidsOn: settings.kids_enabled !== false, kidsCapacity: settings.kids_capacity ?? 0, closedDates: settings.closed_dates || [], parallelOn: settings.parallel_enabled !== false, visitsReady: 'parallel_enabled' in settings,
+      kidsEnabled: settings.kids_enabled !== false && settings.kids_capacity > 0, kidsOn: settings.kids_enabled !== false, kidsCapacity: settings.kids_capacity ?? 0, closedDates: settings.closed_dates || [], parallelOn: settings.parallel_enabled !== false, allowExtras: settings.allow_extras === true, extrasReady: 'allow_extras' in settings, visitsReady: 'parallel_enabled' in settings,
       termsUrl: settings.terms_url || '', privacyUrl: settings.privacy_url || '' },
   });
 }
@@ -421,7 +421,7 @@ const extraThisMonth = (mid) => {
 const fallbackPlan = { id: '', name: '—', price: 0, perMonth: 0, included: [], active: false, desc: '' };
 
 const SETTINGS_COLUMNS = { hours: 'hours', cancelHours: 'cancel_hours', noShowCounts: 'no_show_counts', rollover: 'rollover', mollieMode: 'mollie_mode',
-  kidsOn: 'kids_enabled', kidsCapacity: 'kids_capacity', closedDates: 'closed_dates', slotTimes: 'slot_times', termsUrl: 'terms_url', privacyUrl: 'privacy_url', parallelOn: 'parallel_enabled' };
+  kidsOn: 'kids_enabled', kidsCapacity: 'kids_capacity', closedDates: 'closed_dates', slotTimes: 'slot_times', termsUrl: 'terms_url', privacyUrl: 'privacy_url', parallelOn: 'parallel_enabled', allowExtras: 'allow_extras' };
 const settingsDirty = new Set();
 
 const BP = {

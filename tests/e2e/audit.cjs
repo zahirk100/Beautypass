@@ -10,6 +10,7 @@ const mails = async () => (await fetch(L.MOCK + '/mock/mails')).json();
 const webhook = (id) => fetch(L.APP + '/api/mollie-webhook', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ id }) });
 (async () => {
   const b = await L.chromium.launch();
+  L.sql('update settings set allow_extras=true');   // this test covers paying for treatments outside the membership
   const email = L.sql("select m.email from members m join auth.users u on u.id=m.user_id where m.status='actief' and m.mandate_id is not null and m.mollie_subscription_id is not null and m.cancel_at is null order by m.created_at desc limit 1");
   const id = L.sql(`select id from members where email='${email}'`);
   const plan0 = L.sql(`select plan_id from members where id='${id}'`);
@@ -114,5 +115,6 @@ const webhook = (id) => fetch(L.APP + '/api/mollie-webhook', { method: 'POST', h
   L.check(L.sql(`select status from members where id='${id}'`) === 'actief', 'weer hervat');
 
   for (const x of [anon, m, o]) { const e = x.errs.filter((y) => !/400|401|403|404/.test(y)); if (e.length) console.log('  errs', e.slice(0, 3)); }
+  L.sql('update settings set allow_extras=false');
   await b.close();
 })().catch((e) => { console.error(e); process.exit(1); });
