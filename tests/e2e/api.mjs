@@ -38,7 +38,7 @@ let r = await call(M, 'membership-change', { action: 'plan', plan: 'signature' }
 ok(r.ok && r.immediate, 'upgrade direct: ' + JSON.stringify(r));
 await sleep(1200);
 ok(mem().split('|')[1] === 'signature', 'plan nu signature');
-ok(sql(`select p.status from payments p join members m on m.id=p.member_id where m.email='${email}' and kind='upgrade'`) === 'betaald', 'verschil naar rato geïncasseerd');
+ok(sql(`select p.status from payments p join members m on m.id=p.member_id where m.email='${email}' and kind='upgrade' order by p.created_at desc limit 1`) === 'betaald', 'verschil naar rato geïncasseerd');
 let st = await state(); const subId = sql(`select mollie_subscription_id from members where email='${email}'`);
 ok(st.subscriptions[subId].amount.value === sql("select price from plans where id='signature'"), 'Mollie subscription-bedrag aangepast: ' + st.subscriptions[subId].amount.value);
 

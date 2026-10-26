@@ -46,7 +46,7 @@ export default async function cron(req, res) {
     try {
       const yday = todayAms(-1);
       const finished = await one(db().from('appointments').select('*, treatments(name), staff(name), members(name,email,prefs)')
-        .eq('status', 'afgerond').eq('is_primary', true).is('review_asked_at', null).gte('starts_at', yday + 'T00:00:00Z').lt('starts_at', today + 'T23:59:59Z'));
+        .eq('status', 'afgerond').eq('is_primary', true).is('review_asked_at', null).gte('starts_at', todayAms(-2) + 'T00:00:00Z').lt('starts_at', today + 'T23:59:59Z'));
       for (const a of finished) {
         if (new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Amsterdam' }).format(new Date(a.starts_at)) !== yday) continue;
         const has = await one(db().from('reviews').select('appointment_id').eq('appointment_id', a.id));
