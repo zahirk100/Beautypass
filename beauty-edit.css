@@ -41,7 +41,6 @@
 }
 .edit-index-nav a:hover {text-decoration: underline;}
 .edit-index-short,
-.edit-swipe-hint,
 .edit-lookbook-controls {display: none;}
 .beauty-edit .edit-scene {scroll-margin-top: -16px;}
 .beauty-edit .edit-copy {
@@ -100,7 +99,7 @@
 }
 
 /* Protect captions locally, keeping faces, skin and linen in their own light. */
-.beauty-edit .edit-scene-nails {--edit-position: 42% 15%;}
+.beauty-edit .edit-scene-nails {--edit-position: 44% 18%;}
 .beauty-edit .edit-scene::after {background: none;}
 .beauty-edit .edit-copy::before {
   content: "";
@@ -128,7 +127,7 @@
 .beauty-edit .edit-scene-smooth .edit-copy::before {
   background: linear-gradient(180deg, transparent, rgb(35 26 20 / 66%) 90px, rgb(35 26 20 / 73%));
 }
-.beauty-edit .edit-scene-smooth {--edit-position: 62% 50%;}
+.beauty-edit .edit-scene-smooth {--edit-position: 53% 42%;}
 
 /* Treatment details are a secondary reading layer, opened on request. */
 html.bp-edit-dialog-open {overflow: hidden;}
@@ -220,6 +219,7 @@ html.bp-edit-dialog-open {overflow: hidden;}
   }
   .beauty-edit .edit-scene-nails {min-height: max(480px, var(--edit-height));}
   .beauty-edit .edit-category {font-size: .75rem; margin-bottom: 2px;}
+  .beauty-edit .edit-scene-smooth {--edit-position: 38% 42%;}
   .beauty-edit .edit-scene-hair {
     --edit-display: clamp(3rem, 13.2vw, 3.375rem);
     --edit-position: 83% 25%;
@@ -238,13 +238,6 @@ html.bp-edit-dialog-open {overflow: hidden;}
      and moving rule reveal the native, non-looping horizontal lookbook. */
   .beauty-edit[data-edit-lookbook] {--edit-lookbook-height: max(520px, calc(100svh - 112px));}
   [data-edit-lookbook] .edit-heading {display: grid; grid-template-columns: 1fr auto;}
-  [data-edit-lookbook] .edit-swipe-hint {
-    display: block;
-    margin: 0;
-    color: var(--service-ink);
-    font-size: .625rem;
-    line-height: 1.65;
-  }
   [data-edit-lookbook] .edit-index-nav {
     grid-column: 1 / -1;
     justify-content: space-between;
@@ -266,6 +259,7 @@ html.bp-edit-dialog-open {overflow: hidden;}
     scroll-snap-type: x mandatory;
     scrollbar-width: none;
     background: var(--paper);
+    scroll-margin-top: calc(var(--edit-controls-height, 65px) - 16px);
   }
   [data-edit-lookbook] .edit-gallery::-webkit-scrollbar {display: none;}
   [data-edit-lookbook] .edit-gallery:focus-visible {outline: 1px solid var(--ink); outline-offset: -2px;}
@@ -277,16 +271,21 @@ html.bp-edit-dialog-open {overflow: hidden;}
     min-height: var(--edit-lookbook-height);
     scroll-snap-align: start;
     scroll-snap-stop: always;
+    scroll-margin-top: calc(var(--edit-controls-height, 65px) - 16px);
   }
   [data-edit-lookbook] .edit-category {text-decoration: none;}
   [data-edit-lookbook] .edit-lookbook-controls:not([hidden]) {
+    position: sticky;
+    top: var(--edit-header-height);
+    z-index: 5;
     display: flex;
     flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
     gap: 0 24px;
-    min-height: 76px;
-    padding: 12px 24px;
+    min-height: 64px;
+    padding: 10px 24px;
+    border-bottom: 1px solid var(--line);
     background: var(--paper);
     color: var(--ink);
   }
@@ -299,6 +298,8 @@ html.bp-edit-dialog-open {overflow: hidden;}
 }
 @media (max-width: 760px) {
   .beauty-edit .edit-scene {scroll-margin-top: -14px;}
+  .beauty-edit[data-edit-lookbook] .edit-scene,
+  [data-edit-lookbook] .edit-gallery {scroll-margin-top: calc(var(--edit-controls-height, 65px) - 14px);}
   .edit-dialog {
     inset: auto 0 0;
     width: 100%;

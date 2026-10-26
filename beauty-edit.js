@@ -98,7 +98,6 @@
       const short = link.querySelector('.edit-index-short').textContent.trim();
       link.setAttribute('aria-label', mobile.matches && short !== full ? `${short}: ${full}` : full);
     });
-    section.querySelector('.edit-swipe-hint').hidden = !mobile.matches;
     controls.hidden = !mobile.matches || !canOpenDialog;
     if (mobile.matches) {
       gallery.tabIndex = 0;
@@ -147,6 +146,11 @@
   mobile.addEventListener('change', configure);
   configure();
   if (typeof ResizeObserver !== 'undefined') {
+    new ResizeObserver(() => {
+      if (mobile.matches && !controls.hidden) {
+        section.style.setProperty('--edit-controls-height', `${controls.offsetHeight}px`);
+      }
+    }).observe(controls);
     let width = gallery.clientWidth;
     new ResizeObserver(() => {
       if (gallery.clientWidth === width) return;
