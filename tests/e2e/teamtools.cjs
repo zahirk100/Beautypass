@@ -74,6 +74,7 @@ const nav = (p, label) => p.getByText(label, { exact: true }).locator('visible=t
   await n.locator('input[type=checkbox]').check();
   await O.payAndSignIn(n, email);
   L.check(L.sql(`select terms_accepted_at is not null from members where email='${email}'`) === 't', 'akkoord vastgelegd bij de member');
+  await n.evaluate(() => BP.auth.setPassword('Geheim-1234'));
   L.sql('update settings set terms_url=null, privacy_url=null');
 
   console.log('6. wachtlijst: mail als er plek vrijkomt');

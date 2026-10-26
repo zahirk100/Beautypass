@@ -8,7 +8,6 @@ async function toCheckout(p, { email, name, terms }) {
   const start = p.getByText('Stel je routine samen', { exact: true }).locator('visible=true');
   if (await start.count()) await start.first().click();
   await p.getByText('Gellak manicure', { exact: true }).click();
-  await p.getByRole('button', { name: 'Meer Gellak manicure' }).click();
   await p.getByText('Blowout', { exact: true }).click();
   await p.getByRole('button', { name: 'Bekijk je pakket' }).click();
   await p.getByText('Past het best bij jou').waitFor();
@@ -109,6 +108,7 @@ if (require.main === module) (async () => {
   await g.getByLabel('Code uit je mail').fill(await L.otp(e3b, t3)); await g.getByRole('button', { name: 'Inloggen', exact: true }).click();
   await g.getByText(/time for you/).first().waitFor({ timeout: 20000 });
   L.check(true, 'member logt in met het gecorrigeerde adres');
+  await g.evaluate(() => BP.auth.setPassword('Geheim-1234'));
   const r3b = await o.evaluate(([id]) => BP.act.memberEmail(id, 'nog.anders@beautypass-test.nl').then(() => 'ok', (x) => x.message), [id3]);
   L.check(/al eens ingelogd/.test(r3b), 'na de eerste login niet meer te wijzigen: ' + r3b);
 

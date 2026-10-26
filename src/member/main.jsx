@@ -23,7 +23,7 @@ const api={push:x=>setStack(s=>[...s,x]),pop:()=>setStack(s=>s.slice(0,-1)),rese
 toast:msg=>setToast({msg,k:Date.now()}),logout:async()=>{await BP.auth.signOut();location.replace('/member/');}};
 React.useEffect(()=>{if(!toast)return;const t=setTimeout(()=>setToast(null),2600);return()=>clearTimeout(t);},[toast]);
 const top=stack[stack.length-1];
-const renderTop=x=>x.k==='appt'?<ApptDetail id={x.id}/>:x.k==='book'?<Book tid={x.tid} reschedule={x.reschedule}/>:x.k==='routine'?<RoutineEdit/>:x.k==='plans'?<Plans/>:x.k==='payments'?<Payments/>:null;
+const renderTop=x=>x.k==='appt'?<ApptDetail id={x.id}/>:x.k==='book'?<Book tid={x.tid} reschedule={x.reschedule}/>:x.k==='routine'?<RoutineEdit/>:x.k==='plans'?<Plans/>:x.k==='payments'?<Payments/>:x.k==='visitplan'?<RoutineBook replace={x.replace}/>:x.k==='visit'?<VisitDetail id={x.id}/>:null;
 const root={home:<Home/>,appts:<Appointments/>,membership:<Membership/>,profile:<Profile/>}[tab];
 // Phone: the app layout full screen; tablet and computer: the website layout
 const MOBILE=760;const [mobile,setMobile]=React.useState(()=>window.innerWidth<MOBILE);

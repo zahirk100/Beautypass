@@ -22,6 +22,7 @@ const O = require('./onboard.cjs');
     await q.waitForURL(/checkout/); await q.click('#paid'); await q.waitForURL(/betaald=1/);
     await q.getByText(/you're in/i).first().waitFor({ timeout: 30000 });
     L.check(L.sql(`select status from members where email='${email}'`) === 'actief', tag + ': na tweede poging actief');
+    await q.evaluate(() => BP.auth.setPassword('Geheim-1234'));   // the other tests sign in with a password
     await q.screenshot({ path: `tests/e2e/shots/res_${tag}_5.png` });
     L.check(!q.errs.filter((e) => !/400|401/.test(e)).length, tag + ': geen JS-fouten ' + q.errs.join(' | '));
   }

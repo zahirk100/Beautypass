@@ -41,6 +41,18 @@ async function waitingList(a) {
   }
 }
 
+// A routine visit: its treatments as one mail (claimed once per visit and kind)
+export async function visitInfo(a, settings) {
+  const segs = await one(db().from('appointments').select('*, treatments(name), staff(name)').eq('visit_id', a.visit_id).order('starts_at'));
+  const live = segs.filter((x) => x.status !== 'geannuleerd');
+  const list = live.length ? live : segs;
+  return { segs, live, info: { ...list[0], starts_at: list[0].starts_at, ends_at: list.reduce((e, x) => (x.ends_at > e ? x.ends_at : e), list[0].ends_at),
+    treatment: `je routine (${list.length} behandeling${list.length === 1 ? '' : 'en'})`, kids: Math.max(...list.map((x) => x.kids || 0)),
+    extra: list.reduce((n, x) => n + Number(x.paid_amount || 0), 0), cancel_hours: settings.cancel_hours,
+    segments: list.map((x) => ({ starts_at: x.starts_at, treatment: x.treatments.name, staff: x.staff.name })) } };
+}
+const claimVisit = async (id, col) => (await one(db().from('visits').update({ [col]: new Date().toISOString() }).eq('id', id).is(col, null).select('id'))).length > 0;
+
 export default async function notify(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
   if (!env('NOTIFY_SECRET') || !same(req.headers['x-notify-secret'] || '', env('NOTIFY_SECRET'))) return res.status(401).end();
@@ -51,8 +63,16 @@ export default async function notify(req, res) {
     const settings = await one(db().from('settings').select('cancel_hours').eq('id', 1).single());
     const info = { ...a, treatment: a.treatments.name, staff: a.staff.name, cancel_hours: settings.cancel_hours };
     const to = { email: a.members.email, name: a.members.name };
-    if (event === 'booked') await sendMail(to, mails.booked(a.members, info));
-    if (event === 'cancelled') {
+    if (a.visit_id && event === 'booked') {
+      if (await claimVisit(a.visit_id, 'booked_mail_at')) await sendMail(to, mails.booked(a.members, (await visitInfo(a, settings)).info));
+    } else if (a.visit_id && event === 'cancelled' && !(await visitInfo(a, settings)).live.length) {
+      // the whole visit is cancelled: one mail
+      if (await claimVisit(a.visit_id, 'cancelled_mail_at')) {
+        const v = await visitInfo(a, settings);
+        await sendMail(to, mails.cancelled(a.members, { ...v.info, cancel_reason: a.cancel_reason, late_cancel: a.late_cancel, extra: 0 }));
+      }
+    } else if (event === 'booked') await sendMail(to, mails.booked(a.members, info));
+    else if (event === 'cancelled') {
       info.refunded = await refund(a);
       await sendMail(to, mails.cancelled(a.members, info));
     }

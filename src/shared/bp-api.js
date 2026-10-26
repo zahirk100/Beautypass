@@ -49,7 +49,7 @@ const mapAppt = (a, rooms) => {
     memberId: a.member_id, treatmentId: a.treatment_id, staffId: a.staff_id, roomId: a.room_id,
     room: (rooms.find((r) => r.id === a.room_id) || {}).name || a.room_id,
     status: lapsed ? 'geannuleerd' : a.status, unpaid: a.status === 'gepland' && !a.confirmed && !lapsed, note: a.note || '', paid: Number(a.paid_amount) || 0, late: a.late_cancel,
-    confirmed: a.confirmed, holdUntil: a.hold_until, checkedInAt: a.checked_in_at || null, kids: a.kids || 0,
+    confirmed: a.confirmed, holdUntil: a.hold_until, visitId: a.visit_id || null, checkedInAt: a.checked_in_at || null, kids: a.kids || 0,
   };
 };
 const mapMember = (m, teamNotes = {}) => ({
@@ -97,7 +97,7 @@ async function loadCatalog() {
     q(supabase.from('settings').select('*').eq('id', 1).single()),
   ]);
   const categories = cats.map((c) => ({ id: c.id, name: c.name, title: c.title, it: c.title_it, img: c.img }));
-  const treatments = trs.map((t) => ({ id: t.id, cat: t.category_id, name: t.name, dur: t.duration_min, price: Number(t.price), room: t.room, active: t.active }));
+  const treatments = trs.map((t) => ({ id: t.id, cat: t.category_id, name: t.name, dur: t.duration_min, price: Number(t.price), room: t.room, active: t.active, zone: t.zone || null }));
   const planList = plans.map((p) => ({ id: p.id, name: p.name, price: Number(p.price), perMonth: p.per_month, interval: '1 month', active: p.active, desc: p.description,
     included: pt.filter((x) => x.plan_id === p.id).map((x) => x.treatment_id) }));
   // Which login belongs to a specialist is team-only (staff_links); unknown until the team data is loaded
@@ -108,7 +108,7 @@ async function loadCatalog() {
     settings: { ...state.settings, hours: settings.hours, cancelHours: settings.cancel_hours, noShowCounts: settings.no_show_counts,
       rollover: settings.rollover, mollieMode: settings.mollie_mode, mollieProfile: settings.mollie_profile || '', rooms: rooms.filter((r) => r.active).map((r) => r.name),
       slotTimes: settings.slot_times, bookingDays: settings.booking_days, pauseMonths: settings.pause_months_per_year,
-      kidsEnabled: settings.kids_enabled !== false && settings.kids_capacity > 0, kidsOn: settings.kids_enabled !== false, kidsCapacity: settings.kids_capacity ?? 0, closedDates: settings.closed_dates || [],
+      kidsEnabled: settings.kids_enabled !== false && settings.kids_capacity > 0, kidsOn: settings.kids_enabled !== false, kidsCapacity: settings.kids_capacity ?? 0, closedDates: settings.closed_dates || [], parallelOn: settings.parallel_enabled !== false, visitsReady: 'parallel_enabled' in settings,
       termsUrl: settings.terms_url || '', privacyUrl: settings.privacy_url || '' },
   });
 }
@@ -276,6 +276,10 @@ const act = {
     await loadMemberSelf();
     return r;
   },
+  // Your routine in one visit: start times on a day (with the plan per time), book, cancel the whole visit
+  visitSlots: (tids, date, skip, member) => q(supabase.rpc('visit_slots', { p_treatments: tids, p_date: date, p_skip: skip || null, p_member: member || null })),
+  bookVisit: async ({ tids, date, time, kids, replace }) => { const r = await q(supabase.rpc('book_visit', { p_treatments: tids, p_date: date, p_time: time, p_kids: kids || 0, p_replace: replace || null })); await loadMemberSelf(); return r; },
+  cancelVisit: async (id) => { const r = await q(supabase.rpc('cancel_visit', { p_visit: id })); await loadMemberSelf(); return r; },
   payAppointment: async (groupId) => api('appointment-pay', { group_id: groupId }),   // → { checkoutUrl }
   cancel: async (id) => { const r = await q(supabase.rpc('cancel_appointment', { p_appointment: id })); await loadMemberSelf(); return r; },
   // Name, phone, routine, preferences, note. The e-mail address belongs to the membership and is not changed here
@@ -328,7 +332,7 @@ const act = {
   updateTreatment: (id, patch) => {
     set({ treatments: replaceIn(state.treatments, id, patch) });
     const t = state.treatments.find((x) => x.id === id);
-    later('tr' + id, () => q(supabase.from('treatments').update({ name: t.name, category_id: t.cat, duration_min: t.dur, price: t.price, room: t.room }).eq('id', id)));
+    later('tr' + id, () => q(supabase.from('treatments').update({ name: t.name, category_id: t.cat, duration_min: t.dur, price: t.price, room: t.room, ...(state.settings.visitsReady ? { zone: t.zone || null } : {}) }).eq('id', id)));
   },
   addTreatment: async () => { const row = await q(supabase.from('treatments').insert({ category_id: 'nails', name: 'Nieuwe behandeling', duration_min: 45, price: 50, room: 'solo', sort: state.treatments.length + 1 }).select().single()); await loadCatalog(); return row.id; },
   // Treatments with history are switched off instead of deleted, so past appointments keep their name
@@ -417,7 +421,7 @@ const extraThisMonth = (mid) => {
 const fallbackPlan = { id: '', name: '—', price: 0, perMonth: 0, included: [], active: false, desc: '' };
 
 const SETTINGS_COLUMNS = { hours: 'hours', cancelHours: 'cancel_hours', noShowCounts: 'no_show_counts', rollover: 'rollover', mollieMode: 'mollie_mode',
-  kidsOn: 'kids_enabled', kidsCapacity: 'kids_capacity', closedDates: 'closed_dates', slotTimes: 'slot_times', termsUrl: 'terms_url', privacyUrl: 'privacy_url' };
+  kidsOn: 'kids_enabled', kidsCapacity: 'kids_capacity', closedDates: 'closed_dates', slotTimes: 'slot_times', termsUrl: 'terms_url', privacyUrl: 'privacy_url', parallelOn: 'parallel_enabled' };
 const settingsDirty = new Set();
 
 const BP = {

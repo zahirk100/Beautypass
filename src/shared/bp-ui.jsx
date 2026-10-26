@@ -52,8 +52,9 @@ function useSlots(tid,date,skip){const [st,setSt]=React.useState({loading:false,
 React.useEffect(()=>{if(!tid||!date){setSt({loading:false,map:{}});return;}let live=true;setSt(x=>({...x,loading:true}));
 BP.act.slotsFor(tid,date,skip).then(rows=>{if(live)setSt({loading:false,map:Object.fromEntries((rows||[]).map(r=>[r.slot,r.staff_ids||[]]))});}).catch(()=>{if(live)setSt({loading:false,map:{}});});return()=>{live=false;};},[tid,date,skip,stamp]);return st;}
 // "Zet in agenda": a calendar file for the appointment
-function downloadIcs(a){const t=BP.tr(a.treatmentId);const s=new Date(a.startsAt);const e=new Date(s.getTime()+t.dur*60000);const f=d=>d.toISOString().replace(/[-:]/g,'').replace(/\.\d{3}/,'');
-const body=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//BeautyPass//NL','BEGIN:VEVENT','UID:'+a.id+'@beautypass.nl','DTSTAMP:'+f(new Date()),'DTSTART:'+f(s),'DTEND:'+f(e),'SUMMARY:'+t.name+' · BeautyPass','LOCATION:BeautyPass house\\, Amsterdam','END:VEVENT','END:VCALENDAR'].join('\r\n');
+// o: a whole visit ({minutes, title}) instead of one treatment
+function downloadIcs(a,o={}){const t=BP.tr(a.treatmentId);const s=new Date(a.startsAt);const e=new Date(s.getTime()+(o.minutes||t.dur)*60000);const f=d=>d.toISOString().replace(/[-:]/g,'').replace(/\.\d{3}/,'');
+const body=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//BeautyPass//NL','BEGIN:VEVENT','UID:'+a.id+'@beautypass.nl','DTSTAMP:'+f(new Date()),'DTSTART:'+f(s),'DTEND:'+f(e),'SUMMARY:'+(o.title||t.name)+' · BeautyPass','LOCATION:BeautyPass house\\, Amsterdam','END:VEVENT','END:VCALENDAR'].join('\r\n');
 const url=URL.createObjectURL(new Blob([body],{type:'text/calendar'}));const l=document.createElement('a');l.href=url;l.download='beautypass-afspraak.ics';document.body.appendChild(l);l.click();l.remove();setTimeout(()=>URL.revokeObjectURL(url),1000);}
 function Loading({label}){return <div style={{minHeight:'100vh',display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center',gap:18,background:BPC.paper,fontFamily:BPC.sans,color:BPC.ink2}}><img src={WORDMARK} alt="BeautyPass" style={{height:15}}/><div style={{width:28,height:28,borderRadius:14,border:`2.5px solid ${BPC.line}`,borderTopColor:BPC.esp,animation:'bpSpin .8s linear infinite'}}></div>{label&&<div style={{fontSize:13}}>{label}</div>}</div>;}
 Object.assign(window,{useSlots,downloadIcs,Loading});

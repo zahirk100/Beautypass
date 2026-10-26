@@ -2,6 +2,7 @@
 import { timingSafeEqual } from 'node:crypto';
 import { db, one, env, mollie, money, webhookUrl, todayAms, addMonths } from '../_lib.js';
 import { mails, sendMail } from '../_mail.js';
+import { visitInfo } from './notify.js';
 
 const same = (a, b) => { const x = Buffer.from(String(a)), y = Buffer.from(String(b)); return x.length === y.length && timingSafeEqual(x, y); };
 
@@ -17,9 +18,20 @@ export default async function cron(req, res) {
     const appts = await one(db().from('appointments').select('*, treatments(name), staff(name), members(name,email,prefs)')
       .eq('status', 'gepland').eq('is_primary', true).eq('confirmed', true).is('reminder_sent_at', null).gte('starts_at', from).lte('starts_at', to));
     const settings = await one(db().from('settings').select('cancel_hours').eq('id', 1).single());
+    const visitsDone = new Set();
     for (const a of appts) {
       if (new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Amsterdam' }).format(new Date(a.starts_at)) !== tomorrow) continue;
       if (a.members.prefs && a.members.prefs.reminders === false) continue;
+      if (a.visit_id) {
+        // a routine visit: one reminder for all its treatments
+        if (!visitsDone.has(a.visit_id)) {
+          visitsDone.add(a.visit_id);
+          await sendMail({ email: a.members.email, name: a.members.name }, mails.reminder(a.members, (await visitInfo(a, settings)).info));
+          done.reminders++;
+        }
+        await one(db().from('appointments').update({ reminder_sent_at: new Date().toISOString() }).eq('id', a.id));
+        continue;
+      }
       await sendMail({ email: a.members.email, name: a.members.name }, mails.reminder(a.members, { ...a, treatment: a.treatments.name, staff: a.staff.name, cancel_hours: settings.cancel_hours }));
       await one(db().from('appointments').update({ reminder_sent_at: new Date().toISOString() }).eq('id', a.id));
       done.reminders++;
@@ -39,7 +51,9 @@ export default async function cron(req, res) {
         if (new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Amsterdam' }).format(new Date(a.starts_at)) !== yday) continue;
         const has = await one(db().from('reviews').select('appointment_id').eq('appointment_id', a.id));
         await one(db().from('appointments').update({ review_asked_at: new Date().toISOString() }).eq('id', a.id));
-        if (has.length || (a.members.prefs && a.members.prefs.reminders === false)) continue;
+        // a routine visit: ask once (about its first treatment)
+        const later = a.visit_id && (await one(db().from('appointments').select('id').eq('visit_id', a.visit_id).eq('status', 'afgerond').lt('starts_at', a.starts_at))).length;
+        if (has.length || later || (a.members.prefs && a.members.prefs.reminders === false)) continue;
         await sendMail({ email: a.members.email, name: a.members.name }, mails.reviewAsk(a.members, { ...a, treatment: a.treatments.name, staff: a.staff.name }));
         done.reviews++;
       }

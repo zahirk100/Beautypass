@@ -26,7 +26,14 @@ const button = (href, label) => `<table role="presentation" cellpadding="0" cell
 const rows = (list) => `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin:6px 0 20px;border-top:1px solid #e6e0d6;">${list.map(([k, v]) =>
   `<tr><td style="padding:11px 12px 11px 0;border-bottom:1px solid #e6e0d6;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:#958c80;font-weight:600;white-space:nowrap;vertical-align:top;">${k}</td><td style="padding:11px 0;border-bottom:1px solid #e6e0d6;color:#1d1a17;font-size:15px;text-align:right;">${v}</td></tr>`).join('')}</table>`;
 
-const apptRows = (a) => rows([['Wanneer', esc(fmtWhen(a.starts_at))], ['Behandeling', esc(a.treatment)], ['Specialist', esc(a.staff)], ['Waar', 'BeautyPass house · Amsterdam'],
+const hhmm = (ts) => new Intl.DateTimeFormat('nl-NL', { timeZone: 'Europe/Amsterdam', hour: '2-digit', minute: '2-digit' }).format(new Date(ts));
+// One appointment, or a routine visit (a.segments: its treatments, some at the same time)
+const apptRows = (a) => a.segments ? rows([['Wanneer', esc(fmtWhen(a.starts_at)) + ' – ' + hhmm(a.ends_at)],
+  ['Behandelingen', a.segments.map((x) => `${hhmm(x.starts_at)} ${esc(x.treatment)}<br><span style="font-size:13px;color:#958c80;">${esc(x.staff)}</span>`).join('<br>')],
+  ['Waar', 'BeautyPass house · Amsterdam'],
+  ...(a.extra > 0 ? [['Los af te rekenen', eur(a.extra) + ' in de salon']] : []),
+  ...(a.kids > 0 && a.status !== 'geannuleerd' ? [['Kinderhoek', a.kids === 1 ? 'Gereserveerd voor 1 kind' : `Gereserveerd voor ${a.kids} kinderen`]] : [])])
+  : rows([['Wanneer', esc(fmtWhen(a.starts_at))], ['Behandeling', esc(a.treatment)], ['Specialist', esc(a.staff)], ['Waar', 'BeautyPass house · Amsterdam'],
   ...(a.kids > 0 && a.status !== 'geannuleerd' ? [['Kinderhoek', a.kids === 1 ? 'Gereserveerd voor 1 kind' : `Gereserveerd voor ${a.kids} kinderen`]] : [])]);
 
 export const mails = {

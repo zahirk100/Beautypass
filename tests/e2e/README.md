@@ -20,6 +20,7 @@ Then, with Playwright available:
 | `api.mjs` | upgrade/downgrade, pause/resume, new payment method, cancel, cron, waitlist and team invites, permissions |
 | `beheer.cjs` | team booking, team notes, team cancel, specialist view, staff drawer |
 | `audit.cjs` | no leaks (staff logins, others' usage), paying a failed month yourself, undoing a cancellation, unpaid reservations (retry, lapse, refund when paid too late), unpaid upgrade reverted, pause cancels appointments in the unpaid period |
+| `visit.cjs` | routine in one visit: Home button, routine ticked from the profile, treatments at the same time (six hands) in one suite, one mail, reschedule, cancel one part or the whole visit, Beheer sees the visit |
 | `sweep.cjs` | screenshots of every screen (member web + app, Beheer desktop + mobile) |
 
 Screenshots go to `tests/e2e/shots/` (ignored by git).

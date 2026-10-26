@@ -40,11 +40,13 @@ return <Screen title="Overzicht" onBack={back} footer={<Btn kind={paid?'esp':'pr
 <div style={{fontSize:12,color:BPC.ink3,marginTop:12,lineHeight:1.45}}>Kosteloos annuleren of verzetten tot {s.settings.cancelHours} uur van tevoren.</div></Screen>;}
 
 function Appointments(){const s=useBP();const m=useM();const [seg,setSeg]=React.useState('up');const mine=s.appointments.filter(a=>a.memberId===s.me);
-const up=mine.filter(a=>a.status==='gepland'&&a.date>=BP.today).sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));const past=mine.filter(a=>!(a.status==='gepland'&&a.date>=BP.today)).sort((a,b)=>(b.date+b.time).localeCompare(a.date+a.time));const list=seg==='up'?up:past;
-return <div style={{padding:'66px 20px 110px'}}><Serif size={40} it="moments." style={{marginBottom:20}}>Your</Serif><Segmented opts={[['up','Komend ('+up.length+')'],['past','Eerder']]} val={seg} onChange={setSeg}/>
-<div style={{display:'grid',gap:10}}>{list.map(a=><ApptCard key={a.id} a={a} onClick={()=>m.push({k:'appt',id:a.id})}/>)}</div>
+const up=mine.filter(a=>a.status==='gepland'&&a.date>=BP.today).sort((a,b)=>(a.date+a.time).localeCompare(b.date+b.time));const past=mine.filter(a=>!(a.status==='gepland'&&a.date>=BP.today)).sort((a,b)=>(b.date+b.time).localeCompare(a.date+a.time));
+// a routine visit is one card (first treatment marks its place in the list)
+const visits=Object.fromEntries(myVisits(s).map(v=>[v.id,v]));const seen=new Set();const upItems=up.filter(a=>!a.visitId||!visits[a.visitId]||(!seen.has(a.visitId)&&seen.add(a.visitId)));const list=seg==='up'?upItems:past;
+return <div style={{padding:'66px 20px 110px'}}><Serif size={40} it="moments." style={{marginBottom:20}}>Your</Serif><Segmented opts={[['up','Komend ('+upItems.length+')'],['past','Eerder']]} val={seg} onChange={setSeg}/>
+<div style={{display:'grid',gap:10}}>{list.map(a=>seg==='up'&&a.visitId&&visits[a.visitId]?<VisitCard key={a.visitId} v={visits[a.visitId]} onClick={()=>m.push({k:'visit',id:a.visitId})}/>:<ApptCard key={a.id} a={a} onClick={()=>m.push({k:'appt',id:a.id})}/>)}</div>
 {!list.length&&<div style={{textAlign:'center',padding:'40px 0',color:BPC.ink2,fontSize:14}}>Niets te zien hier.</div>}
-{seg==='up'&&<div style={{marginTop:18}}><Btn kind="ghost" icon="plus" onClick={()=>m.setTab('book')}>Nieuwe afspraak</Btn></div>}</div>;}
+{seg==='up'&&<div style={{marginTop:18,display:'grid',gap:10}}><RoutineCta onClick={()=>m.push({k:'visitplan'})}/><Btn kind="ghost" icon="plus" onClick={()=>m.setTab('book')}>Nieuwe afspraak</Btn></div>}</div>;}
 
 function ApptDetail({id}){const s=useBP();const m=useM();const a=s.appointments.find(x=>x.id===id);const [sheet,setSheet]=React.useState(false);if(!a)return null;
 const t=BP.tr(a.treatmentId),st=BP.staff(a.staffId),c=BP.cat(t.cat);const hoursTo=(new Date(a.date+'T'+a.time)-new Date())/36e5;const late=hoursTo<s.settings.cancelHours;const upcoming=a.status==='gepland'&&a.date>=BP.today;
@@ -114,4 +116,34 @@ return <div style={{padding:'66px 20px 110px'}}><div style={{display:'flex',flex
 <Eyebrow style={{margin:'24px 0 8px'}}>Meldingen</Eyebrow><Card style={{padding:'4px 16px'}}>{[['reminders','Herinnering 24 uur van tevoren'],['newsletter','Nieuws & nieuwe behandelingen']].map(([k,l],i)=><div key={k} style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'12px 0',borderBottom:i===0?`1px solid ${BPC.line}`:'none'}}><span style={{fontSize:14}}>{l}</span><Toggle on={!!p[k]} onChange={v=>setP({[k]:v})}/></div>)}</Card>
 <Card style={{marginTop:24,padding:'0 16px'}}><Row icon="logout" label="Uitloggen" danger last onClick={()=>m.logout()}/></Card><Sheet open={!!ed} onClose={()=>setEd(null)} title="Je gegevens">{ed&&<div style={{display:'grid',gap:14}}><Field label="Naam" value={ed.name} onChange={v=>setEd({...ed,name:v})}/><Field label="Telefoon" type="tel" value={ed.phone} onChange={v=>setEd({...ed,phone:v})}/><div style={{fontSize:12.5,color:BPC.ink2,lineHeight:1.45}}>Je e-mailadres hoort bij je membership en kun je niet zelf wijzigen. Neem contact op met de salon als dat nodig is.</div>
 <Btn disabled={ed.name.trim().length<2} onClick={()=>{upd({name:ed.name.trim(),phone:ed.phone.trim()});setEd(null);m.toast('Gegevens opgeslagen');}}>Opslaan</Btn></div>}</Sheet></div>;}
-Object.assign(window,{Book,Appointments,ApptDetail,Membership,RoutineEdit,Plans,Payments,Profile,Segmented});
+// Plan the routine in one visit (phone)
+function RoutineBook({replace}){const m=useM();const p=useRoutinePlanner(replace);const {s,plan}=p;
+if(p.done)return <div style={{position:'absolute',inset:0,background:BPC.paper,display:'flex',flexDirection:'column',justifyContent:'center',padding:'0 28px',textAlign:'center',animation:'bpFade .3s'}}>
+<div style={{width:76,height:76,borderRadius:38,background:BPC.sageSoft,display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 22px'}}><Ico n="check" s={34} c={BPC.sage} w={2}/></div>
+<Eyebrow style={{marginBottom:10}}>{replace?'Verzet':'Bevestigd'}</Eyebrow><Serif size={40} it="see you soon.">Je routine,</Serif>
+<div style={{fontSize:14.5,color:BPC.ink2,lineHeight:1.55,margin:'16px 0 30px'}}>{BP.fmtDate(p.done.date)}, {p.done.start} – {p.done.end}. Je krijgt een bevestiging per e-mail en een herinnering een dag van tevoren.{Number(p.done.extra)>0?` Los af te rekenen in de salon: ${BP.eur(Number(p.done.extra))}.`:''}</div>
+<Btn onClick={()=>{m.reset();m.setTab('appts');}}>Naar mijn afspraken</Btn><div onClick={()=>{m.reset();m.setTab('home');}} style={{fontSize:14,color:BPC.ink2,marginTop:16,cursor:'pointer'}}>Terug naar home</div></div>;
+return <Screen title={replace?'Bezoek verzetten':'Plan je routine'} onBack={m.pop} footer={<Btn disabled={!p.sel||p.busy} onClick={()=>p.book(m.toast)}>{p.busy?'Bezig…':p.sel?`Bevestig · ${BP.fmtDate(p.date,{weekday:'short',day:'numeric',month:'short'})} ${p.sel.plan.start} – ${p.sel.plan.end}`:p.tids.length?'Kies een tijd':'Kies je behandelingen'}</Btn>}>
+<Serif size={34} it="in één bezoek." style={{marginBottom:6}}>Je routine,</Serif><div style={{fontSize:13.5,color:BPC.ink2,lineHeight:1.5,marginBottom:18}}>Alles op één dag. Waar het kan, werken meerdere specialisten tegelijk. Vink uit wat je deze keer overslaat.</div>
+<VisitPicker tids={p.tids} setTids={p.setTids} routine={p.routine}/>
+<div style={{marginTop:14}}><VisitCreditNote cr={p.cr} plan={plan}/></div>
+{p.tids.length>0&&<><Eyebrow style={{margin:'24px 0 10px'}}>Datum</Eyebrow><VisitDays days={p.days} date={p.date} setDate={p.setDate}/>
+<Eyebrow style={{margin:'20px 0 10px'}}>Starttijd</Eyebrow><VisitTimes slots={p.slots} time={p.time} setTime={p.setTime}/></>}
+{p.sel&&<Card style={{marginTop:20}}><div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline',marginBottom:14}}><div style={{fontSize:14,fontWeight:700}}>Jouw bezoek</div><div style={{fontSize:13,color:BPC.ink2}}>{p.sel.plan.start} – {p.sel.plan.end} · {durText(p.sel.plan.minutes)}</div></div><VisitTimeline plan={p.sel.plan}/></Card>}
+{p.sel&&<div style={{marginTop:18}}><VisitKids p={p}/></div>}
+<div style={{fontSize:12,color:BPC.ink3,marginTop:16,lineHeight:1.45}}>Kosteloos annuleren of verzetten tot {s.settings.cancelHours} uur van tevoren.</div></Screen>;}
+
+// A booked visit (phone)
+function VisitDetail({id}){const s=useBP();const m=useM();const v=myVisits(s).find(x=>x.id===id);const [sheet,setSheet]=React.useState(false);if(!v)return <Screen title="Bezoek" onBack={m.pop}><div style={{fontSize:14,color:BPC.ink2,marginTop:20}}>Dit bezoek is niet meer gepland.</div></Screen>;
+const first=v.list.reduce((a,b)=>a.time<b.time?a:b);const late=(new Date(v.date+'T'+v.plan.start)-new Date())/36e5<s.settings.cancelHours;const paid=v.list.some(a=>a.paid>0);
+return <><Screen title="Je routine" onBack={m.pop}><Eyebrow>{BP.fmtDate(v.date,{weekday:'long',day:'numeric',month:'long'})}</Eyebrow><Serif size={36} style={{margin:'8px 0 4px'}}>{v.plan.start} – {v.plan.end}</Serif><div style={{fontSize:13.5,color:BPC.ink2,marginBottom:18}}>{v.list.length} behandelingen · {durText(v.plan.minutes)} · BeautyPass house</div>
+<VisitTimeline plan={v.plan} onPart={x=>BP.act.cancel(x.id).then(()=>m.toast(BP.tr(x.treatment).name+' geannuleerd')).catch(e=>m.toast(e.message))}/>
+{paid&&<Card style={{marginTop:14,background:BPC.goldSoft,border:'none',fontSize:13,lineHeight:1.45}}>Los af te rekenen in de salon: {BP.eur(v.list.reduce((n,a)=>n+a.paid,0))}</Card>}
+<div style={{display:'grid',gap:10,marginTop:22}}><Btn kind="ghost" icon="cal" onClick={()=>{downloadIcs(first,{minutes:v.plan.minutes,title:'Je routine'});m.toast('Agenda-bestand gedownload');}}>Zet in agenda</Btn><Btn kind="ghost" onClick={()=>m.push({k:'visitplan',replace:id})}>Verzetten</Btn><Btn kind="danger" onClick={()=>setSheet(true)}>Hele bezoek annuleren</Btn></div></Screen>
+<Sheet open={sheet} onClose={()=>setSheet(false)} title="Bezoek annuleren?"><div style={{fontSize:14,color:BPC.ink2,lineHeight:1.5,marginBottom:20}}>{late?`Je bezoek is binnen ${s.settings.cancelHours} uur. De behandelingen tellen mee voor deze maand.`:'Je annuleert ruim op tijd. De behandelingen komen terug in je maandtegoed.'}</div>
+<div style={{display:'grid',gap:10}}><Btn kind="primary" style={{background:BPC.bord}} onClick={()=>BP.act.cancelVisit(id).then(()=>{setSheet(false);m.pop();m.toast('Bezoek geannuleerd');}).catch(e=>m.toast(e.message))}>Ja, annuleren</Btn><Btn kind="soft" onClick={()=>setSheet(false)}>Behouden</Btn></div></Sheet></>;}
+function VisitCard({v,onClick}){const names=v.list.slice().sort((a,b)=>a.time.localeCompare(b.time)).map(a=>BP.tr(a.treatmentId).name);return <div onClick={onClick} style={{display:'flex',gap:14,alignItems:'center',background:BPC.esp,color:'#fff',borderRadius:20,padding:14,cursor:'pointer'}}>
+<div style={{width:56,height:56,borderRadius:14,background:'rgba(255,255,255,.12)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}><Ico n="spark" s={22} c="#fff"/></div>
+<div style={{flex:1,minWidth:0}}><div style={{fontSize:12,opacity:.75,textTransform:'capitalize'}}>{BP.fmtDate(v.date,{weekday:'short',day:'numeric',month:'short'})} · {v.plan.start} – {v.plan.end}</div><div style={{fontFamily:BPC.serif,fontSize:21,fontWeight:600,margin:'2px 0',lineHeight:1.1}}>Je routine</div><div style={{fontSize:12,opacity:.8,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{names.join(' · ')}</div></div><Ico n="chev" s={16} c="#fff"/></div>;}
+
+Object.assign(window,{RoutineBook,VisitDetail,VisitCard,Book,Appointments,ApptDetail,Membership,RoutineEdit,Plans,Payments,Profile,Segmented});
