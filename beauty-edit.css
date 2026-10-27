@@ -319,12 +319,12 @@ html.bp-edit-dialog-open {overflow: hidden;}
   .edit-progress > span {transition: none;}
 }
 
-/* Glass-skin close-up: protect the light neck behind the white caption. */
+/* Relaxed skin portrait: preserve the cheek and hand in narrow crops. */
 .beauty-edit .edit-scene-skin {--edit-position: 50% 10%;}
 .beauty-edit .edit-scene-skin .edit-copy::before {
-  background: linear-gradient(180deg, transparent, rgb(35 26 20 / 52%) 90px, rgb(35 26 20 / 62%));
+  background: linear-gradient(180deg, transparent, rgb(35 26 20 / 50%) 90px, rgb(35 26 20 / 60%));
 }
 
 @media (max-width: 900px), (orientation: portrait) {
-  .beauty-edit .edit-scene-skin {--edit-position: 20% 10%;}
+  .beauty-edit .edit-scene-skin {--edit-position: 50% 10%;}
 }
