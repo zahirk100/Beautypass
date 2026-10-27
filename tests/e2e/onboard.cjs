@@ -1,23 +1,18 @@
-// Onboarding: routine → package → checkout without an account → Mollie → sign in with a code → welcome.
+// Onboarding: welcome → membership → checkout without an account → Mollie → sign in with a code → plan the first moment.
 // Also: typo suggestion, already a member, failed payment and retry, team corrects the e-mail, cleanup.
 const L = require('./lib.cjs');
 
 // Routine + package + checkout form up to the Mollie page
 async function toCheckout(p, { email, name, terms }) {
   await p.goto(L.APP + '/onboarding', { waitUntil: 'networkidle' });
-  const start = p.getByText('Bekijk de memberships', { exact: true }).locator('visible=true');
-  if (await start.count()) await start.first().click();
-  // 1. the plan: the middle one is preselected ("Meest gekozen")
-  await p.getByText('Meest gekozen').waitFor();
+  // 0. welcome, 1. the plan (the middle one is recommended and preselected)
+  await p.getByRole('button', { name: 'Kies je membership' }).first().click();
+  await p.getByText('Aanrader').waitFor();
   await p.getByText('Essential', { exact: true }).click();   // the other suites expect an Essential member
   await p.getByRole('button', { name: /^Kies Essential/ }).click();
-  // 2. favourites by category: they become the routine
-  await p.getByText('Manicure & pedicure', { exact: true }).click(); await p.getByText('Gellak manicure', { exact: true }).click();
-  await p.getByText('Blowouts', { exact: true }).click(); await p.getByText('Blowout', { exact: true }).click();
-  await p.getByRole('button', { name: 'Verder', exact: true }).click();
-  await p.getByLabel('Volledige naam').fill(name);
+  // 2. checkout: name and e-mail only
+  await p.getByLabel('Je naam').fill(name);
   await p.getByLabel('E-mailadres').fill(email);
-  await p.getByLabel('Telefoon (optioneel)').fill('0612345678');
   if (terms) await p.locator('input[type=checkbox]').check();
 }
 async function payAndSignIn(p, email, outcome = 'paid') {
@@ -58,13 +53,17 @@ if (require.main === module) (async () => {
     await payAndSignIn(p, email);
     await p.screenshot({ path: `tests/e2e/shots/onb_${tag}_done.png` });
     await p.evaluate(() => BP.auth.setPassword('Geheim-1234'));   // the other tests sign in with a password
-    L.check(L.sql(`select status||' '||array_to_string(routine,',') from members where email='${email}'`) === 'actief gel,blow', 'member is actief met de routine');
+    L.check(L.sql(`select status from members where email='${email}'`) === 'actief', 'member is actief');
     L.check(L.sql(`select count(*) from payments p join members m on m.id=p.member_id where m.email='${email}' and p.status='betaald' and p.invoice_no like 'BP-%'`) === '1', 'eerste betaling betaald met factuurnummer');
     L.check(L.sql(`select mollie_subscription_id is not null and mandate_id is not null from members where email='${email}'`) === 't', 'subscription + mandaat vastgelegd');
     const mails = await (await fetch(L.MOCK + '/mock/mails')).json();
     L.check(mails.some((x) => x.to[0].email === email && /Welkom/.test(x.subject)), 'welkomstmail verstuurd');
-    await p.getByRole('button', { name: /Plan je eerste behandeling/ }).click(); await p.waitForURL(/member/); await p.waitForTimeout(1500);
-    L.check(await p.getByText(/time for you/).count() > 0, 'direct in de member-app');
+    // the first moment: a ready-made routine → straight into the planner with it
+    L.check(await p.getByText('Plan je eerste moment').count() === 1, 'na betalen: "Plan je eerste moment"');
+    await p.getByText('Fresh hands & hair', { exact: true }).click(); await p.waitForURL(/member/); await p.waitForTimeout(1800);
+    L.check(L.sql(`select array_to_string(routine,',') from members where email='${email}'`) === 'gel,blow', 'routine opgeslagen');
+    L.check(await p.getByText(/in één bezoek/).count() > 0 && await p.getByText('Gellak manicure', { exact: true }).count() > 0, 'routineplanner staat open met de routine');
+    await p.screenshot({ path: `tests/e2e/shots/onb_${tag}_planner.png` });
     L.check(!p.errs.filter((e) => !/400|401/.test(e)).length, 'geen JS-fouten ' + (p.errs.join(' | ')));
     if (tag === 'm') {
       console.log('al member met dit e-mailadres');

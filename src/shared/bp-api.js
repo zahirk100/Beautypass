@@ -148,6 +148,7 @@ async function loadTeamData() {
     users: can('settings') ? q(supabase.from('profiles').select('id,email,name,role').neq('role', 'member').order('created_at')) : Promise.resolve([]),
     roles: q(supabase.from('role_perms').select('*')),
     usage: can('members') ? q(supabase.rpc('month_usage')).catch(() => []) : Promise.resolve([]),
+    funnel: q(supabase.rpc('onboarding_funnel', { p_days: 30 })).catch(() => null),
     reviews: can('members') || can('team') ? q(supabase.from('reviews').select('*').order('created_at', { ascending: false }).limit(500)).catch(() => []) : Promise.resolve([]),
     links: q(supabase.rpc('staff_links')).catch(() => q(supabase.from('staff').select('staff_id:id,user_id'))).catch(() => null),
     absence: q(supabase.from('staff_absence').select('*').gte('ends', addDays(todayAms(), -1)).order('starts')).catch(() => []),
@@ -165,7 +166,7 @@ async function loadTeamData() {
     appointments: r.appts.map((a) => mapAppt(a, state.rooms)), members, allowances: r.allow,
     waitlist: r.waitlist.map((w) => ({ id: w.id, email: w.email, date: w.created_at.slice(0, 10), source: w.source, interest: w.interest || [], status: w.status, round: w.round })),
     payments: r.payments.map((p) => ({ ...mapPayment(p), memberId: p.member_id })),
-    reviews: r.reviews.map(mapReview),
+    reviews: r.reviews.map(mapReview), funnel: r.funnel ? Object.fromEntries(r.funnel.map((x) => [x.step, Number(x.n)])) : null,
     absence: r.absence.map((x) => ({ id: x.id, staffId: x.staff_id, starts: x.starts, ends: x.ends, reason: x.reason })),
     settings: { ...state.settings,
       roles: order.map((id) => r.roles.find((x) => x.role === id)).filter(Boolean).map((x) => ({ id: x.role, name: x.name, perms: x.role === 'owner' ? PERMS_ALL : x.perms })),
@@ -268,6 +269,8 @@ const act = {
   // ── member ──
   onboard: async ({ name, phone, routine, plan }) => { await q(supabase.rpc('member_onboard', { p_name: name, p_phone: phone, p_routine: routine, p_plan: plan })); },
   startMembership: async (plan, method) => api('membership-start', { plan, method }),   // → { checkoutUrl }
+  // The routine from the profile, saved right away (the first moment after paying opens the planner with it)
+  setRoutine: async (tids) => { await q(supabase.from('members').update({ routine: tids }).eq('id', state.me)); await loadMemberSelf(); },
   // Not signed in yet: the account is made together with the first payment (onboarding checkout)
   checkout: (data) => api('membership-checkout', data),   // → { checkoutUrl, ref }
   checkoutStatus: (ref) => api('checkout-status', { ref }),   // → { status: open | paid | failed }
@@ -430,7 +433,12 @@ const DEFAULT_PRESETS = [
   { id: 'full', name: 'Full treatment', tagline: 'Handen, voeten, haar en wimpers in één bezoek', treatments: ['gel', 'pedi', 'blow', 'lash'] },
 ];
 
+// Anonymous step counter for the onboarding (Beheer → dashboard): no cookies, no personal data, once per step per tab
+const track = (step) => { if (!step) return; try { const k = 'bp-t-' + step; if (sessionStorage.getItem(k)) return; sessionStorage.setItem(k, '1'); } catch (e) { /* counted anyway */ }
+  supabase.rpc('track_step', { p_step: step }).then(() => {}, () => {}); };
+
 const BP = {
+  track,
   get: () => state, subscribe: (f) => { subs.add(f); return () => subs.delete(f); },
   // The most recent completed treatment (last 14 days) the member has not rated yet
   toReview: () => {

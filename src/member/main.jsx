@@ -16,7 +16,7 @@ function MemberApp({flash}){
 const view='app';const setView=()=>{};
 const [tab,setTabS]=React.useState(()=>localStorage.getItem('bp-member-tab')||'home');
 // Opened from the "Hoe was je behandeling?" mail: straight to that appointment
-const [stack,setStack]=React.useState(()=>{const r=new URLSearchParams(location.search).get('review');if(!r)return [];try{localStorage.setItem('bp-member-tab','appts');localStorage.setItem('bp-web-page','appts');sessionStorage.setItem('bp-review',r);}catch(e){}history.replaceState(null,'',location.pathname);return window.innerWidth<760?[{k:'appt',id:r}]:[];});const [toast,setToast]=React.useState(null);const [ok,setOk]=React.useState(0);
+const [stack,setStack]=React.useState(()=>{let open=null;try{open=localStorage.getItem('bp-open-planner');localStorage.removeItem('bp-open-planner');}catch(e){}if(open==='1'&&window.innerWidth<760)return [{k:'visitplan'}];if(open==='book'&&window.innerWidth<760)return [{k:'book'}];if(open&&window.innerWidth>=760){try{localStorage.setItem('bp-web-page',open==='1'?'routine':'book');}catch(e){}}const r=new URLSearchParams(location.search).get('review');if(!r)return [];try{localStorage.setItem('bp-member-tab','appts');localStorage.setItem('bp-web-page','appts');sessionStorage.setItem('bp-review',r);}catch(e){}history.replaceState(null,'',location.pathname);return window.innerWidth<760?[{k:'appt',id:r}]:[];});const [toast,setToast]=React.useState(null);const [ok,setOk]=React.useState(0);
 React.useEffect(()=>{localStorage.setItem('bp-member-tab',tab);},[tab]);
 const scrollRef=React.useRef(null);
 const api={push:x=>setStack(s=>[...s,x]),pop:()=>setStack(s=>s.slice(0,-1)),reset:()=>setStack([]),setTab:t=>{setStack([]);setTabS(t);if(scrollRef.current)scrollRef.current.scrollTop=0;},

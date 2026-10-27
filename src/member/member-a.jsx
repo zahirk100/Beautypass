@@ -25,9 +25,7 @@ function IncludedTag({s,plan,tid}){if(plan.included.includes(tid))return <Pill t
 function Thumb({src,size=52,r=14}){return <img src={src} alt="" style={{width:size,height:size,borderRadius:r,objectFit:'cover',flexShrink:0,background:BPC.paper2}}/>;}
 
 /* ---------- Onboarding ---------- */
-// Routine → package → checkout. Choosing comes first; the login is made at checkout (e-mail only) and the
-// member signs in with a code from their mail after paying. Signed-in visitors (unpaid, or rejoining) pay
-// through their own account.
+// Typo suggestions for e-mail addresses at checkout
 const MAIL_DOMAINS=['gmail.com','hotmail.com','hotmail.nl','outlook.com','outlook.nl','live.nl','live.com','icloud.com','me.com','yahoo.com','ziggo.nl','kpnmail.nl','planet.nl','xs4all.nl','home.nl','upcmail.nl','telfort.nl','protonmail.com'];
 function editDist(a,b){const d=Array.from({length:a.length+1},(_,i)=>[i]);for(let j=1;j<=b.length;j++)d[0][j]=j;for(let i=1;i<=a.length;i++)for(let j=1;j<=b.length;j++)d[i][j]=Math.min(d[i-1][j]+1,d[i][j-1]+1,d[i-1][j-1]+(a[i-1]===b[j-1]?0:1));return d[a.length][b.length];}
 // "jan@gmial.com" → "jan@gmail.com"
@@ -39,103 +37,99 @@ function TrustRow(){return <div style={{display:'flex',justifyContent:'center',g
 function visitEstimate(s,tids){const items=tids.map(BP.tr).filter(t=>t.cat).sort((a,b)=>b.dur-a.dur);const ok=(a,b)=>a&&b&&a!==b&&a!=='body'&&b!=='body'&&!([a,b].includes('face')&&[a,b].includes('head'));const waves=[];
 for(const t of items){const w=s.settings.parallelOn!==false&&waves.find(w=>w.length<3&&w.every(x=>ok(x.zone,t.zone)));if(w)w.push(t);else waves.push([t]);}
 return {minutes:waves.reduce((n,w)=>n+Math.max(...w.map(t=>t.dur)),0),together:waves.filter(w=>w.length>1).map(w=>w.map(t=>t.name))};}
+// Onboarding: welcome → membership → checkout, then (paid) plan the first moment. Every screen has one decision:
+// choosing treatments happens after paying, as a reward instead of a hurdle. Signed-in visitors (unpaid, or
+// rejoining) pay through their own account.
 function Onboarding({onDone,onLogin,initStep}){const s=useBP();const signedIn=!!s.session;const wide=React.useContext(ScreenWide);const draft=React.useMemo(()=>{try{return JSON.parse(sessionStorage.getItem('bp-onb')||'{}');}catch(e){return {};}},[]);
-const me0=s.members.find(x=>x.id===s.me);
-const [step,setStep]=React.useState(()=>{const st=initStep!=null?initStep:Math.min(draft.step||0,3);return wide?Math.max(1,st):st;});
-const [counts,setCounts]=React.useState(()=>draft.counts&&Object.keys(draft.counts).length?Object.fromEntries(Object.keys(draft.counts).map(t=>[t,1])):Object.fromEntries(((me0&&me0.routine)||[]).map(t=>[t,1])));
+const me0=s.members.find(x=>x.id===s.me);const invited=new URLSearchParams(location.search).get('email');
+const [step,setStep]=React.useState(()=>initStep!=null?initStep:Math.min(draft.step||0,2));
 const [planId,setPlanId]=React.useState(()=>draft.plan||(me0&&me0.plan)||null);
-const [f,setF]=React.useState({name:draft.name||(me0&&me0.name)||(s.profile&&s.profile.name)||'',email:(s.session&&s.session.user.email)||draft.email||new URLSearchParams(location.search).get('email')||'',phone:draft.phone||(me0&&me0.phone)||'',hp:''});
-const [payM,setPayM]=React.useState(draft.method||'iDEAL');const [tried,setTried]=React.useState(false);const [busy,setBusy]=React.useState(false);const [err,setErr]=React.useState('');const [bump,setBump]=React.useState(0);
-React.useEffect(()=>{try{sessionStorage.setItem('bp-onb',JSON.stringify({step:Math.min(step,3),counts,plan:planId,name:f.name,email:f.email,phone:f.phone,method:payM}));}catch(e){}},[step,counts,planId,f.name,f.email,f.phone,payM]);
-// Plans by number per month; the middle one is the one most people pick
-const plansA=s.plans.filter(p=>p.active).sort((a,b)=>a.perMonth-b.perMonth||a.price-b.price);const popular=plansA[Math.floor((plansA.length-1)/2)];
-const chosen=plansA.find(p=>p.id===planId)||popular;const [openCat,setOpenCat]=React.useState(null);
-// Ready-made routines (Beheer → Routine-ideeën): only treatments that exist and can be booked on their own
-const presets=(s.settings.routinePresets||[]).map(pr=>({...pr,treatments:(pr.treatments||[]).filter(id=>s.treatments.some(t=>t.id===id&&t.active!==false&&t.room==='solo'))})).filter(pr=>pr.name&&pr.treatments.length);
-// What a plan holds: its categories, what only this plan (and bigger) has, price per treatment and what you save
-const planInfo=p=>{const inc=s.treatments.filter(t=>t.active!==false&&p.included.includes(t.id));const cats=s.categories.filter(c=>inc.some(t=>t.cat===c.id));
-const smaller=plansA.filter(q=>q.perMonth<p.perMonth);const extra=smaller.length?inc.filter(t=>t.room==='solo'&&!smaller.some(q=>q.included.includes(t.id))):[];
-const solo=inc.filter(t=>t.room==='solo');const avg=solo.length?Math.round(solo.reduce((n,t)=>n+t.price,0)/solo.length):0;return {cats,extra,avg,save:Math.round(avg*p.perMonth-p.price)};};
-const pick=Object.keys(counts).filter(t=>counts[t]>0&&BP.tr(t).cat&&(!chosen||chosen.included.includes(t))).slice(0,chosen?chosen.perMonth:99);const total=pick.reduce((n,t)=>n+counts[t],0);const los=pick.reduce((n,t)=>n+BP.tr(t).price*counts[t],0);
-const setN=(t,n)=>{setCounts(c=>{const x={...c};if(n<=0)delete x[t];else x[t]=Math.min(4,n);return x;});setBump(k=>k+1);};
-
+const [f,setF]=React.useState({name:draft.name||(me0&&me0.name)||(s.profile&&s.profile.name)||'',email:(s.session&&s.session.user.email)||invited||draft.email||'',hp:''});
+const [tried,setTried]=React.useState(false);const [busy,setBusy]=React.useState(false);const [err,setErr]=React.useState('');
+React.useEffect(()=>{try{sessionStorage.setItem('bp-onb',JSON.stringify({step:Math.min(step,2),plan:planId,name:f.name,email:f.email}));}catch(e){}},[step,planId,f.name,f.email]);
+React.useEffect(()=>{BP.track(['welcome','plan','checkout'][step]);},[step]);
+// Plans by number per month; the middle one is the one we recommend
+const plansA=s.plans.filter(p=>p.active).sort((a,b)=>a.perMonth-b.perMonth||a.price-b.price);const rec=plansA[Math.floor((plansA.length-1)/2)];
+const chosen=plansA.find(p=>p.id===planId)||rec;
 const needTerms=!!(s.settings.termsUrl&&s.settings.privacyUrl);const [terms,setTerms]=React.useState(false);
 const errs={name:f.name.trim().length<2&&'Vul je naam in',email:!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(f.email.trim())&&'Vul een geldig e-mailadres in'};const sug=!signedIn&&mailSuggestion(f.email);
-const finish=()=>{try{sessionStorage.removeItem('bp-onb');}catch(e){}onDone();};
-const prog=<div style={{display:'flex',gap:4,marginBottom:22}}>{[1,2,3].map(i=><div key={i} style={{flex:1,height:2,borderRadius:1,background:i<=step?BPC.ink:BPC.line2,transition:'background .3s'}}></div>)}</div>;
-// Checkout: signed in → own account; otherwise the account is made with the payment
+const prog=<div style={{display:'flex',alignItems:'center',gap:10,marginBottom:22}}><div style={{flex:1,display:'flex',gap:4}}>{[1,2].map(i=><div key={i} style={{flex:1,height:2,borderRadius:1,background:i<=step?BPC.ink:BPC.line2,transition:'background .3s'}}></div>)}</div><span style={{fontSize:11.5,color:BPC.ink3,fontWeight:600}}>Stap {step} van 2</span></div>;
+// Checkout: signed in → own account; otherwise the account is made with the payment. The payment method is chosen at Mollie.
 const pay=async()=>{setTried(true);setErr('');if(errs.name||errs.email)return;if(needTerms&&!terms){setErr('Ga eerst akkoord met de voorwaarden en het privacybeleid');return;}setBusy(true);
-try{let r;if(signedIn){await BP.act.onboard({name:f.name.trim(),phone:f.phone,routine:pick,plan:chosen.id});if(needTerms)await BP.act.acceptTerms();r=await BP.act.startMembership(chosen.id,payM);}
-else r=await BP.act.checkout({name:f.name.trim(),email:f.email.trim(),phone:f.phone.trim(),plan:chosen.id,routine:pick,method:payM,terms:needTerms?terms:undefined,website:f.hp});
+try{let r;if(signedIn){await BP.act.onboard({name:f.name.trim(),phone:(me0&&me0.phone)||'',routine:(me0&&me0.routine)||[],plan:chosen.id});if(needTerms)await BP.act.acceptTerms();r=await BP.act.startMembership(chosen.id);}
+else r=await BP.act.checkout({name:f.name.trim(),email:f.email.trim(),plan:chosen.id,routine:[],terms:needTerms?terms:undefined,website:f.hp});
 window.location.href=r.checkoutUrl;}catch(e){setBusy(false);setErr(e.message);}};
-const me=s.members.find(x=>x.id===s.me);
+const Bullet=({icon,children,dark})=><div style={{display:'flex',gap:12,alignItems:'flex-start',fontSize:14.5,lineHeight:1.45}}><div style={{width:30,height:30,borderRadius:15,flexShrink:0,display:'flex',alignItems:'center',justifyContent:'center',background:dark?'rgba(255,255,255,.16)':BPC.paper2}}><Ico n={icon} s={15} c={dark?'#fff':BPC.ink}/></div><div style={{paddingTop:4}}>{children}</div></div>;
+const welcome={eyebrow:invited?'First access · Amsterdam':'Amsterdam · Members',title:invited?'Je plek staat':'Your beauty.',it:invited?'klaar.':'Your way.',
+  bullets:[['spark','Elke maand je vaste behandelingen: nagels, wimpers, haar, huid'],['clock','Alles op één dag: specialisten werken tegelijk aan je'],['check','Maandelijks opzegbaar, pauzeren kan']]};
 
-if(step===0)return <div style={{position:'absolute',inset:0,background:BPC.ink,animation:'bpFade .4s'}}>
+// ── Welcome: the feeling of the invitation, three reasons, one button ──
+if(step===0&&!wide)return <div style={{position:'absolute',inset:0,background:BPC.ink,animation:'bpFade .4s'}}>
 <img src="/assets/cover-v3.webp" alt="" style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover'}}/>
-<div style={{position:'absolute',inset:0,background:'linear-gradient(180deg,rgba(20,16,12,.15) 0%,rgba(20,16,12,0) 35%,rgba(20,16,12,.78) 78%)'}}></div>
+<div style={{position:'absolute',inset:0,background:'linear-gradient(180deg,rgba(20,16,12,.2) 0%,rgba(20,16,12,0) 28%,rgba(20,16,12,.82) 64%)'}}></div>
 <img src={WORDMARK} alt="BeautyPass" style={{position:'absolute',top:72,left:'50%',transform:'translateX(-50%)',height:20,filter:'invert(1)'}}/>
-<div style={{position:'absolute',left:24,right:24,bottom:44,color:'#fff'}}><Eyebrow style={{color:'rgba(255,255,255,.75)',marginBottom:12}}>Amsterdam · Members</Eyebrow>
-<Serif size={52} it="Your way." style={{color:'#fff'}}>Your beauty.</Serif><div style={{fontSize:15,lineHeight:1.5,opacity:.88,margin:'14px 0 26px'}}>Elke maand je vaste beauty-momenten, alles op één dag als je wilt. Kies hoe vaak, wij regelen de rest.</div>
-<Btn kind="ghost" style={{background:'#fff',border:'none'}} onClick={()=>setStep(1)}>Bekijk de memberships</Btn><div onClick={onLogin} style={{textAlign:'center',fontSize:14,marginTop:16,opacity:.85,cursor:'pointer'}}>Al member? <b>Inloggen</b></div></div></div>;
+<div style={{position:'absolute',left:24,right:24,bottom:40,color:'#fff'}}><Eyebrow style={{color:'rgba(255,255,255,.78)',marginBottom:12}}>{welcome.eyebrow}</Eyebrow>
+<Serif size={48} it={welcome.it} style={{color:'#fff'}}>{welcome.title}</Serif>
+<div style={{display:'grid',gap:12,margin:'20px 0 26px'}}>{welcome.bullets.map(([i,t])=><Bullet key={t} icon={i} dark>{t}</Bullet>)}</div>
+<Btn kind="ghost" style={{background:'#fff',border:'none'}} onClick={()=>setStep(1)}>Kies je membership</Btn><div onClick={onLogin} style={{textAlign:'center',fontSize:14,marginTop:16,opacity:.85,cursor:'pointer'}}>Al member? <b>Inloggen</b></div></div></div>;
+if(step===0)return <Screen title="" footer={<Btn onClick={()=>setStep(1)}>Kies je membership</Btn>}><div style={{paddingTop:'6vh'}}><Eyebrow style={{marginBottom:14}}>{welcome.eyebrow}</Eyebrow><Serif size={54} it={welcome.it}>{welcome.title}</Serif>
+<div style={{fontSize:15.5,color:BPC.ink2,lineHeight:1.55,margin:'16px 0 28px'}}>{invited?'Je stond op de First access-lijst. Word nu als een van de eersten member van BeautyPass house Amsterdam.':'Je favoriete behandelingen, elke maand, in één membership.'}</div>
+<div style={{display:'grid',gap:16}}>{welcome.bullets.map(([i,t])=><Bullet key={t} icon={i}>{t}</Bullet>)}</div></div></Screen>;
 
-if(step===1&&chosen)return <Screen onBack={wide?null:()=>setStep(0)} title="Membership" footer={<><TrustRow/><Btn onClick={()=>{setPlanId(chosen.id);setCounts(Object.fromEntries(pick.map(t=>[t,1])));setStep(2);}}>Kies {chosen.name} · {BP.eur(chosen.price)}/mnd</Btn></>}>{prog}
-<Serif size={36} it="trakteren?">Hoe vaak wil je jezelf</Serif><div style={{fontSize:14,color:BPC.ink2,margin:'10px 0 20px',lineHeight:1.5}}>Een vast aantal behandelingen per maand. Welke, kies je elke maand zelf.</div>
-{(()=>{const info=planInfo(chosen);return <>
-<div style={{display:'grid',gridTemplateColumns:`repeat(${plansA.length},minmax(0,1fr))`,gap:8,marginTop:6}}>{plansA.map(p=>{const sel=chosen.id===p.id,pop=popular&&p.id===popular.id;return <div key={p.id} onClick={()=>setPlanId(p.id)} role="button" aria-pressed={sel} style={{position:'relative',borderRadius:20,padding:'18px 6px 14px',textAlign:'center',cursor:'pointer',background:sel?BPC.esp:BPC.card,color:sel?'#fff':BPC.ink,border:`1.5px solid ${sel?BPC.esp:BPC.line}`,transition:'background .2s, color .2s',boxShadow:sel?'0 12px 28px rgba(60,40,25,.22)':'none'}}>
-{pop&&<div style={{position:'absolute',top:-10,left:0,right:0,display:'flex',justifyContent:'center'}}><Pill style={{background:BPC.gold,color:'#fff',fontSize:10}}>Meest gekozen</Pill></div>}
+// ── Membership: three tiles side by side, below them what a month with the chosen one looks like ──
+if(step===1&&chosen){const month=monthExample(s,chosen,plansA);const save=planSaving(s,chosen);
+return <Screen onBack={()=>setStep(0)} title="Membership" footer={<><TrustRow/><Btn onClick={()=>{setPlanId(chosen.id);setStep(2);}}>Kies {chosen.name} · {BP.eur(chosen.price)}/mnd</Btn></>}>{prog}
+<Serif size={34} it="trakteren?">Hoe vaak wil je jezelf</Serif><div style={{fontSize:14,color:BPC.ink2,margin:'8px 0 18px'}}>Welke behandelingen, kies je elke maand zelf.</div>
+<div style={{display:'grid',gridTemplateColumns:`repeat(${plansA.length},minmax(0,1fr))`,gap:8}}>{plansA.map(p=>{const sel=chosen.id===p.id,r=rec&&p.id===rec.id;return <div key={p.id} onClick={()=>setPlanId(p.id)} role="button" aria-pressed={sel} style={{position:'relative',borderRadius:20,padding:'18px 6px 14px',textAlign:'center',cursor:'pointer',background:sel?BPC.esp:BPC.card,color:sel?'#fff':BPC.ink,border:`1.5px solid ${sel?BPC.esp:BPC.line}`,transition:'background .2s, color .2s',boxShadow:sel?'0 12px 28px rgba(60,40,25,.22)':'none'}}>
+{r&&<div style={{position:'absolute',top:-10,left:0,right:0,display:'flex',justifyContent:'center'}}><Pill style={{background:BPC.gold,color:'#fff',fontSize:10}}>Aanrader</Pill></div>}
 <div style={{fontFamily:BPC.serif,fontSize:44,fontWeight:600,lineHeight:1}}>{p.perMonth}</div><div style={{fontSize:11.5,opacity:.75,marginTop:2}}>per maand</div>
 <div style={{fontSize:13,fontWeight:700,marginTop:10}}>{p.name}</div><div style={{fontSize:14,marginTop:2}}>{BP.eur(p.price)}</div></div>;})}</div>
-<Card key={chosen.id} style={{marginTop:14,animation:'bpFade .25s'}}><div style={{display:'flex',justifyContent:'space-between',alignItems:'baseline',gap:10}}><Serif size={26}>{chosen.name}</Serif><div style={{fontFamily:BPC.serif,fontSize:24,fontWeight:600}}>{BP.eur(chosen.price)}<span style={{fontFamily:BPC.sans,fontSize:12,fontWeight:500,color:BPC.ink3}}> /mnd</span></div></div>
-<div style={{fontSize:13.5,fontWeight:600,marginTop:6}}>{chosen.perMonth} behandelingen per maand, naar keuze</div>
-<div style={{fontSize:12.5,color:BPC.ink2,marginTop:4}}>{BP.eur(Math.round(chosen.price/chosen.perMonth))} per behandeling{info.avg?` · los gemiddeld ${BP.eur(info.avg)}`:''}</div>
-<div style={{display:'flex',gap:6,marginTop:14,flexWrap:'wrap'}}>{info.cats.map(c=><div key={c.id} style={{display:'flex',alignItems:'center',gap:6,padding:'4px 10px 4px 4px',borderRadius:99,background:BPC.paper2,fontSize:12}}><img src={c.img} alt="" style={{width:22,height:22,borderRadius:11,objectFit:'cover'}}/>{c.name}</div>)}</div>
-{info.extra.length>0&&<div style={{fontSize:12.5,marginTop:10,fontWeight:600}}>+ ook {info.extra.map(t=>t.name).join(', ')}</div>}
-{info.save>0&&<div style={{display:'inline-block',marginTop:12,padding:'6px 10px',borderRadius:10,fontSize:12.5,fontWeight:700,background:BPC.sageSoft,color:BPC.sage}}>Je bespaart ± {BP.eur(info.save)} per maand</div>}</Card></>;})()}</Screen>;
+<div key={chosen.id} style={{marginTop:16,padding:14,borderRadius:18,background:BPC.card,border:`1px solid ${BPC.line}`,animation:'bpFade .25s'}}>
+<div style={{display:'flex',alignItems:'center',gap:12}}><div style={{display:'flex',flexShrink:0}}>{[...new Set(month.map(t=>t.cat))].slice(0,4).map((c,i)=><img key={c} src={BP.cat(c).img} alt="" style={{width:40,height:40,borderRadius:20,objectFit:'cover',border:`2px solid ${BPC.card}`,marginLeft:i?-12:0}}/>)}</div>
+<div style={{flex:1,minWidth:0}}><div style={{fontSize:11,letterSpacing:1.2,textTransform:'uppercase',fontWeight:700,color:BPC.ink3}}>Zo kan jouw maand eruitzien</div><div style={{fontSize:13.5,fontWeight:600,marginTop:3,lineHeight:1.35}}>{month.map(t=>t.name).join(' · ')}</div></div></div>
+<div style={{display:'flex',justifyContent:'space-between',gap:10,flexWrap:'wrap',marginTop:10,paddingTop:10,borderTop:`1px solid ${BPC.line}`,fontSize:12.5}}><span style={{color:BPC.ink2}}>{BP.eur(Math.round(chosen.price/chosen.perMonth))} per behandeling</span>{save>0&&<span style={{color:BPC.sage,fontWeight:700}}>Je bespaart ± {BP.eur(save)} per maand</span>}</div></div></Screen>;}
 
-if(step===2&&chosen){const est=visitEstimate(s,pick);const inPlan=id=>chosen.included.includes(id);
-return <Screen onBack={()=>setStep(1)} title="Jouw routine" footer={<><div key={bump} style={{display:'flex',justifyContent:'space-between',alignItems:'baseline',marginBottom:10,fontSize:13,color:BPC.ink2,animation:bump?'bpPop .35s':'none'}}><span><b style={{color:BPC.ink,fontSize:15}}>{pick.length}</b> van {chosen.perMonth} gekozen</span><span>{chosen.name}</span></div>
-<Btn onClick={()=>setStep(3)}>{pick.length?'Verder':'Sla over, ik kies later'}</Btn></>}>{prog}
-<Serif size={36} it="zin in?">Waar heb je</Serif><div style={{fontSize:14,color:BPC.ink2,margin:'10px 0 18px',lineHeight:1.5}}>Tik aan wat je graag laat doen. Dit wordt je routine: daarmee plan je straks alles in één bezoek. Je kunt het altijd aanpassen.</div>
-{presets.length>0&&<><Eyebrow style={{marginBottom:10}}>Snel kiezen</Eyebrow><div className="bp-scroll" style={{display:'flex',gap:10,overflowX:'auto',margin:wide?'0 0 22px':'0 -20px 22px',padding:wide?'0 0 4px':'0 20px 4px'}}>{presets.map(pr=>{const fits=pr.treatments.every(id=>chosen.included.includes(id))&&pr.treatments.length<=chosen.perMonth;const on=pr.treatments.length===pick.length&&pr.treatments.every(id=>pick.includes(id));const e=visitEstimate(s,pr.treatments);const big=!fits&&plansA.find(q=>pr.treatments.every(id=>q.included.includes(id))&&pr.treatments.length<=q.perMonth);
-return <div key={pr.id} onClick={()=>{if(!fits){setErr(big?`${pr.name} past in ${big.name}`:`${pr.name} past niet in ${chosen.name}`);return;}setErr('');setCounts(Object.fromEntries(pr.treatments.map(t=>[t,1])));setBump(k=>k+1);}} style={{flexShrink:0,width:200,borderRadius:20,overflow:'hidden',cursor:'pointer',background:on?BPC.esp:BPC.card,color:on?'#fff':BPC.ink,border:`1.5px solid ${on?BPC.esp:BPC.line}`,opacity:fits?1:.55,transition:'background .2s, color .2s'}}>
-<div style={{display:'flex',height:64}}>{pr.treatments.slice(0,3).map(id=><img key={id} src={BP.cat(BP.tr(id).cat).img} alt="" style={{flex:1,minWidth:0,objectFit:'cover'}}/>)}</div>
-<div style={{padding:'12px 14px'}}><div style={{display:'flex',alignItems:'center',gap:6,fontSize:14.5,fontWeight:700}}>{!fits&&<Ico n="lock" s={13}/>}{pr.name}</div><div style={{fontSize:12,opacity:.75,marginTop:3,lineHeight:1.35}}>{pr.tagline}</div>
-<div style={{fontSize:11.5,marginTop:8,fontWeight:600,opacity:.85}}>{pr.treatments.length} behandelingen · ± {durText(e.minutes)}{!fits&&big?' · in '+big.name:''}</div></div></div>;})}</div>
-{err&&!openCat&&<div style={{fontSize:12.5,color:BPC.gold,margin:'-12px 0 16px',lineHeight:1.45}}>{err} · <span onClick={()=>{setErr('');setStep(1);}} style={{textDecoration:'underline',cursor:'pointer'}}>bekijk memberships</span></div>}
-<Eyebrow style={{marginBottom:10}}>Of stel zelf samen</Eyebrow></>}
-<div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:10}}>{(()=>{const cats=s.categories.filter(c=>s.treatments.some(t=>t.cat===c.id&&t.active!==false&&t.room==='solo'));const oi=cats.findIndex(c=>c.id===openCat);const after=oi<0?-1:Math.min(cats.length-1,oi%2===0?oi+1:oi);
-return cats.map((c,ci)=>{const list=s.treatments.filter(t=>t.cat===c.id&&t.active!==false&&t.room==='solo');const n=list.filter(t=>counts[t.id]).length;const open=openCat===c.id;
-return <React.Fragment key={c.id}><div onClick={()=>setOpenCat(open?null:c.id)} style={{position:'relative',borderRadius:18,overflow:'hidden',cursor:'pointer',aspectRatio:'4/3',outline:open?`2px solid ${BPC.ink}`:'none',outlineOffset:2}}><img src={c.img} alt="" style={{position:'absolute',inset:0,width:'100%',height:'100%',objectFit:'cover'}}/><div style={{position:'absolute',inset:0,background:'linear-gradient(180deg,rgba(20,16,12,0) 40%,rgba(20,16,12,.7))'}}></div>
-<div style={{position:'absolute',left:12,right:12,bottom:10,color:'#fff',fontSize:13.5,fontWeight:700}}>{c.name}</div>{n>0&&<div style={{position:'absolute',top:8,right:8,minWidth:24,height:24,borderRadius:12,background:'#fff',color:BPC.ink,fontSize:12,fontWeight:700,display:'flex',alignItems:'center',justifyContent:'center'}}>{n}</div>}</div>
-{ci===after&&<Card style={{gridColumn:'1 / -1',animation:'bpIn .25s'}}><div style={{fontSize:13,fontWeight:700,marginBottom:10}}>{BP.cat(openCat).name}</div><div style={{display:'flex',flexWrap:'wrap',gap:8}}>{s.treatments.filter(t=>t.cat===openCat&&t.active!==false&&t.room==='solo').map(t=>{const on=!!counts[t.id],ok=inPlan(t.id),lp=!ok&&lowestPlanFor(s,t.id);
-return <div key={t.id} onClick={()=>!ok?setErr(`${t.name} zit in ${lp?lp.name:'een ander membership'}`):!on&&pick.length>=chosen.perMonth?setErr(`In ${chosen.name} kies je ${chosen.perMonth} behandelingen per maand. Haal er eerst een weg${plansA.some(q=>q.perMonth>chosen.perMonth)?'':'.'}`):(setErr(''),setN(t.id,on?0:1))} style={{padding:'9px 14px',borderRadius:99,fontSize:13,fontWeight:500,cursor:'pointer',border:`1px solid ${on?BPC.ink:BPC.line2}`,background:on?BPC.ink:BPC.card,color:on?'#fff':ok?BPC.ink:BPC.ink3,display:'flex',alignItems:'center',gap:6,transition:'all .15s'}}>{on&&<Ico n="check" s={13} w={2.2}/>}{!ok&&<Ico n="lock" s={12}/>}{t.name}{!ok&&lp&&<span style={{fontSize:11}}>· in {lp.name}</span>}</div>;})}</div>
-{err&&<div style={{fontSize:12.5,color:BPC.gold,marginTop:10,lineHeight:1.45}}>{err}{(/zit in/.test(err)||plansA.some(q=>q.perMonth>chosen.perMonth))&&<> · <span onClick={()=>{setErr('');setStep(1);}} style={{textDecoration:'underline',cursor:'pointer'}}>{/zit in/.test(err)?'bekijk memberships':'of kies een groter membership'}</span></>}</div>}</Card>}</React.Fragment>;});})()}</div>
-{pick.length>0&&<Card style={{marginTop:14,background:BPC.paper2,border:'none'}}><Eyebrow style={{marginBottom:8}}>Jouw routine</Eyebrow><div style={{display:'flex',flexWrap:'wrap',gap:6}}>{pick.map(id=><Pill key={id} tone="ink">{BP.tr(id).name}</Pill>)}</div>
-{pick.length>1&&<div style={{fontSize:13,color:BPC.ink2,marginTop:12,lineHeight:1.45}}>In één bezoek ± <b style={{color:BPC.ink}}>{durText(est.minutes)}</b>{est.together.length>0&&<> in plaats van {durText(pick.reduce((n,id)=>n+BP.tr(id).dur,0))}</>}{est.together.length>0?', omdat meerdere specialisten tegelijk aan je werken.':'.'} Verspreid over de maand plannen kan ook.</div>}</Card>}</Screen>;}
-
-if(step===3&&chosen)return <Screen onBack={()=>setStep(2)} title="Afrekenen" footer={<>{err&&<div style={{fontSize:12.5,color:BPC.bord,marginBottom:10,textAlign:'center',lineHeight:1.4}}>{err}{/al member|Log in/.test(err)&&onLogin&&<> · <span onClick={onLogin} style={{textDecoration:'underline',cursor:'pointer',fontWeight:600}}>Inloggen</span></>}</div>}
-<Btn kind="esp" disabled={busy} onClick={pay} icon="lock">{busy?'Doorsturen naar Mollie…':`Betaal ${BP.eur(chosen.price)} met ${payM}`}</Btn><div style={{fontSize:11.5,color:BPC.ink3,textAlign:'center',marginTop:10,lineHeight:1.4}}>Daarna incasseren we maandelijks automatisch. Maandelijks opzegbaar.</div></>}>{prog}
-<Serif size={36} it="afrekenen.">Bijna klaar,</Serif>
-<Card style={{marginTop:18,display:'flex',alignItems:'center',gap:12}}><div style={{flex:1}}><div style={{fontSize:15,fontWeight:600}}>{chosen.name}</div><div style={{fontSize:12.5,color:BPC.ink2}}>{chosen.perMonth} behandelingen per maand{pick.length?' · '+pick.length+' in je routine':''}</div></div><div style={{textAlign:'right'}}><div style={{fontFamily:BPC.serif,fontSize:24,fontWeight:600}}>{BP.eur(chosen.price)}</div><div onClick={()=>setStep(2)} style={{fontSize:12,color:BPC.ink2,textDecoration:'underline',cursor:'pointer'}}>Wijzig</div></div></Card>
-<Eyebrow style={{margin:'24px 0 10px'}}>Je gegevens</Eyebrow>
-<div style={{display:'grid',gap:14}}><Field label="Volledige naam" value={f.name} onChange={v=>setF({...f,name:v})} error={tried&&errs.name}/>
+// ── Checkout: name, e-mail (already filled in from the invitation) and pay ──
+if(step===2&&chosen)return <Screen onBack={()=>setStep(1)} title="Afrekenen" footer={<>{err&&<div style={{fontSize:12.5,color:BPC.bord,marginBottom:10,textAlign:'center',lineHeight:1.4}}>{err}{/al member|Log in/.test(err)&&onLogin&&<> · <span onClick={onLogin} style={{textDecoration:'underline',cursor:'pointer',fontWeight:600}}>Inloggen</span></>}</div>}
+<Btn kind="esp" disabled={busy} onClick={pay} icon="lock">{busy?'Doorsturen naar Mollie…':`Betaal ${BP.eur(chosen.price)}`}</Btn><div style={{fontSize:11.5,color:BPC.ink3,textAlign:'center',marginTop:10,lineHeight:1.4}}>{s.paymentsMode==='demo'?'Testmodus · er wordt niet echt betaald':'Veilig via Mollie met iDEAL of creditcard'} · daarna maandelijks, opzegbaar</div></>}>{prog}
+<Serif size={34} it="klaar.">Bijna</Serif>
+<Card style={{marginTop:18,display:'flex',alignItems:'center',gap:12}}><div style={{flex:1}}><div style={{fontSize:15,fontWeight:600}}>{chosen.name}</div><div style={{fontSize:12.5,color:BPC.ink2}}>{chosen.perMonth} behandelingen per maand</div></div><div style={{textAlign:'right'}}><div style={{fontFamily:BPC.serif,fontSize:24,fontWeight:600}}>{BP.eur(chosen.price)}</div><div onClick={()=>setStep(1)} style={{fontSize:12,color:BPC.ink2,textDecoration:'underline',cursor:'pointer'}}>Wijzig</div></div></Card>
+<div style={{display:'grid',gap:14,marginTop:22}}><Field label="Je naam" value={f.name} onChange={v=>setF({...f,name:v})} error={tried&&errs.name}/>
 {signedIn?<div><div style={{fontSize:11.5,fontWeight:600,color:BPC.ink2,marginBottom:6}}>E-mailadres</div><div style={{fontSize:15,padding:'2px 0'}}>{f.email}</div></div>
-:<div><Field label="E-mailadres" type="email" value={f.email} onChange={v=>setF({...f,email:v})} error={tried&&errs.email}/>{sug&&<div style={{fontSize:12.5,color:BPC.gold,marginTop:6}}>Bedoel je <span onClick={()=>setF({...f,email:sug})} style={{textDecoration:'underline',cursor:'pointer',fontWeight:600}}>{sug}</span>?</div>}</div>}
-<Field label="Telefoon (optioneel)" type="tel" value={f.phone} onChange={v=>setF({...f,phone:v})}/>
+:<div><Field label="E-mailadres" type="email" value={f.email} onChange={v=>setF({...f,email:v})} error={tried&&errs.email}/>{sug?<div style={{fontSize:12.5,color:BPC.gold,marginTop:6}}>Bedoel je <span onClick={()=>setF({...f,email:sug})} style={{textDecoration:'underline',cursor:'pointer',fontWeight:600}}>{sug}</span>?</div>:<div style={{fontSize:12,color:BPC.ink3,marginTop:6}}>Hiermee log je straks in, met een code per mail.</div>}</div>}
 <input tabIndex={-1} autoComplete="off" aria-hidden="true" value={f.hp} onChange={e=>setF({...f,hp:e.target.value})} name="website" style={{position:'absolute',left:-9999,width:1,height:1,opacity:0}}/></div>
-{!signedIn&&<div style={{display:'flex',gap:10,marginTop:14,padding:12,borderRadius:14,background:BPC.paper2,fontSize:12.5,color:BPC.ink2,lineHeight:1.45}}><Ico n="mail" s={17}/><span>We maken je account automatisch aan met dit e-mailadres. Na het betalen log je in met een code uit je mail, zonder wachtwoord.</span></div>}
-<Eyebrow style={{margin:'24px 0 10px'}}>Betaalmethode</Eyebrow>
-<div style={{display:'grid',gap:8}}>{[['iDEAL','Eerste maand nu, daarna automatische incasso'],['Creditcard','Visa, Mastercard, Amex']].map(([m,d])=>{const on=payM===m;return <Card key={m} onClick={()=>setPayM(m)} style={{display:'flex',alignItems:'center',gap:12,padding:14,cursor:'pointer',borderColor:on?BPC.ink:BPC.line}}><div style={{width:20,height:20,borderRadius:10,border:on?`6px solid ${BPC.ink}`:`1.5px solid ${BPC.line2}`,boxSizing:'border-box'}}></div><div style={{flex:1}}><div style={{fontSize:14,fontWeight:600}}>{m}</div><div style={{fontSize:12,color:BPC.ink3}}>{d}</div></div></Card>;})}</div>
 {needTerms&&<label style={{display:'flex',gap:10,alignItems:'flex-start',marginTop:20,fontSize:13,lineHeight:1.45,color:BPC.ink2,cursor:'pointer'}}><input type="checkbox" checked={terms} onChange={e=>{setTerms(e.target.checked);setErr('');}} style={{width:20,height:20,marginTop:1,accentColor:BPC.ink,flexShrink:0}}/><span>Ik ga akkoord met de <a href={s.settings.termsUrl} target="_blank" rel="noopener" style={{color:BPC.ink,fontWeight:600}}>algemene voorwaarden</a> en het <a href={s.settings.privacyUrl} target="_blank" rel="noopener" style={{color:BPC.ink,fontWeight:600}}>privacybeleid</a>, en met de maandelijkse automatische incasso.</span></label>}
-<div style={{display:'flex',alignItems:'center',gap:8,justifyContent:'center',marginTop:20,fontSize:12,color:BPC.ink3}}><Ico n="lock" s={14}/>{s.paymentsMode==='demo'?'Testmodus · er wordt niet echt betaald':'Veilig betalen via Mollie'}</div></Screen>;
+<div style={{marginTop:22}}><TrustRow/></div></Screen>;
 
-if(step<5)return <Screen onBack={()=>setStep(1)} title="Jouw pakket"><div style={{fontSize:14,color:BPC.ink2,marginTop:20}}>Kies eerst je behandelingen.</div><div style={{height:16}}></div><Btn onClick={()=>setStep(1)}>Naar je routine</Btn></Screen>;
-const pl=BP.plan(me?me.plan:(chosen||{}).id);
-return <div style={{position:'absolute',inset:0,background:BPC.paper,display:'flex',flexDirection:'column',justifyContent:'center',padding:wide?'0 max(28px, calc(50% - 220px))':'0 28px',animation:'bpFade .4s',textAlign:'center'}}>
-<div style={{width:76,height:76,borderRadius:38,background:BPC.sageSoft,display:'flex',alignItems:'center',justifyContent:'center',margin:'0 auto 26px'}}><Ico n="check" s={34} c={BPC.sage} w={2}/></div>
-<Eyebrow style={{marginBottom:12}}>Welkom bij BeautyPass</Eyebrow><Serif size={42} it="you're in.">{((me&&me.name)||f.name).split(' ')[0]},</Serif>
-<div style={{fontSize:14.5,color:BPC.ink2,lineHeight:1.55,margin:'16px 0 32px'}}>Je {pl.name}-membership is actief. Je hebt deze maand {pl.perMonth} behandelingen tegoed.</div>
-<Btn onClick={finish} icon="arrow">Plan je eerste behandeling</Btn></div>;}
+if(step<5)return <Screen onBack={()=>setStep(1)} title="Membership"><div style={{fontSize:14,color:BPC.ink2,marginTop:20}}>Kies eerst je membership.</div><div style={{height:16}}></div><Btn onClick={()=>setStep(1)}>Naar de memberships</Btn></Screen>;
+return <FirstMoment onDone={onDone}/>;}
+
+// After paying: the welcome, and straight on to the first visit (the end people remember)
+function FirstMoment({onDone}){const s=useBP();const wide=React.useContext(ScreenWide);const me=BP.mem(s.me),plan=BP.plan(me.plan);const [busy,setBusy]=React.useState(false);
+React.useEffect(()=>{BP.track('paid');try{sessionStorage.removeItem('bp-onb');}catch(e){}},[]);
+const presets=(s.settings.routinePresets||[]).map(pr=>({...pr,treatments:(pr.treatments||[]).filter(id=>s.treatments.some(t=>t.id===id&&t.active!==false&&t.room==='solo'))}))
+  .filter(pr=>pr.name&&pr.treatments.length&&pr.treatments.length<=plan.perMonth&&pr.treatments.every(id=>plan.included.includes(id)));
+const go=async(tids)=>{setBusy(true);try{if(tids)await BP.act.setRoutine(tids);localStorage.setItem('bp-open-planner',tids?'1':'book');}catch(e){}onDone();};
+return <div style={{position:'absolute',inset:0,background:BPC.paper,overflowY:'auto',animation:'bpFade .4s'}} className="bp-scroll"><div style={{maxWidth:520,margin:'0 auto',padding:wide?'56px 32px 40px':'70px 24px 40px'}}>
+<div style={{width:64,height:64,borderRadius:32,background:BPC.sageSoft,display:'flex',alignItems:'center',justifyContent:'center',marginBottom:20}}><Ico n="check" s={30} c={BPC.sage} w={2}/></div>
+<Eyebrow style={{marginBottom:10}}>Welkom bij BeautyPass</Eyebrow><Serif size={42} it="you're in.">{(me.name||'').split(' ')[0]||'Welkom'},</Serif>
+<div style={{fontSize:14.5,color:BPC.ink2,lineHeight:1.55,margin:'14px 0 28px'}}>Je {plan.name}-membership is actief: {plan.perMonth} behandelingen per maand. Plan meteen je eerste moment.</div>
+{s.settings.visitsReady&&presets.length>0?<><Eyebrow style={{marginBottom:10}}>Plan je eerste moment</Eyebrow><div style={{display:'grid',gap:10}}>{presets.map(pr=>{const e=visitEstimate(s,pr.treatments);return <div key={pr.id} onClick={()=>!busy&&go(pr.treatments)} style={{display:'flex',gap:12,alignItems:'center',padding:10,borderRadius:20,background:BPC.card,border:`1px solid ${BPC.line}`,cursor:'pointer'}}>
+<div style={{display:'flex',width:84,height:64,borderRadius:14,overflow:'hidden',flexShrink:0}}>{pr.treatments.slice(0,2).map(id=><img key={id} src={BP.cat(BP.tr(id).cat).img} alt="" style={{flex:1,minWidth:0,objectFit:'cover'}}/>)}</div>
+<div style={{flex:1,minWidth:0}}><div style={{fontSize:15,fontWeight:700}}>{pr.name}</div><div style={{fontSize:12.5,color:BPC.ink2,marginTop:2}}>{pr.treatments.map(id=>BP.tr(id).name).join(' · ')}</div><div style={{fontSize:12,color:BPC.ink3,marginTop:3}}>± {durText(e.minutes)}{e.together.length?' · deels tegelijk':''}</div></div><Ico n="chev" s={16} c={BPC.ink3}/></div>;})}</div>
+<div style={{display:'grid',gap:10,marginTop:16}}><Btn kind="ghost" disabled={busy} onClick={()=>go(null)}>Zelf een behandeling kiezen</Btn><div onClick={()=>{try{localStorage.removeItem('bp-open-planner');}catch(e){}onDone();}} style={{textAlign:'center',fontSize:13.5,color:BPC.ink2,cursor:'pointer'}}>Later plannen</div></div></>
+:<Btn onClick={()=>go(null)} icon="arrow">Plan je eerste behandeling</Btn>}</div></div>;}
+
+// What a month with this plan can look like: a ready-made routine that fits, filled up with other categories
+function monthExample(s,plan,plans){const ok=t=>t&&t.active!==false&&t.room==='solo'&&plan.included.includes(t.id);
+const pre=(s.settings.routinePresets||[]).map(p=>(p.treatments||[]).map(BP.tr).filter(ok)).filter(l=>l.length&&l.length<=plan.perMonth).sort((a,b)=>b.length-a.length)[0]||[];
+const n=Math.min(plan.perMonth,6),pool=s.treatments.filter(ok),out=pre.slice(0,n);
+for(const c of s.categories){if(out.length>=n)break;if(out.some(x=>x.cat===c.id))continue;const t=pool.find(x=>x.cat===c.id);if(t)out.push(t);}   // one per category first
+for(const t of pool){if(out.length>=n)break;if(!out.includes(t))out.push(t);}
+return out;}
+const planSaving=(s,p)=>{const solo=s.treatments.filter(t=>t.active!==false&&t.room==='solo'&&p.included.includes(t.id));const avg=solo.length?solo.reduce((n,t)=>n+t.price,0)/solo.length:0;return Math.round(avg*p.perMonth-p.price);};
+
+
 
 /* ---------- Home ---------- */
 // Nothing free on a day: ask for an e-mail as soon as a time comes free for this treatment
@@ -273,4 +267,4 @@ const total=r.reduce((n,id)=>n+BP.tr(id).dur,0);
 return <div onClick={onClick} style={{display:'flex',alignItems:'center',gap:14,padding:wide?'18px 20px':16,borderRadius:22,background:BPC.esp,color:'#fff',cursor:'pointer'}}><div style={{width:44,height:44,borderRadius:22,background:'rgba(255,255,255,.14)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0}}><Ico n="spark" s={20} c="#fff"/></div>
 <div style={{flex:1,minWidth:0}}><div style={{fontSize:15.5,fontWeight:700}}>Plan je routine</div><div style={{fontSize:12.5,opacity:.8,marginTop:2}}>{r.length} {r.length===1?'behandeling':'behandelingen'} in één bezoek{r.length>1?' · vaak sneller dan '+durText(total):''}</div></div><Ico n="chev" s={18} c="#fff"/></div>;}
 
-Object.assign(window,{bookBlock,LockTag,TrustRow,visitEstimate,visitable,visitCredits,useVisitSlots,durText,visitPlan,myVisits,VisitTimeline,VisitPicker,VisitCreditNote,VisitTimes,VisitDays,useRoutinePlanner,VisitKids,RoutineCta,mailSuggestion,MembershipNotice,UnpaidPill,payNow,WatchDay,ReviewForm,KidsPicker,useKidsFree,SheetFixed,ScreenWide,MCtx,useM,Btn,Screen,Sheet,Card,Row,Field,IncludedTag,Thumb,lowestPlanFor,Onboarding,Home,MemberCard,ApptCard});
+Object.assign(window,{FirstMoment,monthExample,planSaving,bookBlock,LockTag,TrustRow,visitEstimate,visitable,visitCredits,useVisitSlots,durText,visitPlan,myVisits,VisitTimeline,VisitPicker,VisitCreditNote,VisitTimes,VisitDays,useRoutinePlanner,VisitKids,RoutineCta,mailSuggestion,MembershipNotice,UnpaidPill,payNow,WatchDay,ReviewForm,KidsPicker,useKidsFree,SheetFixed,ScreenWide,MCtx,useM,Btn,Screen,Sheet,Card,Row,Field,IncludedTag,Thumb,lowestPlanFor,Onboarding,Home,MemberCard,ApptCard});

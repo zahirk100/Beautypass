@@ -11,9 +11,10 @@ const mails = async () => (await fetch(L.MOCK + '/mock/mails')).json();
   L.sql('update settings set allow_extras=true');   // this test covers paying for treatments outside the membership
   const email = `e2e.f.${Date.now()}@beautypass-test.nl`;
   const p = await require('./onboard.cjs').onboard(b, { email, name: 'Flow Tester', opts: L.M });
-  await p.getByRole('button', { name: /Plan je eerste behandeling/ }).click();
+  await p.getByText('Later plannen', { exact: true }).click();   // to the member app home
   await p.waitForTimeout(1500);
   console.log('0. boeken (inbegrepen)');
+  await p.getByText('Plannen', { exact: true }).last().click(); await p.waitForTimeout(600);   // no routine yet: book from the list
   await p.getByText('Gellak manicure', { exact: true }).locator('visible=true').first().click();
   await p.waitForTimeout(1200);
   { const free = p.locator('div[style*="cursor: pointer"]', { hasText: /^\d\d:\d\d$/ }); const t = await free.first().innerText(); await free.first().click();

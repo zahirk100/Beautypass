@@ -16,7 +16,7 @@ const O = require('./onboard.cjs');
     await q.getByLabel('Code uit je mail').fill(await L.otp(email, t0)); await q.getByRole('button', { name: 'Inloggen', exact: true }).click();
     await q.waitForURL(/onboarding/); await q.waitForTimeout(1500);
     L.check(await q.getByRole('button', { name: /^Betaal / }).count() === 1, tag + ': /member stuurt naar de betaalstap');
-    L.check(/Signature|Essential|The Edit/.test(await q.locator('body').innerText()) && await q.getByText(/in je routine/).count() === 1, tag + ': membership en routine behouden');
+    L.check(/Signature|Essential|The Edit/.test(await q.locator('body').innerText()) , tag + ': membership behouden');
     if (tag === 'd') L.check(await q.getByText('Uitloggen').count() === 1, 'd: uitloggen zichtbaar i.p.v. inloggen');
     await q.getByRole('button', { name: /^Betaal / }).click();
     await q.waitForURL(/checkout/); await q.click('#paid'); await q.waitForURL(/betaald=1/);
