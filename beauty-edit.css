@@ -127,7 +127,7 @@
 .beauty-edit .edit-scene-smooth .edit-copy::before {
   background: linear-gradient(180deg, transparent, rgb(35 26 20 / 66%) 90px, rgb(35 26 20 / 73%));
 }
-.beauty-edit .edit-scene-smooth {--edit-position: 53% 0%;}
+.beauty-edit .edit-scene-smooth {--edit-position: 53% 18%;}
 
 /* Treatment details are a secondary reading layer, opened on request. */
 html.bp-edit-dialog-open {overflow: hidden;}
