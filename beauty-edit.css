@@ -114,7 +114,7 @@
 }
 .beauty-edit .edit-scene-hair {
   --edit-display: clamp(3.5rem, 4.7vw, 4.5rem);
-  min-height: max(540px, calc(86svh - var(--edit-header-height)));
+  min-height: max(500px, var(--edit-height));
 }
 .beauty-edit .edit-scene-hair .edit-copy {
   width: 49%;
@@ -127,7 +127,7 @@
 .beauty-edit .edit-scene-smooth .edit-copy::before {
   background: linear-gradient(180deg, transparent, rgb(35 26 20 / 66%) 90px, rgb(35 26 20 / 73%));
 }
-.beauty-edit .edit-scene-smooth {--edit-position: 53% 42%;}
+.beauty-edit .edit-scene-smooth {--edit-position: 53% 0%;}
 
 /* Treatment details are a secondary reading layer, opened on request. */
 html.bp-edit-dialog-open {overflow: hidden;}
