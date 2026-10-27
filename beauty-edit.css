@@ -123,7 +123,6 @@
 .beauty-edit .edit-scene-hair .edit-copy::before {display: none;}
 .beauty-edit .edit-scene-skin,
 .beauty-edit .edit-scene-smooth {color: var(--paper);}
-.beauty-edit .edit-scene-skin .edit-copy::before,
 .beauty-edit .edit-scene-smooth .edit-copy::before {
   background: linear-gradient(180deg, transparent, rgb(35 26 20 / 66%) 90px, rgb(35 26 20 / 73%));
 }
@@ -318,4 +317,10 @@ html.bp-edit-dialog-open {overflow: hidden;}
 @media (prefers-reduced-motion: reduce) {
   html:has(.beauty-edit) {scroll-behavior: auto;}
   .edit-progress > span {transition: none;}
+}
+
+/* Window-light skin campaign: keep the face clear and shade only the caption. */
+.beauty-edit .edit-scene-skin {--edit-position: 50% 10%;}
+.beauty-edit .edit-scene-skin .edit-copy::before {
+  background: linear-gradient(180deg, transparent, rgb(35 26 20 / 36%) 90px, rgb(35 26 20 / 48%));
 }
