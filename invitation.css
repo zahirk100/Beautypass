@@ -1,0 +1,97 @@
+/* A real, fluid invitation card, supported by the photographed satin glove.
+   Content sets the paper height, including validation and email confirmation. */
+.bp-invitation-editorial {
+  --invite-ink: #332b25;
+  --invite-muted: #655b51;
+  padding: 88px 24px 0;
+  background: #170b0b;
+  color: var(--invite-ink);
+  scroll-margin-top: 76px;
+}
+.bp-invitation-editorial::before { display: none; }
+.bp-invite-object { width: min(100%, 580px); margin-inline: auto; position: relative; }
+.bp-invite-paper {
+  position: relative;
+  z-index: 1;
+  padding: 42px 56px 74px;
+  background-color: #eee4d5;
+  background-image: url('assets/beautypass-vector-03.svg'), linear-gradient(120deg, #f4ecdf, #e8ddcc);
+  border: 1px solid #e8ddcc;
+  box-shadow: 0 1px 0 #cbbda9, 0 18px 54px #00000030;
+  text-align: center;
+}
+.bp-invite-monogram { display: block; width: auto; height: 30px; margin: 0 auto 20px; opacity: .75; }
+.bp-invite-edition { font-size: 0.625rem; line-height: 1.5; letter-spacing: .19em; color: var(--invite-muted); }
+.bp-invitation-editorial .bp-invite-title {
+  font-size: 4rem;
+  line-height: 1.08;
+  letter-spacing: -.035em;
+  margin-top: 17px;
+  text-wrap: balance;
+}
+.bp-invitation-editorial .bp-invite-intro {
+  max-width: 290px;
+  margin: 16px auto 0;
+  font-size: 0.9375rem;
+  line-height: 1.65;
+  text-wrap: balance;
+  color: var(--invite-muted);
+}
+.bp-invite-response { max-width: 340px; margin: 29px auto 0; }
+.bp-invitation-editorial .bp-signup { width: 100%; margin: 0; text-align: left; }
+.bp-invitation-editorial .bp-signup-row { display: grid; grid-template-columns: minmax(0, 1fr); gap: 18px; }
+.bp-invitation-editorial .bp-email-label > span { font-size: 0.75rem; color: var(--invite-ink); margin: 0 0 6px; line-height: 1.5; }
+.bp-invitation-editorial .bp-email-label input {
+  width: 100%; height: 48px; min-height: 48px;
+  padding: 9px 0; font-size: 1rem; line-height: 1.5;
+  color: var(--invite-ink); border: 0; border-bottom: 1px solid #958878;
+  background: transparent; border-radius: 0; transform: none;
+  box-shadow: none; transition: border-color .15s;
+}
+.bp-invitation-editorial .bp-email-label input::placeholder { color: #807264; opacity: 1; font-size: 1rem; }
+.bp-invitation-editorial .bp-email-label input:focus-visible { outline: 1px solid #655044; outline-offset: 4px; }
+.bp-invitation-editorial .bp-email-label input[aria-invalid=true] { border-bottom-color: #8d3630; }
+.bp-invitation-editorial .bp-submit {
+  width: 100%; min-height: 50px; padding: 13px 17px; gap: 19px;
+  border: 1px solid #33231e; background: #33231e;
+  color: #f8f2e9 !important; font-size: 0.875rem !important;
+  font-weight: 400 !important; line-height: 1.5 !important;
+  text-decoration: none; letter-spacing: .005em;
+}
+.bp-invitation-editorial .bp-submit:hover { background: #4a352c; border-color: #4a352c; }
+.bp-invitation-editorial .bp-submit:focus-visible { outline: 2px solid #655044; outline-offset: 4px; }
+.bp-invite-arrow { width: 21px; height: 16px; flex: 0 0 auto; }
+.bp-invitation-editorial .bp-signup-note { margin: 15px 0 0 !important; color: var(--invite-muted); font-size: 0.75rem; line-height: 1.55; text-align: center; text-wrap: balance; }
+.bp-invitation-editorial .bp-form-status { position: static; margin: 13px 0 0 !important; padding: 0; font-size: 0.8125rem; line-height: 1.55; text-align: left; background: none; }
+.bp-invitation-editorial [hidden] { display: none !important; }
+.bp-invite-confirmation { padding: 21px 0 0; border-top: 1px solid #b5a795; }
+.bp-invite-confirmation h3 { font-size: 2.125rem; line-height: 1.15; letter-spacing: -.02em; }
+.bp-invite-confirmation h3:focus { outline: none; }
+.bp-invitation-editorial .bp-invite-confirmation p { margin-top: 13px; color: var(--invite-muted); font-size: 0.875rem; line-height: 1.65; text-wrap: balance; }
+.bp-invitation-editorial p.bp-invite-mail-hint { font-size: 0.75rem; margin-top: 17px; }
+.bp-invitation-editorial .bp-invite-edit { background: none; border: 0; padding: 12px 5px; min-height: 44px; margin-top: 5px; font-size: 0.8125rem; color: var(--invite-ink); text-decoration: underline; text-underline-offset: 4px; }
+.bp-invite-gesture { position: relative; z-index: 2; width: 80%; height: 320px; margin: -15.8% auto 0; pointer-events: none; overflow: hidden; }
+.bp-invite-gesture img { display: block; width: 100%; height: auto; max-width: none; }
+@media (max-width: 600px) {
+  .bp-invitation-editorial { padding: 54px 24px 0; scroll-margin-top: 66px; }
+  .bp-invite-paper { padding: 32px 24px 58px; }
+  .bp-invite-monogram { height: 26px; margin-bottom: 18px; }
+  .bp-invite-edition { font-size: 0.5625rem; letter-spacing: .16em; }
+  .bp-invitation-editorial .bp-invite-title { font-size: clamp(2.4375rem, 11.8vw, 3.625rem); margin-top: 15px; }
+  .bp-invitation-editorial .bp-invite-intro { max-width: 270px; font-size: 0.875rem; line-height: 1.65; margin-top: 14px; }
+  .bp-invite-response { margin-top: 25px; }
+  .bp-invitation-editorial .bp-signup-row { gap: 17px; }
+  .bp-invitation-editorial .bp-submit { min-height: 49px; }
+  .bp-invitation-editorial .bp-signup-note { margin-top: 14px !important; }
+  .bp-invite-gesture { height: 230px; margin-top: -17.2%; width: 87%; }
+}
+@media (max-width: 359px) {
+  .bp-invitation-editorial { padding-inline: 18px; }
+  .bp-invite-paper { padding-inline: 19px; }
+  .bp-invite-edition { letter-spacing: .12em; }
+  .bp-invitation-editorial .bp-submit { gap: 12px; font-size: 0.8125rem !important; padding-inline: 12px; }
+  .bp-invite-gesture { height: 210px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bp-invitation-editorial input, .bp-invitation-editorial button { transition: none; }
+}

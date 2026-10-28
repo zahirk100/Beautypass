@@ -64,6 +64,11 @@
     const button = form.querySelector('[data-bp-submit]');
     const buttonText = form.querySelector('[data-bp-button-text]');
     const status = form.querySelector('[data-bp-status]');
+    const confirmation = root.querySelector('[data-bp-confirmation]');
+    const confirmationTitle = root.querySelector('[data-bp-confirmation-title]');
+    const confirmationCopy = root.querySelector('[data-bp-confirmation-copy]');
+    const confirmationHint = root.querySelector('[data-bp-confirmation-hint]');
+    const editEmail = root.querySelector('[data-bp-edit-email]');
     const idleText = buttonText.textContent;
     let pending = false;
     let complete = false;
@@ -71,6 +76,47 @@
     const announce = (message, kind) => {
       status.hidden = false; status.textContent = message; status.dataset.kind = kind;
     };
+    function showConfirmation(confirmed) {
+      const title = confirmed ? 'Je staat op de lijst.' : 'Nog één stap.';
+      const copy = confirmed
+        ? 'Je ontvangt je uitnodiging zodra First access opent.'
+        : 'Bevestig je e-mailadres via de link die we je hebben gestuurd.';
+      complete = true;
+      input.readOnly = true;
+      button.disabled = true;
+      if (confirmation && confirmationTitle && confirmationCopy) {
+        confirmationTitle.textContent = title;
+        confirmationCopy.textContent = copy;
+        confirmation.dataset.state = confirmed ? 'confirmed' : 'sent';
+        if (confirmationHint) confirmationHint.hidden = confirmed;
+        if (editEmail) editEmail.hidden = confirmed;
+        status.hidden = true;
+        status.textContent = '';
+        form.hidden = true;
+        confirmation.hidden = false;
+        confirmationTitle.focus({ preventScroll: true });
+      } else {
+        // Older previews have no separate receipt panel.
+        buttonText.textContent = confirmed ? 'Aangemeld' : 'Check je e-mail';
+        announce(title + ' ' + copy, 'success');
+      }
+    }
+    if (editEmail) {
+      editEmail.type = 'button';
+      listen(editEmail, 'click', () => {
+        if (pending) return;
+        complete = false;
+        if (confirmation) confirmation.hidden = true;
+        form.hidden = false;
+        input.readOnly = false;
+        input.removeAttribute('aria-invalid');
+        button.disabled = false;
+        buttonText.textContent = idleText;
+        status.hidden = true;
+        status.textContent = '';
+        input.focus({ preventScroll: true });
+      });
+    }
     listen(input, 'input', () => {
       input.removeAttribute('aria-invalid');
       if (!complete && !pending) { status.hidden = true; status.textContent = ''; }
@@ -88,29 +134,35 @@
         announce('Dit is een ontwerpvoorbeeld. Je e-mailadres is niet verstuurd of opgeslagen.', 'preview');
         return;
       }
-      pending = true; button.disabled = true; form.setAttribute('aria-busy', 'true');
+      pending = true; button.disabled = true; input.readOnly = true;
+      form.setAttribute('aria-busy', 'true');
       buttonText.textContent = 'Even geduld…';
       announce('Je aanvraag wordt verstuurd.', 'pending');
       try {
         const result = await options.submitFirstAccess({ email: input.value });
         // A resolved promise alone is not evidence of a successful signup.
-        if (!result || result.ok !== true) throw new Error('Signup was not confirmed.');
-        complete = true; input.readOnly = true;
-        buttonText.textContent = 'Check je e-mail';
-        announce('Bevestig je aanmelding via de link in je e-mail.', 'success');
+        if (!result || result.ok !== true) throw new Error('Confirmation email was not accepted.');
+        showConfirmation(false);
       } catch (_) {
-        buttonText.textContent = idleText; button.disabled = false;
+        buttonText.textContent = idleText; button.disabled = false; input.readOnly = false;
         announce('Aanmelden is nog niet gelukt. Probeer het opnieuw.', 'error');
       } finally {
         pending = false; form.removeAttribute('aria-busy');
       }
     });
     root.dataset.bpEnhanced = 'true'; sync();
+    if (mode === 'live' && options.confirmed === true) showConfirmation(true);
     return {
       selectTopic(key) { if (tabs.some(t => t.dataset.bpTab === key)) select(key, false); },
       destroy() {
         disposers.forEach(fn => fn()); delete root.dataset.bpEnhanced;
         panels.forEach(panel => { panel.hidden = false; panel.removeAttribute('role'); panel.removeAttribute('tabindex'); panel.setAttribute('aria-labelledby', 'bp-topic-' + panel.dataset.bpPanel); });
+        form.hidden = false;
+        form.removeAttribute('aria-busy');
+        if (confirmation) confirmation.hidden = true;
+        input.readOnly = false;
+        button.disabled = false;
+        buttonText.textContent = idleText;
         button.type = 'button';
       }
     };
@@ -119,6 +171,7 @@
 })(window);
 
 const signupRoot = document.querySelector('[data-bp-sections]');
+if (signupRoot) {
 const signupForm = signupRoot.querySelector('[data-bp-form]');
 const trapLabel = document.createElement('label');
 trapLabel.hidden = true;
@@ -131,6 +184,9 @@ trapLabel.appendChild(trap);
 signupForm.appendChild(trapLabel);
 BeautyPassSections.mount(signupRoot, {
   mode: 'live',
+  // The provider returns here after double opt-in. This query selects a
+  // presentation state only; it never grants access or changes subscription data.
+  confirmed: new URLSearchParams(window.location.search).get('first-access') === 'confirmed',
   async submitFirstAccess({ email }) {
     const response = await fetch('/api/first-access', {
       method: 'POST',
@@ -142,3 +198,4 @@ BeautyPassSections.mount(signupRoot, {
     return response.json();
   }
 });
+}

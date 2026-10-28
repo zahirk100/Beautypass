@@ -59,7 +59,7 @@ export default async function handler(req, res) {
       method: 'POST',
       headers: { 'api-key': key, 'Content-Type': 'application/json', Accept: 'application/json' },
       body: JSON.stringify({ email, includeListIds: [listId], templateId,
-        redirectionUrl: 'https://beautypass.nl/#invitation' }),
+        redirectionUrl: 'https://www.beautypass.nl/?first-access=confirmed#invitation' }),
       signal: AbortSignal.timeout(10000)
     });
     // Never report a successful subscription on a provider failure.
