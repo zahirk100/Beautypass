@@ -71,17 +71,18 @@ categorielabel, beschrijvende uitleg en een kort merkbijschrift.
   om de afgesproken regelverdeling bij tekstvergroting af te dwingen.
 - Voeg geen nieuwe fontfamilie toe om één onderdeel een ander gevoel te geven.
   Werk eerst met rol, grootte, gewicht, afstand, uitlijning en beschikbare breedte.
-- The BeautyPass Experience gebruikt een warm steenkleurig vlak. Desktop houdt
-  een asymmetrische tweekolomscompositie met de belofte links en de ervaring
-  rechts. Mobiel wordt de volledige sectie gecentreerd op één middenas.
-- De experience-titel blijft twee betekenisvolle regels: 33–42 px op mobiel,
-  met alleen de tweede regel cursief. De six-hands-lead is 26 px; de uitleg
-  en kinderzin zijn beide DM Sans 16 px. Geen decoratieve scheiding tussen
-  de ervaringsonderdelen en geen verkleining van de kinderzin tot voetnoot.
-- De experience-uitleg breekt na ‘Your hair styled’. ‘while your hands and feet’
-  en ‘are cared for.’ mogen als groepen doorlopen of naar de volgende regel.
-  De kinderzin breekt na de gedachtestreep en op mobiel ook vóór ‘for stories
-  and play.’. Woordgroepen mogen bij tekstvergroting verder afbreken.
+- The BeautyPass Experience gebruikt één dominante belofte op een warm
+  steenkleurig vlak. Desktop behoudt de asymmetrische tweekolomscompositie;
+  mobiel staan label en titel links, met de toelichting 32 px ingesprongen
+  (20 px op de smalste telefoons). Zo ontstaat een eigen mobiele compositie.
+- De experience-titel houdt twee regels op 34–44 px mobiel, de tweede cursief.
+  Op mobiel zijn six-hands-belofte en uitleg één DM Sans-paragraaf van 16 px;
+  alleen de openingszin heeft gewicht 500. Desktop behoudt de serif-lead.
+- De kinderzin sluit dezelfde tekstkolom af na een subtiele haarlijn: 15 px
+  mobiel, 16 px desktop. Geen extra kop, pictogram of decoratief tekstversje.
+- Alleen de hoofdtitel krijgt vaste zinsregels. De ondersteunende tekst
+  vloeit natuurlijk binnen de beschikbare breedte; geen geforceerde
+  zinsfragmenten of nowrap. De kolom en sectie groeien bij tekstvergroting.
 
 ## Verificatie bij wijzigingen
 

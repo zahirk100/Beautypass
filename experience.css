@@ -1,5 +1,5 @@
-/* A quiet editorial pause between the campaign photographs and invitation.
-   Type roles and font files come from the existing BeautyPass system. */
+/* One display statement with a supporting editorial column.
+   Mobile retains the asymmetry through an inset, naturally flowing column. */
 .bp-experience {
   position: relative;
   padding-block: clamp(88px, 7.5vw, 112px) clamp(96px, 8vw, 120px);
@@ -54,16 +54,18 @@
 
 .bp-experience .bp-experience-copy {
   padding-top: .35rem;
-  max-width: 25rem;
+  max-width: 23rem;
 }
 
 .bp-experience .bp-experience-lead {
+  display: block;
   margin: 0 0 14px;
   font-family: var(--font-editorial);
   font-size: clamp(1.5rem, 2vw, 1.75rem);
   font-weight: 400;
   line-height: 1.25;
   letter-spacing: -.01em;
+  color: #2c2622;
 }
 
 .bp-experience .bp-experience-description,
@@ -74,23 +76,19 @@
   line-height: 1.75;
   letter-spacing: 0;
   color: #625b53;
-  text-wrap: balance;
-}
-
-.bp-experience-description > span,
-.bp-experience-welcome > span {
-  display: block;
-}
-
-/* Keep meaningful phrases together when they fit; enlarged text can reflow. */
-.bp-experience-phrase {
-  display: inline-block;
-  max-width: 100%;
-  vertical-align: top;
+  text-wrap: pretty;
 }
 
 .bp-experience .bp-experience-welcome {
-  margin-top: 28px;
+  margin-top: 26px;
+  padding-top: 22px;
+  border-top: 1px solid #d9d1c7;
+  text-wrap: balance;
+}
+
+.bp-experience-detail {
+  display: block;
+  text-wrap: balance;
 }
 
 @media (min-width: 761px) and (max-width: 1050px) {
@@ -105,50 +103,62 @@
 
 @media (max-width: 760px) {
   .bp-experience {
-    padding-block: 56px;
-    text-align: center;
+    padding-block: 56px 60px;
   }
   .bp-experience .bp-experience-inner {
     width: calc(100% - 48px);
-    max-width: 27rem;
+    max-width: 30rem;
   }
   .bp-experience .bp-experience-kicker {
-    margin-bottom: 22px;
+    margin-bottom: 24px;
     font-size: .625rem;
   }
   .bp-experience .bp-experience-layout {
     grid-template-columns: minmax(0, 1fr);
-    gap: 34px;
+    gap: 30px;
   }
   .bp-experience .bp-experience-title {
-    font-size: clamp(2.0625rem, 10vw, 2.625rem);
+    font-size: clamp(2.125rem, 10.2vw, 2.75rem);
     line-height: 1.1;
     letter-spacing: -.015em;
   }
   .bp-experience .bp-experience-copy {
-    width: 100%;
-    max-width: 22rem;
-    margin-inline: auto;
+    width: calc(100% - 32px);
+    max-width: 23rem;
+    margin-left: auto;
+    margin-right: 0;
     padding-top: 0;
   }
   .bp-experience .bp-experience-lead {
-    font-size: 1.625rem;
-    margin-bottom: 10px;
+    display: inline;
+    margin: 0;
+    font-family: var(--font-service);
+    font-size: inherit;
+    font-weight: 500;
+    line-height: inherit;
+    letter-spacing: inherit;
+    color: #2c2622;
+  }
+  .bp-experience-detail {
+    display: inline;
+    text-wrap: inherit;
   }
   .bp-experience .bp-experience-description,
   .bp-experience .bp-experience-welcome {
-    line-height: 1.7;
+    line-height: 1.65;
   }
   .bp-experience .bp-experience-welcome {
-    margin-top: 28px;
-  }
-  .bp-experience-play {
-    display: block;
+    margin-top: 24px;
+    padding-top: 20px;
+    font-size: .9375rem;
   }
 }
 
 @media (max-width: 359px) {
   .bp-experience .bp-experience-inner {
     width: calc(100% - 40px);
+  }
+  .bp-experience .bp-experience-copy {
+    width: calc(100% - 20px);
   }
 }
