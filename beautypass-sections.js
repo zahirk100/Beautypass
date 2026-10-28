@@ -19,6 +19,9 @@
     const disposers = [];
     const listen = (el, event, fn) => { el.addEventListener(event, fn); disposers.push(() => el.removeEventListener(event, fn)); };
     function sync() {
+      // The campaign now uses a static experience section. Retain tab support
+      // for older previews without coupling signup to the presence of tabs.
+      if (!tablist) return;
       if (media.matches) tablist.setAttribute('role', 'tablist');
       else tablist.removeAttribute('role');
       tabs.forEach(tab => {
