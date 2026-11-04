@@ -1,0 +1,18 @@
+@import url('muse-hero-concept.css');
+
+/* White typography shares one layer above the daylight portrait. */
+html,body{background:#68716d;color:#fcfbf8}
+.wordmark{width:200px;filter:brightness(0) invert(1);opacity:.98}
+input{border-bottom-color:rgba(252,251,248,.7)}
+input::placeholder{opacity:1}
+input:-webkit-autofill{-webkit-text-fill-color:#fcfbf8}
+button{background:#fcfbf8;border-color:#fcfbf8;color:#24211e}
+button:hover{background:#e9e7e1;border-color:#e9e7e1}
+footer{justify-content:flex-start;gap:28px}
+@media(max-width:760px){
+  .wordmark{width:154px}
+  .promise{top:clamp(64px,9.3svh,87px)}
+  .membership{margin-top:8px}
+  footer{justify-content:space-between;gap:12px}
+}
+@media(max-width:360px){.promise{top:60px}}

@@ -1,0 +1,26 @@
+@font-face{font-family:BP;src:url('assets/fonts/font-01.ttf');font-weight:400;font-style:normal;font-display:swap}
+@font-face{font-family:BP;src:url('assets/fonts/font-02.ttf');font-weight:400;font-style:italic;font-display:swap}
+@font-face{font-family:BPFine;src:url('assets/fonts/font-01.otf');font-weight:400;font-display:swap}
+@font-face{font-family:Manrope;src:url('assets/fonts/manrope-medium.woff');font-weight:400;font-display:swap}
+*{box-sizing:border-box}html,body{margin:0;min-width:320px;background:#cecbca}body{font-family:Manrope,Arial,sans-serif;color:#24211e;-webkit-font-smoothing:antialiased}
+.hero{position:relative;isolation:isolate;min-height:620px;height:100svh;overflow:hidden;display:grid;grid-template-rows:auto 1fr auto}
+.visual{position:absolute;inset:0;z-index:-1}.visual img{display:block;width:100%;height:100%;object-fit:cover;object-position:50% 50%}
+header{display:flex;justify-content:center;padding:30px 6vw}.wordmark{width:220px;height:auto}
+main{align-self:center;width:43%;padding-left:6vw;padding-bottom:20px}
+h1{font-family:BP,Georgia,serif;font-weight:400;margin:0;font-synthesis:none}h1 span,h1 em{display:block;white-space:nowrap;font-weight:400}
+h1 span{font-size:clamp(56px,6.1vw,104px);letter-spacing:.02em;line-height:1.04}h1 em{font-size:clamp(50px,5.6vw,96px);letter-spacing:-.015em;line-height:1.06;margin-top:7px}
+.membership{font-family:BPFine,Georgia,serif;font-size:22px;line-height:1.4;margin:24px 0 0}
+.signup{max-width:430px;margin-top:48px}#access-intro{font-size:16px;line-height:1.6;margin:0 0 16px}
+.fields{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:18px;align-items:stretch}label{min-width:0}
+input,button{font:inherit;border-radius:0}input{width:100%;min-height:52px;background:transparent;color:inherit;border:0;border-bottom:1px solid #716b66;padding:12px 0;font-size:16px;outline:none;appearance:none;-webkit-appearance:none;box-shadow:none}input::placeholder{color:inherit;opacity:.85}input:focus{border-bottom-color:currentColor;box-shadow:0 1px 0 currentColor}input:-webkit-autofill{-webkit-text-fill-color:#24211e;background-clip:text;-webkit-background-clip:text}
+button{display:flex;align-items:center;justify-content:center;gap:16px;padding:12px 20px;min-height:52px;border:1px solid #24211e;background:#24211e;color:#faf8f4;font-size:14px;cursor:pointer}button:hover{background:#403b36}button:focus-visible,a:focus-visible{outline:2px solid currentColor;outline-offset:5px}button svg{flex-shrink:0}
+#access-status{font-size:12px;line-height:1.5;margin:12px 0 0}input[aria-invalid=true]{border-bottom-width:2px}footer{display:flex;justify-content:space-between;align-items:center;font-size:11px;padding:14px 6vw 24px}footer p{margin:0}footer span{margin:0 6px}footer a{color:inherit;text-decoration:none;min-height:32px;display:flex;align-items:center}footer a:hover{text-decoration:underline}
+[hidden]{display:none!important}.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap;border:0}
+@media(max-width:1000px) and (min-width:761px){main{padding-left:4vw;width:47%}h1 span{font-size:5.8vw}h1 em{font-size:5.5vw}.signup{max-width:340px}.fields{gap:12px}button{padding-inline:13px;font-size:12px}}
+@media(max-width:760px){
+.hero{min-height:clamp(620px,177.8vw,700px);height:100svh}.visual img{object-position:50% 0%}header{padding:20px 24px 0}.wordmark{width:174px}
+main{display:contents}.promise{position:absolute;left:20px;right:20px;top:clamp(62px,9svh,85px);text-align:center}h1 span{font-size:clamp(39px,11.3vw,48px);line-height:1.02;letter-spacing:.025em}h1 em{font-size:clamp(35px,10.3vw,44px);line-height:1.04;margin-top:3px}.membership{font-size:17px;margin-top:10px;line-height:1.3}
+.signup{position:absolute;left:26px;right:26px;bottom:48px;margin:0 auto;max-width:390px;color:#faf8f4}#access-intro{font-size:13px;text-align:center;margin-bottom:12px;line-height:1.5}.fields{gap:14px}input{min-height:48px;border-bottom-color:#b9b5ae;padding:10px 0}input:-webkit-autofill{-webkit-text-fill-color:#faf8f4}button{min-height:48px;background:#faf8f4;border-color:#faf8f4;color:#24211e;font-size:13px;gap:10px;padding:10px 14px}button:hover{background:#e6e1da}button svg{width:19px}
+footer{position:absolute;bottom:9px;left:26px;right:26px;padding:0;color:#faf8f4;font-size:10px;gap:12px}footer a{min-height:30px}#access-status{background:#171717;padding:6px;margin-top:5px}
+}
+@media(max-width:360px){.promise{top:60px}h1 span{font-size:38px}h1 em{font-size:35px}.membership{font-size:16px;margin-top:8px}.signup{left:22px;right:22px}#access-intro{font-size:11px}.fields{gap:10px}button{padding-inline:11px}footer{left:22px;right:22px}}

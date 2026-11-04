@@ -1,76 +1,23 @@
 <!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#e9e8e6">
-  <meta name="description" content="Your beauty, brought together. In one membership. Join BeautyPass First access. Amsterdam — opening soon.">
-  <title>BeautyPass — First access</title>
-  <link rel="icon" href="assets/beautypass-vector-01.svg" type="image/svg+xml">
-  <link rel="preload" href="assets/first-access-fresh-colour-v1.webp" as="image" media="(max-width: 760px)" fetchpriority="high">
-  <link rel="preload" href="assets/first-access-fresh-colour-v1.webp" as="image" media="(min-width: 761px)" fetchpriority="high">
-  <link rel="preload" href="assets/fonts/font-01.ttf" as="font" type="font/ttf" crossorigin>
-  <link rel="preload" href="assets/fonts/font-02.ttf" as="font" type="font/ttf" crossorigin>
-  <link rel="stylesheet" href="prelaunch-concept.css?v=3">
-  <script src="first-access-screen.js?v=1" defer></script>
-<style>
-:root{--cream:#fff;--gutter:30px}
-html,body{background:#e9e8e6}
-.access-screen{max-width:430px;margin:auto;min-height:100svh}
-.access-shade{display:none}
-.access-image{object-position:50% 0%}
-.access-header{padding:20px 24px 12px}
-.access-wordmark{width:180px;filter:none;opacity:1}
-.access-main{align-items:flex-end;justify-content:center;padding:190px 30px 16px}
-.access-composition{width:100%;max-width:330px;text-align:center}
-h1 span{font-size:42px;line-height:1.04;letter-spacing:.025em}
-h1 em{font-size:37px;line-height:1.06;margin-top:4px}
-.access-membership{font-size:16px;line-height:1.4;margin-top:10px}
-.access-signup{margin:20px auto 0;max-width:310px}
-.access-intro{font-size:12px;line-height:1.5;margin-bottom:12px;color:white}
-.access-fields{grid-template-columns:minmax(0,1fr) auto;gap:12px;text-align:left}
-.access-email input{font-size:16px;min-height:48px;padding:10px 0}
-.access-fields button{font-size:12px;min-height:48px;padding:10px 14px;gap:8px;background:#fff;color:#202020;border-color:#fff}
-.access-fields button svg{width:17px}
-.access-footer{justify-content:center;padding:0 20px 16px;font-size:9px;min-height:34px}
-.access-footer a,.access-edition{display:none}
-@media(max-width:359px){.access-main{padding-inline:24px}h1 span{font-size:36px}h1 em{font-size:32px}.access-fields{gap:10px}.access-fields button{padding-inline:10px}.access-signup{margin-top:16px}}
-</style></head>
-<body>
-  <div class="access-screen">
-    <picture class="access-visual" aria-hidden="true">
-      <source media="(max-width: 760px)" srcset="assets/first-access-fresh-colour-v1.webp">
-      <img class="access-image" src="assets/first-access-fresh-colour-v1.webp" width="941" height="1672" alt="" fetchpriority="high">
-    </picture>
-    <div class="access-shade" aria-hidden="true"></div>
-    <header class="access-header">
-      <img class="access-wordmark" src="assets/beautypass-wordmark-v6-small-ink.svg" width="8349" height="1130" alt="BeautyPass">
-    </header>
-    <main class="access-main">
-      <div class="access-composition">
-        <h1><span>YOUR BEAUTY</span><em>Brought together</em></h1>
-        <p class="access-membership">In one membership</p>
-        <div class="access-signup">
-          <p class="access-intro" id="access-intro">Be first to discover our memberships.</p>
-          <form id="access-form" aria-label="First access" aria-describedby="access-intro" novalidate>
-            <div class="access-fields">
-              <label class="access-email">
-                <span class="visually-hidden">Email address</span>
-                <input name="email" type="email" placeholder="Email address" required maxlength="254" autocomplete="email" inputmode="email" autocapitalize="none" spellcheck="false" aria-describedby="access-status">
-              </label>
-              <button type="submit"><span>Join the list</span><svg width="21" height="16" viewBox="0 0 24 16" fill="none" aria-hidden="true"><path d="M2 8h18M14 2l6 6-6 6" stroke="currentColor" stroke-width="1.2"/></svg></button>
-            </div>
-            <p class="access-status" id="access-status" role="status" aria-live="polite" aria-atomic="true" hidden></p>
-            <noscript><p class="access-status">Please enable JavaScript to join the list.</p></noscript>
-          </form>
-        </div>
-      </div>
-    </main>
-    <footer class="access-footer">
-      <p>Amsterdam <span aria-hidden="true">·</span> Opening soon</p>
-      <span class="access-edition">FIRST ACCESS</span>
-      <a href="mailto:hallo@beautypass.nl">Contact</a>
-    </footer>
-  </div>
-</body>
-</html>
+<html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="description" content="Your beauty, brought together. In one membership. Join BeautyPass First access. Amsterdam — opening soon."><meta name="theme-color" content="#68716d">
+<title>BeautyPass — First access</title>
+<link rel="preload" href="assets/fonts/font-01.ttf" as="font" type="font/ttf" crossorigin>
+<link rel="preload" href="assets/fonts/font-02.ttf" as="font" type="font/ttf" crossorigin>
+<link rel="stylesheet" href="muse-hero-v2.css">
+<script src="first-access-screen.js?v=1" defer></script>
+</head><body>
+<section class="hero" aria-label="BeautyPass First access">
+<picture class="visual" aria-hidden="true"><source media="(max-width:760px)" srcset="assets/muse-hero-mobile-v2.webp"><img src="assets/muse-hero-desktop-v2.webp" width="1672" height="941" alt="" fetchpriority="high"></picture>
+<header><img class="wordmark" src="assets/beautypass-wordmark-v6-small-ink.svg" width="8349" height="1130" alt="BeautyPass"></header>
+<main>
+<div class="promise"><h1><span>YOUR BEAUTY</span><em>Brought together</em></h1><p class="membership">In one membership</p></div>
+<div class="signup"><p id="access-intro">Be first to discover our memberships.</p>
+<form id="access-form" aria-label="First access" aria-describedby="access-intro" novalidate>
+<div class="fields access-fields"><label><span class="sr-only">Email address</span><input type="email" name="email" placeholder="Email address" autocomplete="email" inputmode="email" autocapitalize="none" spellcheck="false" required maxlength="254" aria-describedby="access-status"></label>
+<button type="submit"><span>Join the list</span> <svg width="22" height="16" viewBox="0 0 24 16" fill="none" aria-hidden="true"><path d="M2 8h18M14 2l6 6-6 6" stroke="currentColor" stroke-width="1.2"/></svg></button></div>
+<p id="access-status" role="status" aria-live="polite" hidden></p></form>
+</div></main>
+<footer><p>Amsterdam <span>·</span> Opening soon</p><a href="mailto:hallo@beautypass.nl">Contact</a></footer>
+</section></body></html>
