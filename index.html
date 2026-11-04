@@ -3,22 +3,44 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-  <meta name="theme-color" content="#20130e">
+  <meta name="theme-color" content="#e9e8e6">
   <meta name="description" content="Your beauty, brought together. In one membership. Join BeautyPass First access. Amsterdam — opening soon.">
   <title>BeautyPass — First access</title>
   <link rel="icon" href="assets/beautypass-vector-01.svg" type="image/svg+xml">
-  <link rel="preload" href="assets/first-access-campaign-mobile-v1.webp" as="image" media="(max-width: 760px)" fetchpriority="high">
-  <link rel="preload" href="assets/first-access-campaign-desktop-v1.webp" as="image" media="(min-width: 761px)" fetchpriority="high">
+  <link rel="preload" href="assets/first-access-fresh-colour-v1.webp" as="image" media="(max-width: 760px)" fetchpriority="high">
+  <link rel="preload" href="assets/first-access-fresh-colour-v1.webp" as="image" media="(min-width: 761px)" fetchpriority="high">
   <link rel="preload" href="assets/fonts/font-01.ttf" as="font" type="font/ttf" crossorigin>
   <link rel="preload" href="assets/fonts/font-02.ttf" as="font" type="font/ttf" crossorigin>
   <link rel="stylesheet" href="prelaunch-concept.css?v=3">
   <script src="first-access-screen.js?v=1" defer></script>
-</head>
+<style>
+:root{--cream:#fff;--gutter:30px}
+html,body{background:#e9e8e6}
+.access-screen{max-width:430px;margin:auto;min-height:100svh}
+.access-shade{display:none}
+.access-image{object-position:50% 0%}
+.access-header{padding:20px 24px 12px}
+.access-wordmark{width:180px;filter:none;opacity:1}
+.access-main{align-items:flex-end;justify-content:center;padding:190px 30px 16px}
+.access-composition{width:100%;max-width:330px;text-align:center}
+h1 span{font-size:42px;line-height:1.04;letter-spacing:.025em}
+h1 em{font-size:37px;line-height:1.06;margin-top:4px}
+.access-membership{font-size:16px;line-height:1.4;margin-top:10px}
+.access-signup{margin:20px auto 0;max-width:310px}
+.access-intro{font-size:12px;line-height:1.5;margin-bottom:12px;color:white}
+.access-fields{grid-template-columns:minmax(0,1fr) auto;gap:12px;text-align:left}
+.access-email input{font-size:16px;min-height:48px;padding:10px 0}
+.access-fields button{font-size:12px;min-height:48px;padding:10px 14px;gap:8px;background:#fff;color:#202020;border-color:#fff}
+.access-fields button svg{width:17px}
+.access-footer{justify-content:center;padding:0 20px 16px;font-size:9px;min-height:34px}
+.access-footer a,.access-edition{display:none}
+@media(max-width:359px){.access-main{padding-inline:24px}h1 span{font-size:36px}h1 em{font-size:32px}.access-fields{gap:10px}.access-fields button{padding-inline:10px}.access-signup{margin-top:16px}}
+</style></head>
 <body>
   <div class="access-screen">
     <picture class="access-visual" aria-hidden="true">
-      <source media="(max-width: 760px)" srcset="assets/first-access-campaign-mobile-v1.webp">
-      <img class="access-image" src="assets/first-access-campaign-desktop-v1.webp" width="1586" height="992" alt="" fetchpriority="high">
+      <source media="(max-width: 760px)" srcset="assets/first-access-fresh-colour-v1.webp">
+      <img class="access-image" src="assets/first-access-fresh-colour-v1.webp" width="941" height="1672" alt="" fetchpriority="high">
     </picture>
     <div class="access-shade" aria-hidden="true"></div>
     <header class="access-header">
