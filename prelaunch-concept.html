@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#20130e">
+  <meta name="robots" content="noindex,nofollow">
+  <title>BeautyPass — First access concept</title>
+  <link rel="icon" href="assets/beautypass-vector-01.svg" type="image/svg+xml">
+  <link rel="preload" href="assets/cover-v3.webp" as="image" fetchpriority="high">
+  <link rel="preload" href="assets/fonts/font-01.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="preload" href="assets/fonts/font-02.ttf" as="font" type="font/ttf" crossorigin>
+  <link rel="stylesheet" href="prelaunch-concept.css?v=1">
+  <script src="prelaunch-concept.js?v=1" defer></script>
+</head>
+<body>
+  <div class="access-screen">
+    <img class="access-image" src="assets/cover-v3.webp" width="1672" height="940" alt="" fetchpriority="high">
+    <div class="access-shade" aria-hidden="true"></div>
+    <header class="access-header">
+      <img class="access-wordmark" src="assets/beautypass-wordmark-v6-small-ink.svg" width="8349" height="1130" alt="BeautyPass">
+    </header>
+    <main class="access-main">
+      <div class="access-composition">
+        <h1><span>YOUR BEAUTY</span><em>Brought together</em></h1>
+        <p class="access-membership">In one membership</p>
+        <div class="access-signup">
+          <p class="access-intro" id="access-intro">Be first to discover our memberships.</p>
+          <form id="access-form" aria-label="First access" aria-describedby="access-intro" novalidate>
+            <div class="access-fields">
+              <label class="access-email">
+                <span class="visually-hidden">Email address</span>
+                <input name="email" type="email" placeholder="Email address" required maxlength="254" autocomplete="email" inputmode="email" autocapitalize="none" spellcheck="false" aria-describedby="access-status">
+              </label>
+              <button type="submit"><span>Join the list</span><svg width="21" height="16" viewBox="0 0 24 16" fill="none" aria-hidden="true"><path d="M2 8h18M14 2l6 6-6 6" stroke="currentColor" stroke-width="1.2"/></svg></button>
+            </div>
+            <p class="access-status" id="access-status" role="status" aria-live="polite" aria-atomic="true" hidden></p>
+            <noscript><p class="access-status">Design preview — no details are saved.</p></noscript>
+          </form>
+        </div>
+      </div>
+    </main>
+    <footer class="access-footer">
+      <p>Amsterdam <span aria-hidden="true">·</span> Opening soon</p>
+      <span class="access-edition">FIRST ACCESS</span>
+      <a href="mailto:hallo@beautypass.nl">Contact</a>
+    </footer>
+  </div>
+</body>
+</html>
