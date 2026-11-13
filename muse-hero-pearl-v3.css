@@ -1,0 +1,30 @@
+@import url('muse-hero-concept.css');
+
+/* Contrast follows the photograph; the daylight image stays unfiltered. */
+html,body{background:#fff;color:#242424}
+.wordmark{width:200px;filter:brightness(0);opacity:1}
+.promise{color:#242424}
+input{border-bottom-color:#646464;caret-color:currentColor}
+input::placeholder{opacity:1}
+input:-webkit-autofill{-webkit-text-fill-color:#242424}
+button{background:#242424;border-color:#242424;color:#fcfbf8}
+button:hover{background:#3d3d3d;border-color:#3d3d3d}
+footer{justify-content:flex-start;gap:28px}
+
+@media(max-width:760px){
+  .wordmark{width:154px}
+  .promise{top:clamp(64px,9.3svh,87px)}
+  .membership{margin-top:8px}
+  .signup{color:#fcfbf8}
+  input{border-bottom-color:rgba(252,251,248,.7)}
+  input:-webkit-autofill{-webkit-text-fill-color:#fcfbf8}
+  button{background:#fcfbf8;border-color:#fcfbf8;color:#242424}
+  button:hover{background:#e9e7e1;border-color:#e9e7e1}
+  footer{color:#fcfbf8;justify-content:space-between;gap:12px}
+}
+@media(max-width:360px){.promise{top:60px}}
+/* Keep the lower white text on the garment when the viewport is short. */
+@media(max-width:760px){.hero{min-height:max(620px,177.8vw)}}
+/* At narrow desktop widths, keep both footer links in the light image area. */
+@media(min-width:761px) and (max-width:1000px){footer{align-items:flex-start;flex-direction:column;gap:0}}
+
